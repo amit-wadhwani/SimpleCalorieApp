@@ -33,3 +33,15 @@ To help people eat consciously and track calories without friction — a **trust
 | Noom | Behavioral coaching | Expensive, impersonal |
 
 ### Folder Structure
+App/
+Design/
+Docs/
+Resources/
+Scripts/
+Tests/
+
+### License
+Currently **proprietary** (private repo).  
+License will be added when project is published or open-sourced.
+
+---
