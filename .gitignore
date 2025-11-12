@@ -1,5 +1,18 @@
-.DS_Store
-*.xcuserstate
+# Xcode
 DerivedData/
 build/
-.xcworkspace
+*.xcuserdatad
+*.xcuserdata
+*.xccheckout
+*.moved-aside
+
+# SwiftPM
+.swiftpm/
+Packages/
+Package.resolved
+
+# Logs
+*.log
+
+# macOS
+.DS_Store

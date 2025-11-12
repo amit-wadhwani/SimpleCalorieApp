@@ -1,0 +1,7 @@
+{
+  "foods": [
+    { "id": "00000000-0000-0000-0000-000000000001", "name": "Chicken Breast", "servingGrams": 100, "macros": { "protein": 31, "carbs": 0, "fat": 3.6 }, "kcal": 165 },
+    { "id": "00000000-0000-0000-0000-000000000002", "name": "Brown Rice", "servingGrams": 100, "macros": { "protein": 2.6, "carbs": 24, "fat": 0.9 }, "kcal": 112 }
+  ]
+}
+
