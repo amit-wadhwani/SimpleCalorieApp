@@ -2,11 +2,14 @@ import SwiftUI
 
 struct AddFoodView: View {
     @StateObject var viewModel: AddFoodViewModel
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                TopBarView(title: "Add Food") { /* hook back later */ }
+                TopBarView(title: "Add Food") {
+                    dismiss()
+                }
 
                 SearchBarView(placeholder: "Search database…", text: $viewModel.query)
                     .onChange(of: viewModel.query) { _, _ in
