@@ -4,22 +4,17 @@ struct FloatingAddButton: View {
     var action: () -> Void
 
     var body: some View {
-        HStack {
-            Spacer()
-            Button(action: action) {
-                Image(systemName: "plus")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 56, height: 56)
-                    .background(
-                        Circle()
-                            .fill(AppColor.brandPrimary)
-                    )
-                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 4)
-            }
-            .padding(.trailing, AppSpace.s16)
+        Button(action: action) {
+            Image(systemName: "plus")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 56, height: 56)
+                .background(
+                    Circle()
+                        .fill(AppColor.brandPrimary)
+                        .shadow(color: Color.black.opacity(0.20), radius: 12, x: 0, y: 6)
+                )
         }
-        .padding(.bottom, AppSpace.s16)
     }
 }
 

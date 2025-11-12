@@ -7,29 +7,25 @@ struct MealCard: View {
     var onAddFood: () -> Void = {}
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.sm) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(title)
-                    .font(AppFont.titleSm())
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(AppColor.textTitle)
 
                 Spacer()
 
                 if kcal > 0 {
                     Text("\(kcal) kcal")
-                        .font(AppFont.bodySmSmall())
+                        .font(.system(size: 13, weight: .regular))
                         .foregroundStyle(AppColor.textMuted)
                 }
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(AppColor.textMuted)
             }
 
             ForEach(items, id: \.self) { item in
                 HStack {
                     Text(item)
-                        .font(AppFont.bodySm())
+                        .font(.system(size: 13, weight: .regular))
                         .foregroundStyle(AppColor.textMuted)
                     Spacer()
                     Image(systemName: "chevron.right")
@@ -39,24 +35,32 @@ struct MealCard: View {
             }
 
             Button(action: onAddFood) {
-                HStack(spacing: AppSpace.xs) {
-                    Image(systemName: "plus.circle.fill")
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(AppColor.brandPrimary)
+                        .frame(width: 18, height: 18)
+                        .overlay(
+                            Image(systemName: "plus")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(.white)
+                        )
+
                     Text("Add Food")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AppColor.brandPrimary)
+
+                    Spacer()
                 }
-                .font(AppFont.bodySm())
-                .foregroundStyle(AppColor.brandPrimary)
+                .padding(.top, 8)
             }
             .buttonStyle(.plain)
         }
-        .padding(AppSpace.s16)
+        .padding(.vertical, AppSpace.s16)
+        .padding(.horizontal, AppSpace.s16)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.xl)
+            RoundedRectangle(cornerRadius: 18)
                 .fill(AppColor.bgCard)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.xl)
-                        .stroke(AppColor.borderSubtle, lineWidth: 1)
-                )
-                .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 1)
+                .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
         )
         .padding(.horizontal, AppSpace.s16)
     }

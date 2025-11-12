@@ -11,6 +11,7 @@ struct AddFoodView: View {
             }
 
             SearchBarView(placeholder: "Search database…", text: $viewModel.query)
+                .padding(.top, AppSpace.s16)
                 .onChange(of: viewModel.query) { _, _ in
                     Task { await viewModel.refresh() }
                 }
@@ -25,8 +26,8 @@ struct AddFoodView: View {
                         }
                     }
                 }
-                .padding(.top, AppSpace.s16)
-                .padding(.bottom, AppSpace.s30)
+                .padding(.top, AppSpace.s12)
+                .padding(.bottom, AppSpace.s24)
             }
             .scrollIndicators(.never)
         }

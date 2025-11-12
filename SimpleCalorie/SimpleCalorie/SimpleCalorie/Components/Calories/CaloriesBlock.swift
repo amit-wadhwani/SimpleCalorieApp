@@ -24,14 +24,14 @@ struct CaloriesBlock: View {
     private var remaining: Int { max(goal - consumed, 0) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.sm) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline, spacing: AppSpace.xs) {
                 Text("\(consumed)")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(AppColor.textTitle)
 
                 Text("/ \(goal) kcal")
-                    .font(AppFont.bodySm())
+                    .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(AppColor.textMuted)
             }
 
@@ -41,10 +41,11 @@ struct CaloriesBlock: View {
             )
 
             Text("Calories remaining: \(remaining)")
-                .font(AppFont.bodySmSmall())
+                .font(.system(size: 13, weight: .regular))
                 .foregroundStyle(AppColor.textMuted)
         }
-        .padding(AppSpace.s16)
+        .padding(.vertical, AppSpace.s16)
+        .padding(.horizontal, AppSpace.s16)
         .background(
             RoundedRectangle(cornerRadius: AppRadius.xl)
                 .fill(AppColor.bgCard)

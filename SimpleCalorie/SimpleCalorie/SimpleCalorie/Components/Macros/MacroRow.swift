@@ -12,16 +12,16 @@ struct MacroRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.xs) {
-            HStack {
-                Text(label.uppercased())
-                    .font(AppFont.labelCapsSm())
-                    .foregroundStyle(AppColor.textMuted)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                Text(label)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(AppColor.textTitle)
 
                 Spacer()
 
                 Text("\(value)g / \(goal)g")
-                    .font(AppFont.bodySmSmall())
+                    .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(AppColor.textMuted)
             }
 
@@ -29,14 +29,14 @@ struct MacroRow: View {
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(AppColor.borderSubtle)
-                        .frame(height: 6)
+                        .frame(height: 8)
 
                     Capsule()
                         .fill(color)
-                        .frame(width: max(6, proxy.size.width * progress), height: 6)
+                        .frame(width: max(8, proxy.size.width * progress), height: 8)
                 }
             }
-            .frame(height: 6)
+            .frame(height: 8)
         }
         .padding(.horizontal, AppSpace.s16)
     }

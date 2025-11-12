@@ -2,35 +2,35 @@ import SwiftUI
 
 struct AppHeader: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.sm) {
-            HStack {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("SimpleCalorie")
-                    .font(AppFont.title(17))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(AppColor.textTitle)
 
-                Spacer()
+                Text(formattedDate())
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(AppColor.textMuted)
+            }
 
-                HStack(spacing: AppSpace.s12) {
-                    // Avatar placeholder
-                    Circle()
-                        .fill(AppColor.brandPrimary.opacity(0.12))
-                        .frame(width: 28, height: 28)
-                        .overlay(Text("JD").font(.system(size: 11)).foregroundStyle(AppColor.brandPrimary))
+            Spacer()
 
-                    // Settings icon
+            HStack(spacing: AppSpace.s12) {
+                // Avatar placeholder
+                Circle()
+                    .fill(AppColor.brandPrimary.opacity(0.12))
+                    .frame(width: 28, height: 28)
+                    .overlay(Text("JD").font(.system(size: 11)).foregroundStyle(AppColor.brandPrimary))
+
+                // Settings icon
+                Button(action: { /* settings */ }) {
                     Image(systemName: "gearshape.fill")
-                        .font(.system(size: 16))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(AppColor.textMuted)
                 }
             }
-
-            // Date line
-            Text(formattedDate())
-                .font(AppFont.bodySmSmall())
-                .foregroundStyle(AppColor.textMuted)
         }
         .padding(.horizontal, AppSpace.s16)
-        .padding(.top, AppSpace.s12)
     }
     
     private func formattedDate() -> String {

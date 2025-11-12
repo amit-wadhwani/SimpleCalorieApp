@@ -5,7 +5,7 @@ struct TodayScreen: View {
 
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
+            ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppSpace.s16) {
                         AppHeader()
@@ -13,35 +13,37 @@ struct TodayScreen: View {
                         CaloriesBlock(consumed: 1320, goal: 1800)
 
                         // "MACROS" label
-                        Text("MACROS")
-                            .font(AppFont.labelCapsSm())
-                            .foregroundStyle(AppColor.textMuted)
-                            .padding(.horizontal, AppSpace.s16)
-                            .padding(.top, AppSpace.s12)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("MACROS")
+                                .font(.system(size: 11, weight: .medium))
+                                .tracking(0.5)
+                                .foregroundStyle(AppColor.textMuted)
+                                .padding(.horizontal, AppSpace.s16)
 
-                        VStack(spacing: AppSpace.sm) {
-                            MacroRow(
-                                label: "Protein",
-                                value: 45,
-                                goal: 135,
-                                color: AppColor.macroProtein
-                            )
+                            VStack(alignment: .leading, spacing: 12) {
+                                MacroRow(
+                                    label: "Protein",
+                                    value: 45,
+                                    goal: 135,
+                                    color: AppColor.macroProtein
+                                )
 
-                            MacroRow(
-                                label: "Carbs",
-                                value: 120,
-                                goal: 225,
-                                color: AppColor.macroCarbs
-                            )
+                                MacroRow(
+                                    label: "Carbs",
+                                    value: 120,
+                                    goal: 225,
+                                    color: AppColor.macroCarbs
+                                )
 
-                            MacroRow(
-                                label: "Fat",
-                                value: 28,
-                                goal: 60,
-                                color: AppColor.macroFat
-                            )
+                                MacroRow(
+                                    label: "Fat",
+                                    value: 28,
+                                    goal: 60,
+                                    color: AppColor.macroFat
+                                )
+                            }
                         }
-                        .padding(.bottom, AppSpace.s12)
+                        .padding(.vertical, AppSpace.s16)
 
                         TipCard(text: "If you ate like this every day... You'd lose 1.2 lbs/week")
 
@@ -77,12 +79,16 @@ struct TodayScreen: View {
 
                         Spacer(minLength: AppSpace.s24)
                     }
-                    .padding(.vertical, AppSpace.s16)
+                    .padding(.horizontal, AppSpace.s16)
+                    .padding(.top, AppSpace.s16)
+                    .padding(.bottom, AppSpace.s24)
                 }
 
                 FloatingAddButton {
                     showAddFood = true
                 }
+                .padding(.trailing, AppSpace.s24)
+                .padding(.bottom, AppSpace.s24)
             }
             .navigationDestination(isPresented: $showAddFood) {
                 AddFoodView(viewModel: AddFoodViewModel(service: MockFoodSearchService()))

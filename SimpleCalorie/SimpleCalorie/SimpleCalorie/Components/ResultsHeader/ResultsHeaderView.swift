@@ -5,8 +5,10 @@ struct ResultsHeaderView: View {
 
     var body: some View {
         Text("\(count) RESULTS")
-            .font(AppFont.labelCapsSm())
+            .font(.system(size: 11, weight: .medium))
             .foregroundStyle(AppColor.textMuted)
+            .textCase(.uppercase)
+            .tracking(0.5)
             .padding(.horizontal, AppSpace.s16)
             .padding(.top, AppSpace.s16)
             .frame(maxWidth: .infinity, alignment: .leading)
