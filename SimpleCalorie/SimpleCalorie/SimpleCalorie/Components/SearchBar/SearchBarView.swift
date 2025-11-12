@@ -5,27 +5,28 @@ struct SearchBarView: View {
     @Binding var text: String
 
     var body: some View {
-        HStack(spacing: AppSpace.s12) {
+        HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
+                .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(AppColor.textMuted)
+
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
-                .font(AppFont.bodySm())
+                .font(AppFont.bodySm(13))
                 .foregroundStyle(AppColor.textTitle)
         }
-        .padding(.horizontal, AppSpace.s16)
-        .padding(.vertical, AppSpace.s12)
+        .padding(.horizontal, AppSpace.s12)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.full)
+            RoundedRectangle(cornerRadius: AppRadius.sm)
                 .fill(AppColor.bgCard)
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.full)
+                    RoundedRectangle(cornerRadius: AppRadius.sm)
                         .stroke(AppColor.borderSubtle, lineWidth: 1)
                 )
         )
-        .padding(.horizontal, AppSpace.s16)
-        .padding(.top, AppSpace.s24) // 24–30 from top bar
+        .padding(.top, AppSpace.s12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text("Search"))
     }
