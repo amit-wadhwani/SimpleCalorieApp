@@ -1,113 +1,95 @@
 import SwiftUI
 
 struct TodayScreen: View {
-    @State private var showAddFood = false
-    
-    // Demo data matching Figma
-    @State private var calories = CalorieSummary(consumed: 1320, target: 1800)
-    @State private var macros   = MacroSummary(
-        protein: (45, 135),
-        carbs:   (120, 225),
-        fat:     (28, 60)
-    )
-
-    @State private var meals: [MealType: [FoodEntry]] = [
-        .breakfast: [
-            FoodEntry(name: "Oatmeal with berries", calories: 240),
-            FoodEntry(name: "Black coffee", calories: 5)
-        ],
-        .lunch: [
-            FoodEntry(name: "Grilled chicken salad", calories: 350),
-            FoodEntry(name: "Apple", calories: 80)
-        ],
-        .dinner: [
-            FoodEntry(name: "Greek yogurt", calories: 150)
-        ],
-        .snacks: []
-    ]
+    @State private var showAddFood: Bool = false
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: AppSpace.xl) {
-                    // Header
-                    VStack(alignment: .leading, spacing: AppSpace.md) {
-                        HStack(spacing: AppSpace.sm) {
-                            Text("SimpleCalorie")
-                                .font(AppFont.title())
-                                .foregroundStyle(AppColor.textTitle)
-                            Spacer()
-                            // Profile icon with settings
-                            HStack(spacing: AppSpace.sm) {
-                                Circle()
-                                    .fill(AppColor.brandPrimary.opacity(0.12))
-                                    .frame(width: 28, height: 28)
-                                    .overlay(Text("JD").font(.system(size: 11)).foregroundStyle(AppColor.brandPrimary))
-                                Image(systemName: "gearshape")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(AppColor.textMuted)
-                            }
-                        }
-                        Text(formattedToday())
-                            .font(AppFont.bodySmSmall())
-                            .foregroundStyle(AppColor.textMuted)
+            ZStack(alignment: .bottom) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: AppSpace.s16) {
+                        AppHeader()
 
-                        CalorieBar(summary: calories)
-                    }
+                        CaloriesBlock(consumed: 1320, goal: 1800)
 
-                    // Macros
-                    VStack(alignment: .leading, spacing: AppSpace.md) {
+                        // "MACROS" label
                         Text("MACROS")
-                            .font(AppFont.section())
-                            .foregroundStyle(AppColor.textTitle)
+                            .font(AppFont.labelCapsSm())
+                            .foregroundStyle(AppColor.textMuted)
+                            .padding(.horizontal, AppSpace.s16)
+                            .padding(.top, AppSpace.s12)
 
-                        VStack(spacing: AppSpace.md) {
-                            MacroBar(kind: .protein, current: macros.protein.current, target: macros.protein.target)
-                            MacroBar(kind: .carbs,   current: macros.carbs.current,   target: macros.carbs.target)
-                            MacroBar(kind: .fat,     current: macros.fat.current,     target: macros.fat.target)
-                        }
-                    }
+                        VStack(spacing: AppSpace.sm) {
+                            MacroRow(
+                                label: "Protein",
+                                value: 45,
+                                goal: 135,
+                                color: AppColor.macroProtein
+                            )
 
-                    // Tip card
-                    TipCard(emoji: "💡", text: "If you ate like this every day... You'd lose 1.2 lbs/week")
+                            MacroRow(
+                                label: "Carbs",
+                                value: 120,
+                                goal: 225,
+                                color: AppColor.macroCarbs
+                            )
 
-                    // Meals
-                    VStack(alignment: .leading, spacing: AppSpace.xl) {
-                        ForEach(MealType.allCases) { meal in
-                            MealSectionCard(
-                                meal: meal,
-                                items: meals[meal] ?? [],
-                                onAdd: {
-                                    showAddFood = true
-                                }
+                            MacroRow(
+                                label: "Fat",
+                                value: 28,
+                                goal: 60,
+                                color: AppColor.macroFat
                             )
                         }
-                    }
+                        .padding(.bottom, AppSpace.s12)
 
-                    Spacer(minLength: AppSpace.xxl)
+                        TipCard(text: "If you ate like this every day... You'd lose 1.2 lbs/week")
+
+                        VStack(spacing: AppSpace.s12) {
+                            MealCard(
+                                title: "Breakfast",
+                                kcal: 245,
+                                items: ["Oatmeal with berries", "Black coffee"],
+                                onAddFood: { showAddFood = true }
+                            )
+
+                            MealCard(
+                                title: "Lunch",
+                                kcal: 430,
+                                items: ["Grilled chicken salad", "Apple"],
+                                onAddFood: { showAddFood = true }
+                            )
+
+                            MealCard(
+                                title: "Dinner",
+                                kcal: 150,
+                                items: ["Greek yogurt"],
+                                onAddFood: { showAddFood = true }
+                            )
+
+                            MealCard(
+                                title: "Snacks",
+                                kcal: 0,
+                                items: ["No items yet"],
+                                onAddFood: { showAddFood = true }
+                            )
+                        }
+
+                        Spacer(minLength: AppSpace.s24)
+                    }
+                    .padding(.vertical, AppSpace.s16)
                 }
-                .padding(.horizontal, AppSpace.xl)
-                .padding(.top, AppSpace.xl)
-            }
-            .background(AppColor.bgScreen.ignoresSafeArea())
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Today")
-                        .font(AppFont.title())
-                        .foregroundStyle(AppColor.textTitle)
+
+                FloatingAddButton {
+                    showAddFood = true
                 }
             }
             .navigationDestination(isPresented: $showAddFood) {
                 AddFoodView(viewModel: AddFoodViewModel(service: MockFoodSearchService()))
             }
+            .background(AppColor.bgScreen.ignoresSafeArea())
+            .navigationBarHidden(true)
         }
-    }
-
-    private func formattedToday() -> String {
-        let f = DateFormatter()
-        f.dateFormat = "EEEE, MMM d"
-        return f.string(from: .now)
     }
 }
 
