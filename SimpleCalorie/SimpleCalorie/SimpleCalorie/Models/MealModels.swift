@@ -16,6 +16,10 @@ enum MealType: String, CaseIterable, Identifiable {
         case .snacks: return "Snacks"
         }
     }
+    
+    var title: String {
+        return displayName
+    }
 }
 
 struct FoodEntry: Identifiable {

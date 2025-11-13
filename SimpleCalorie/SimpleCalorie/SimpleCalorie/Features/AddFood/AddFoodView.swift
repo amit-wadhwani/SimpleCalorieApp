@@ -1,54 +1,65 @@
 import SwiftUI
 
 struct AddFoodView: View {
-    @StateObject var viewModel: AddFoodViewModel
+    @EnvironmentObject var todayViewModel: TodayViewModel
+    @StateObject private var searchViewModel: AddFoodViewModel
     @Environment(\.dismiss) private var dismiss
-    let initialMeal: MealType
-    @State private var selectedMeal: MealType
+    let selectedMeal: MealType
+    
+    @State private var activeMeal: MealType
+    @State private var query: String = ""
 
-    init(viewModel: AddFoodViewModel, initialMeal: MealType = .breakfast) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
-        self.initialMeal = initialMeal
-        self._selectedMeal = State(initialValue: initialMeal)
+    init(selectedMeal: MealType) {
+        self.selectedMeal = selectedMeal
+        self._activeMeal = State(initialValue: selectedMeal)
+        self._searchViewModel = StateObject(wrappedValue: AddFoodViewModel(service: MockFoodSearchService()))
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            TopBarView(title: "Add Food") {
-                dismiss()
-            }
+        NavigationStack {
+            VStack(spacing: 0) {
+                TopBarView(title: "Add Food") {
+                    dismiss()
+                }
 
-            VStack(alignment: .leading, spacing: AppSpace.s16) {
-                // Meal selector tabs
-                MealSelectorTabs(selectedMeal: $selectedMeal)
+                MealTabsView(selectedMeal: $activeMeal)
 
-                SearchBarView(placeholder: "Search database…", text: $viewModel.query)
-                    .onChange(of: viewModel.query) { _, _ in
-                        Task { await viewModel.refresh() }
+                SearchBarView(placeholder: "Search database...", text: $query)
+                    .onChange(of: query) { _, newValue in
+                        searchViewModel.query = newValue
+                        Task { await searchViewModel.refresh() }
                     }
 
-                ResultsHeaderView(count: viewModel.rows.count)
+                ResultsHeaderView(count: searchViewModel.rows.count)
 
                 ScrollView {
                     VStack(spacing: AppSpace.s12) {
-                        ForEach(viewModel.rows) { row in
+                        ForEach(searchViewModel.rows) { row in
                             FoodRowView(props: row) {
-                                // TODO: selection action - add to selectedMeal
+                                // Convert FoodRowProps to FoodItem and add to selected meal
+                                let foodItem = FoodItem(
+                                    name: row.name,
+                                    calories: Int(row.kcal) ?? 0,
+                                    description: row.serving
+                                )
+                                todayViewModel.add(foodItem, to: activeMeal)
                             }
                         }
+                        .padding(.horizontal, 16)
+
+                        Spacer(minLength: AppSpace.s24)
                     }
-                    .padding(.top, AppSpace.s12)
-                    .padding(.bottom, AppSpace.s24)
+                    .padding(.top, 8)
                 }
                 .scrollIndicators(.never)
             }
+            .background(AppColor.bgScreen.ignoresSafeArea())
+            .navigationBarHidden(true)
         }
-        .background(AppColor.bgScreen.ignoresSafeArea())
-        .navigationBarHidden(true)
     }
 }
 
 #Preview {
-    AddFoodView(viewModel: AddFoodViewModel(service: MockFoodSearchService()))
+    AddFoodView(selectedMeal: .breakfast)
+        .environmentObject(TodayViewModel())
 }
-

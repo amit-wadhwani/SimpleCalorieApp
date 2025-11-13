@@ -19,15 +19,15 @@ struct SearchBarView: View {
         .padding(.horizontal, AppSpace.s12)
         .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(AppColor.bgScreen)
+            RoundedRectangle(cornerRadius: 18)
+                .fill(AppColor.bgCard.opacity(0.8))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 18)
                         .stroke(AppColor.borderSubtle, lineWidth: 1)
                 )
         )
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text("Search"))
     }

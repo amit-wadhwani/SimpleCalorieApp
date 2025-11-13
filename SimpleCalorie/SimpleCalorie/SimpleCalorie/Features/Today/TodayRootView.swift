@@ -1,22 +1,29 @@
 import SwiftUI
 
 struct TodayRootView: View {
+    @StateObject private var viewModel = TodayViewModel()
     @State private var selectedTab: MainTab = .today
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Group {
-                switch selectedTab {
-                case .today:
-                    TodayScreen()
-                case .weekly:
-                    WeeklyPlaceholderView()
-                case .profile:
-                    ProfilePlaceholderView()
-                }
+        Group {
+            switch selectedTab {
+            case .today:
+                TodayScreen()
+                    .environmentObject(viewModel)
+                    .safeAreaInset(edge: .bottom) {
+                        TodayTabBarView(selectedTab: $selectedTab)
+                    }
+            case .weekly:
+                WeeklyPlaceholderView()
+                    .safeAreaInset(edge: .bottom) {
+                        TodayTabBarView(selectedTab: $selectedTab)
+                    }
+            case .profile:
+                ProfilePlaceholderView()
+                    .safeAreaInset(edge: .bottom) {
+                        TodayTabBarView(selectedTab: $selectedTab)
+                    }
             }
-
-            TodayTabBarView(selectedTab: $selectedTab)
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }

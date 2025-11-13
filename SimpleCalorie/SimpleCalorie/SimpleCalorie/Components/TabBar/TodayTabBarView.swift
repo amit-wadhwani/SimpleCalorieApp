@@ -9,14 +9,12 @@ struct TodayTabBarView: View {
             tabItem(.weekly)
             tabItem(.profile)
         }
-        .padding(.horizontal, 32)
         .padding(.top, 10)
-        .padding(.bottom, 10)
-        .background(
-            AppColor.bgCard
-                .ignoresSafeArea(edges: .bottom)
-        )
-        .shadow(color: .black.opacity(0.05), radius: 12, y: -4)
+        .padding(.bottom, 12)
+        .padding(.horizontal, 24)
+        .frame(maxWidth: .infinity)
+        .background(AppColor.bgCard.ignoresSafeArea(edges: .bottom))
+        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: -2)
     }
 
     private func tabItem(_ tab: MainTab) -> some View {

@@ -4,15 +4,20 @@ struct ResultsHeaderView: View {
     let count: Int
 
     var body: some View {
-        Text("\(count) RESULTS")
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(AppColor.textMuted)
-            .textCase(.uppercase)
-            .tracking(0.5)
+        VStack(spacing: 4) {
+            HStack {
+                Text("\(count) RESULTS")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(AppColor.textMuted)
+                    .textCase(.uppercase)
+                Spacer()
+            }
             .padding(.horizontal, AppSpace.s16)
-            .padding(.top, AppSpace.s16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityHidden(true)
+            .padding(.top, 8)
+
+            Divider()
+                .padding(.horizontal, AppSpace.s16)
+        }
     }
 }
 
