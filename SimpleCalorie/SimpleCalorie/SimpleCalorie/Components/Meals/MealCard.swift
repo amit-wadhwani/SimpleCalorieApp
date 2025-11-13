@@ -36,24 +36,20 @@ struct MealCard: View {
 
             Button(action: onAddFood) {
                 HStack(spacing: 8) {
-                    Circle()
-                        .fill(AppColor.brandPrimary)
-                        .frame(width: 18, height: 18)
-                        .overlay(
-                            Image(systemName: "plus")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(.white)
-                        )
+                    Spacer(minLength: 0)
 
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 14, weight: .semibold))
                     Text("Add Food")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(AppColor.brandPrimary)
 
-                    Spacer()
+                    Spacer(minLength: 0)
                 }
-                .padding(.top, 8)
+                .foregroundStyle(AppColor.brandPrimary)
+                .padding(.vertical, 4)
             }
             .buttonStyle(.plain)
+            .padding(.top, 8)
         }
         .padding(.vertical, AppSpace.s16)
         .padding(.horizontal, AppSpace.s16)

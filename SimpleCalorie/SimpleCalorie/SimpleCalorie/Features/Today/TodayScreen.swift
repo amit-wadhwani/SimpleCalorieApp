@@ -2,13 +2,19 @@ import SwiftUI
 
 struct TodayScreen: View {
     @State private var showAddFood: Bool = false
+    @State private var activeMealForAddFood: MealType = .breakfast
+    @State private var currentDate: Date = Date()
+    @State private var showSponsoredCards: Bool = true
+    @State private var showSettingsMenu: Bool = false
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppSpace.s16) {
-                        AppHeader()
+                        AppHeader(currentDate: $currentDate) {
+                            showSettingsMenu = true
+                        }
 
                         CaloriesBlock(consumed: 1320, goal: 1800)
 
@@ -49,49 +55,116 @@ struct TodayScreen: View {
 
                         VStack(spacing: AppSpace.s12) {
                             MealCard(
-                                title: "Breakfast",
+                                title: MealType.breakfast.displayName,
                                 kcal: 245,
                                 items: ["Oatmeal with berries", "Black coffee"],
-                                onAddFood: { showAddFood = true }
+                                onAddFood: {
+                                    activeMealForAddFood = .breakfast
+                                    showAddFood = true
+                                }
                             )
 
+                            if showSponsoredCards {
+                                SponsoredCardView(
+                                    title: "Smart Tip: Try adding healthy fats to breakfast for better satiety.",
+                                    emoji: "😉"
+                                )
+                            }
+
                             MealCard(
-                                title: "Lunch",
+                                title: MealType.lunch.displayName,
                                 kcal: 430,
                                 items: ["Grilled chicken salad", "Apple"],
-                                onAddFood: { showAddFood = true }
+                                onAddFood: {
+                                    activeMealForAddFood = .lunch
+                                    showAddFood = true
+                                }
                             )
 
+                            if showSponsoredCards {
+                                SponsoredCardView(
+                                    title: "Simple Premium auto-logs your meals and macros.",
+                                    emoji: "🍓"
+                                )
+                            }
+
                             MealCard(
-                                title: "Dinner",
+                                title: MealType.dinner.displayName,
                                 kcal: 150,
                                 items: ["Greek yogurt"],
-                                onAddFood: { showAddFood = true }
+                                onAddFood: {
+                                    activeMealForAddFood = .dinner
+                                    showAddFood = true
+                                }
                             )
 
+                            if showSponsoredCards {
+                                SponsoredCardView(
+                                    title: "Smart Tip: High-protein dinners boost next-day energy.",
+                                    emoji: "💪"
+                                )
+                            }
+
                             MealCard(
-                                title: "Snacks",
+                                title: MealType.snacks.displayName,
                                 kcal: 0,
                                 items: ["No items yet"],
-                                onAddFood: { showAddFood = true }
+                                onAddFood: {
+                                    activeMealForAddFood = .snacks
+                                    showAddFood = true
+                                }
                             )
+
+                            if showSponsoredCards {
+                                SponsoredCardView(
+                                    title: "New SimpleCalorie recipes — discover under 200-calorie snacks.",
+                                    emoji: "🍩"
+                                )
+                            }
                         }
 
                         Spacer(minLength: AppSpace.s24)
                     }
                     .padding(.horizontal, AppSpace.s16)
                     .padding(.top, AppSpace.s16)
-                    .padding(.bottom, AppSpace.s24)
+                    .padding(.bottom, 120) // Leave space for tab bar + FAB
                 }
 
                 FloatingAddButton {
+                    activeMealForAddFood = .breakfast // Default to breakfast for FAB
                     showAddFood = true
                 }
                 .padding(.trailing, AppSpace.s24)
-                .padding(.bottom, AppSpace.s24)
+                .padding(.bottom, 80) // Position above tab bar
             }
-            .navigationDestination(isPresented: $showAddFood) {
-                AddFoodView(viewModel: AddFoodViewModel(service: MockFoodSearchService()))
+            .sheet(isPresented: $showAddFood) {
+                NavigationStack {
+                    AddFoodView(
+                        viewModel: AddFoodViewModel(service: MockFoodSearchService()),
+                        initialMeal: activeMealForAddFood
+                    )
+                }
+            }
+            .sheet(isPresented: $showSettingsMenu) {
+                NavigationStack {
+                    VStack(alignment: .leading, spacing: AppSpace.s16) {
+                        Toggle(isOn: $showSponsoredCards) {
+                            Label("Show Sponsored Tips", systemImage: showSponsoredCards ? "eye" : "eye.slash")
+                        }
+                        .padding()
+                        
+                        Spacer()
+                    }
+                    .navigationTitle("Settings")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Done") {
+                                showSettingsMenu = false
+                            }
+                        }
+                    }
+                }
             }
             .background(AppColor.bgScreen.ignoresSafeArea())
             .navigationBarHidden(true)

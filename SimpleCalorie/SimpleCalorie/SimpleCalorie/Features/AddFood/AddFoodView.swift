@@ -3,6 +3,14 @@ import SwiftUI
 struct AddFoodView: View {
     @StateObject var viewModel: AddFoodViewModel
     @Environment(\.dismiss) private var dismiss
+    let initialMeal: MealType
+    @State private var selectedMeal: MealType
+
+    init(viewModel: AddFoodViewModel, initialMeal: MealType = .breakfast) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+        self.initialMeal = initialMeal
+        self._selectedMeal = State(initialValue: initialMeal)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -10,26 +18,37 @@ struct AddFoodView: View {
                 dismiss()
             }
 
-            SearchBarView(placeholder: "Search database…", text: $viewModel.query)
-                .padding(.top, AppSpace.s16)
-                .onChange(of: viewModel.query) { _, _ in
-                    Task { await viewModel.refresh() }
-                }
-
-            ResultsHeaderView(count: viewModel.rows.count)
-
-            ScrollView {
-                VStack(spacing: AppSpace.s16) {
-                    ForEach(viewModel.rows) { row in
-                        FoodRowView(props: row) {
-                            // TODO: selection action
-                        }
+            VStack(alignment: .leading, spacing: AppSpace.s16) {
+                // Meal picker
+                Picker("Meal", selection: $selectedMeal) {
+                    ForEach(MealType.allCases) { meal in
+                        Text(meal.displayName).tag(meal)
                     }
                 }
-                .padding(.top, AppSpace.s12)
-                .padding(.bottom, AppSpace.s24)
+                .pickerStyle(.segmented)
+                .padding(.horizontal, AppSpace.s16)
+                .padding(.top, AppSpace.s16)
+
+                SearchBarView(placeholder: "Search database…", text: $viewModel.query)
+                    .onChange(of: viewModel.query) { _, _ in
+                        Task { await viewModel.refresh() }
+                    }
+
+                ResultsHeaderView(count: viewModel.rows.count)
+
+                ScrollView {
+                    VStack(spacing: AppSpace.s12) {
+                        ForEach(viewModel.rows) { row in
+                            FoodRowView(props: row) {
+                                // TODO: selection action - add to selectedMeal
+                            }
+                        }
+                    }
+                    .padding(.top, AppSpace.s12)
+                    .padding(.bottom, AppSpace.s24)
+                }
+                .scrollIndicators(.never)
             }
-            .scrollIndicators(.never)
         }
         .background(AppColor.bgScreen.ignoresSafeArea())
         .navigationBarHidden(true)
