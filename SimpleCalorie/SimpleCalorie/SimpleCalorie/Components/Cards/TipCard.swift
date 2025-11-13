@@ -5,15 +5,16 @@ struct TipCard: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(AppColor.bgScreen.opacity(0.8))
-                    .frame(width: 32, height: 32)
-
-                Image(systemName: "chart.line.downtrend.xyaxis")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(AppColor.brandPrimary)
-            }
+            // Left blue crescent / pill
+            RoundedRectangle(cornerRadius: 10)
+                .fill(AppColor.brandPrimary.opacity(0.1))
+                .frame(width: 6)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(AppColor.brandPrimary)
+                        .frame(width: 3),
+                    alignment: .center
+                )
 
             Text(text)
                 .font(.system(size: 13, weight: .regular))
@@ -22,16 +23,11 @@ struct TipCard: View {
             
             Spacer()
         }
-        .padding(.vertical, AppSpace.s12)
-        .padding(.horizontal, AppSpace.s16)
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.xl)
+            RoundedRectangle(cornerRadius: 18)
                 .fill(AppColor.bgCard)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.xl)
-                        .stroke(AppColor.borderSubtle, lineWidth: 1)
-                )
-                .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 1)
+                .shadow(color: Color.black.opacity(0.03), radius: 10, x: 0, y: 4)
         )
         .padding(.horizontal, AppSpace.s16)
     }

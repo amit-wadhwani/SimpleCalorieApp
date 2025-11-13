@@ -15,15 +15,31 @@ struct FoodRowView: View {
     var onAdd: () -> Void = {}
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
+        HStack(alignment: .top, spacing: AppSpace.s16) {
+            // Left column
+            VStack(alignment: .leading, spacing: 4) {
                 Text(props.name)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(AppColor.textTitle)
 
-                Spacer()
+                Text(props.serving)
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(AppColor.textMuted)
 
-                VStack(alignment: .trailing, spacing: 0) {
+                HStack(spacing: 16) {
+                    macroBlock(label: "PROTEIN", value: props.protein, color: AppColor.macroProtein)
+                    macroBlock(label: "CARBS",   value: props.carbs,   color: AppColor.macroCarbs)
+                    macroBlock(label: "FAT",     value: props.fat,     color: AppColor.macroFat)
+                }
+                .padding(.top, 6)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Spacer(minLength: 12)
+
+            // Right column
+            VStack(alignment: .trailing, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(props.kcal)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(AppColor.textTitle)
@@ -33,31 +49,24 @@ struct FoodRowView: View {
                         .foregroundStyle(AppColor.textMuted)
                 }
 
+                Spacer()
+
                 Button(action: onAdd) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 16, weight: .bold))
-                        .frame(width: 44, height: 44) // ≥44pt tap
-                        .background(
-                            Circle().fill(AppColor.brandPrimary)
-                        )
-                        .foregroundStyle(.white)
+                    ZStack {
+                        Circle()
+                            .fill(AppColor.brandPrimary)
+                            .frame(width: 30, height: 30)
+                        Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
                 }
                 .accessibilityLabel(Text("Add \(props.name)"))
             }
-
-            Text(props.serving)
-                .font(.system(size: 13, weight: .regular))
-                .foregroundStyle(AppColor.textMuted)
-
-            HStack(spacing: 24) {
-                macroBlock(label: "PROTEIN", value: props.protein, color: AppColor.macroProtein)
-                macroBlock(label: "CARBS",   value: props.carbs,   color: AppColor.macroCarbs)
-                macroBlock(label: "FAT",     value: props.fat,     color: AppColor.macroFat)
-            }
-            .padding(.top, 8)
+            .frame(height: 60, alignment: .top)
         }
-        .padding(.vertical, AppSpace.s12)
         .padding(.horizontal, AppSpace.s16)
+        .padding(.vertical, AppSpace.s12)
         .background(
             RoundedRectangle(cornerRadius: 18)
                 .fill(AppColor.bgCard)
@@ -65,8 +74,9 @@ struct FoodRowView: View {
                     RoundedRectangle(cornerRadius: 18)
                         .stroke(AppColor.borderSubtle, lineWidth: 1)
                 )
+                .shadow(color: Color.black.opacity(0.02), radius: 6, x: 0, y: 2)
         )
-        .padding(.horizontal, AppSpace.s16)
+        .padding(.horizontal, 20)
     }
 
     @ViewBuilder

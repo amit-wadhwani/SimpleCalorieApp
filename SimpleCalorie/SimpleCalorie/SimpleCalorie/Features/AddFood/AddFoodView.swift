@@ -19,15 +19,8 @@ struct AddFoodView: View {
             }
 
             VStack(alignment: .leading, spacing: AppSpace.s16) {
-                // Meal picker
-                Picker("Meal", selection: $selectedMeal) {
-                    ForEach(MealType.allCases) { meal in
-                        Text(meal.displayName).tag(meal)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, AppSpace.s16)
-                .padding(.top, AppSpace.s16)
+                // Meal selector tabs
+                MealSelectorTabs(selectedMeal: $selectedMeal)
 
                 SearchBarView(placeholder: "Search database…", text: $viewModel.query)
                     .onChange(of: viewModel.query) { _, _ in

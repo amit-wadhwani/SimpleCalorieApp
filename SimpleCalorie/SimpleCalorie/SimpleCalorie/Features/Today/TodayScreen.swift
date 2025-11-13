@@ -67,7 +67,7 @@ struct TodayScreen: View {
                             if showSponsoredCards {
                                 SponsoredCardView(
                                     title: "Smart Tip: Try adding healthy fats to breakfast for better satiety.",
-                                    emoji: "😉"
+                                    isAd: false
                                 )
                             }
 
@@ -84,7 +84,7 @@ struct TodayScreen: View {
                             if showSponsoredCards {
                                 SponsoredCardView(
                                     title: "Simple Premium auto-logs your meals and macros.",
-                                    emoji: "🍓"
+                                    isAd: true
                                 )
                             }
 
@@ -101,7 +101,7 @@ struct TodayScreen: View {
                             if showSponsoredCards {
                                 SponsoredCardView(
                                     title: "Smart Tip: High-protein dinners boost next-day energy.",
-                                    emoji: "💪"
+                                    isAd: false
                                 )
                             }
 
@@ -118,7 +118,7 @@ struct TodayScreen: View {
                             if showSponsoredCards {
                                 SponsoredCardView(
                                     title: "New SimpleCalorie recipes — discover under 200-calorie snacks.",
-                                    emoji: "🍩"
+                                    isAd: true
                                 )
                             }
                         }

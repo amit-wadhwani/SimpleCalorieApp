@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppHeader: View {
     @Binding var currentDate: Date
+    @State private var isDatePickerPresented = false
     var onSettingsTap: (() -> Void)?
 
     var body: some View {
@@ -29,21 +30,23 @@ struct AppHeader: View {
                 }
             }
 
-            // Date navigation row
+            // Date navigation row - centered with closer chevrons
             HStack {
                 Button {
                     currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(AppColor.textMuted)
                 }
 
                 Spacer()
 
-                Text(formattedDate())
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(AppColor.textMuted)
+                Button(action: { isDatePickerPresented = true }) {
+                    Text(formattedDate())
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(AppColor.textMuted)
+                }
 
                 Spacer()
 
@@ -51,11 +54,32 @@ struct AppHeader: View {
                     currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
                 } label: {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(AppColor.textMuted)
                 }
             }
-            .padding(.top, 2)
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .sheet(isPresented: $isDatePickerPresented) {
+                NavigationStack {
+                    VStack {
+                        Text("Date picker coming soon")
+                            .font(.headline)
+                            .padding()
+                        Spacer()
+                    }
+                    .navigationTitle("Select Date")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Done") {
+                                isDatePickerPresented = false
+                            }
+                        }
+                    }
+                }
+                .presentationDetents([.medium])
+            }
         }
         .padding(.horizontal, AppSpace.s16)
     }
