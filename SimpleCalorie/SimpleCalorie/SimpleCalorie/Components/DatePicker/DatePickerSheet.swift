@@ -21,28 +21,21 @@ struct DatePickerSheet: View {
             }
             .navigationTitle("Select Date")
             .toolbar {
+                // Top-left: Today
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") {
+                    Button("Today") {
+                        selectedDate = Date()
+                    }
+                    .foregroundStyle(AppColor.brandPrimary)
+                }
+
+                // Top-right: Done
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
                         dismiss()
                     }
                     .foregroundStyle(AppColor.brandPrimary)
                 }
-            }
-            .safeAreaInset(edge: .bottom) {
-                Button {
-                    selectedDate = Date()
-                    dismiss()
-                } label: {
-                    Text("Today")
-                        .font(AppFont.bodySm(14))
-                        .foregroundStyle(AppColor.brandPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppSpace.s12)
-                        .background(AppColor.bgCard)
-                        .cornerRadius(AppRadius.card)
-                }
-                .padding(.horizontal, AppSpace.s16)
-                .padding(.bottom, AppSpace.s16)
             }
         }
     }

@@ -43,7 +43,7 @@ struct MealSectionCard: View {
 
             Button(action: onAdd) {
                 Text("+ Add Food")
-                    .font(AppFont.bodySmSmall())
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(AppColor.brandPrimary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, AppSpace.sm)

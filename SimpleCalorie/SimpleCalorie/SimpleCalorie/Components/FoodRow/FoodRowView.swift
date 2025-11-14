@@ -71,9 +71,9 @@ struct FoodRowView: View {
 
     @ViewBuilder
     private func macroRow(label: String, value: String, color: Color) -> some View {
-        HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(AppFont.section(11))
+                .font(AppFont.labelCapsSm(11))
                 .foregroundStyle(AppColor.textMuted)
             Text(value)
                 .font(AppFont.value(13))

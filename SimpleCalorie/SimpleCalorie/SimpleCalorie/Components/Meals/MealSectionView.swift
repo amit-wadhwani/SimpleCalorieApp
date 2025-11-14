@@ -17,8 +17,8 @@ struct MealSectionView: View {
 
                 if totalCalories > 0 {
                     Text("\(totalCalories) kcal")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundStyle(AppColor.textMuted)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AppColor.textTitle)
                 }
             }
             .padding(.horizontal, 12)
@@ -72,7 +72,7 @@ struct MealSectionView: View {
 
                 Button(action: onAddFoodTap) {
                     Text("+ Add Food")
-                        .font(AppFont.bodySmSmall())
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(AppColor.brandPrimary)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, AppSpace.sm)
