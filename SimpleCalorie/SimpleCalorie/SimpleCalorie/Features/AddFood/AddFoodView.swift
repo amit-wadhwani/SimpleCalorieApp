@@ -37,11 +37,14 @@ struct AddFoodView: View {
                     VStack(spacing: AppSpace.s12) {
                         ForEach(searchViewModel.rows) { row in
                             FoodRowView(props: row) {
-                                // Convert FoodRowProps to FoodItem and add to selected meal
+                                // Convert FoodRowProps to FoodItem with macros
                                 let foodItem = FoodItem(
                                     name: row.name,
                                     calories: Int(row.kcal) ?? 0,
-                                    description: row.serving
+                                    description: row.serving,
+                                    protein: parseMacro(row.protein),
+                                    carbs: parseMacro(row.carbs),
+                                    fat: parseMacro(row.fat)
                                 )
                                 
                                 withAnimation(.easeInOut(duration: 0.4)) {
@@ -55,7 +58,7 @@ struct AddFoodView: View {
                                 dismiss()
                             }
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, AppSpace.s16)
 
                         Spacer(minLength: AppSpace.s24)
                     }
@@ -66,6 +69,11 @@ struct AddFoodView: View {
             .background(AppColor.bgScreen.ignoresSafeArea())
             .navigationBarHidden(true)
         }
+    }
+    
+    private func parseMacro(_ str: String) -> Double {
+        let cleaned = str.replacingOccurrences(of: "g", with: "").trimmingCharacters(in: .whitespaces)
+        return Double(cleaned) ?? 0
     }
 }
 

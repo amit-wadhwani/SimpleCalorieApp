@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct MacrosSectionView: View {
+    @EnvironmentObject var viewModel: TodayViewModel
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("MACROS")
@@ -12,22 +14,22 @@ struct MacrosSectionView: View {
             VStack(alignment: .leading, spacing: 12) {
                 MacroRow(
                     label: "Protein",
-                    value: 45,
-                    goal: 135,
+                    value: Int(viewModel.protein),
+                    goal: Int(viewModel.proteinGoal),
                     color: AppColor.macroProtein
                 )
 
                 MacroRow(
                     label: "Carbs",
-                    value: 120,
-                    goal: 225,
+                    value: Int(viewModel.carbs),
+                    goal: Int(viewModel.carbsGoal),
                     color: AppColor.macroCarbs
                 )
 
                 MacroRow(
                     label: "Fat",
-                    value: 28,
-                    goal: 60,
+                    value: Int(viewModel.fat),
+                    goal: Int(viewModel.fatGoal),
                     color: AppColor.macroFat
                 )
             }
@@ -38,6 +40,7 @@ struct MacrosSectionView: View {
 
 #Preview {
     MacrosSectionView()
+        .environmentObject(TodayViewModel())
         .background(AppColor.bgScreen)
 }
 

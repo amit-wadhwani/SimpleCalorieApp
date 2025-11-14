@@ -51,16 +51,12 @@ struct FoodRowView: View {
                 Spacer(minLength: 0)
 
                 Button(action: onAdd) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .bold))
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(AppColor.brandPrimary)
-                        .padding(8)
-                        .background(
-                            Circle()
-                                .fill(AppColor.brandPrimary.opacity(0.08))
-                        )
                 }
                 .buttonStyle(.plain)
+                .padding(.top, 4)
                 .accessibilityLabel(Text("Add \(props.name)"))
             }
             .frame(maxHeight: .infinity, alignment: .center)

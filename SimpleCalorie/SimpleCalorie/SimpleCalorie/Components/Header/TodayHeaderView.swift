@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TodayHeaderView: View {
+    @EnvironmentObject var viewModel: TodayViewModel
     @Binding var selectedDate: Date
     let consumedCalories: Double
     let dailyGoalCalories: Double
@@ -17,17 +18,30 @@ struct TodayHeaderView: View {
             }
 
             // Date row - tappable
-            Button(action: onDateTap) {
-                HStack(spacing: 6) {
+            HStack(spacing: 8) {
+                Button {
+                    selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+                } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(AppColor.textMuted)
+                }
+                
+                Button(action: onDateTap) {
                     Text(formattedDate())
                         .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(AppColor.textMuted)
+                }
+                
+                Button {
+                    selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+                } label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(AppColor.textMuted)
                 }
-                .foregroundStyle(AppColor.textMuted)
-                .frame(maxWidth: .infinity)
+                
+                Spacer()
             }
 
             // Calorie summary card
@@ -59,6 +73,7 @@ struct TodayHeaderView: View {
         dailyGoalCalories: 1800,
         onDateTap: {}
     )
+    .environmentObject(TodayViewModel())
     .background(AppColor.bgScreen)
 }
 

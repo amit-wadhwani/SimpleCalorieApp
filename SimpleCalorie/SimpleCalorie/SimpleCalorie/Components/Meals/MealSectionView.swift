@@ -4,6 +4,7 @@ struct MealSectionView: View {
     let meal: MealType
     let items: [FoodItem]
     var onAddFoodTap: () -> Void
+    var onDelete: ((FoodItem) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -19,40 +20,63 @@ struct MealSectionView: View {
                         .font(.system(size: 13, weight: .regular))
                         .foregroundStyle(AppColor.textMuted)
                 }
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(AppColor.textMuted)
             }
+            .padding(.horizontal, 12)
+            .padding(.top, 12)
 
-            ForEach(items) { item in
-                HStack {
-                    Text(item.description)
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundStyle(AppColor.textMuted)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(AppColor.textMuted)
+            VStack(spacing: 0) {
+                ForEach(items) { item in
+                    HStack(alignment: .firstTextBaseline) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.name)
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundStyle(AppColor.textTitle)
+                            
+                            if !item.description.isEmpty && item.description != item.name {
+                                Text(item.description)
+                                    .font(.system(size: 11, weight: .regular))
+                                    .foregroundStyle(AppColor.textMuted)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        Text("\(item.calories) kcal")
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            onDelete?(item)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+
+                    if item.id != items.last?.id {
+                        Divider()
+                            .padding(.leading, 12)
+                    }
                 }
-            }
 
-            Button(action: onAddFoodTap) {
-                HStack(spacing: 8) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(AppColor.brandPrimary)
-                    Text("Add Food")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(AppColor.brandPrimary)
-                    Spacer()
+                Button(action: onAddFoodTap) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(AppColor.brandPrimary)
+                        Text("Add Food")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(AppColor.brandPrimary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 12)
                 }
-                .padding(.vertical, 8)
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
-            .padding(.top, 4)
         }
-        .padding(16)
         .background(AppColor.bgCard)
         .cornerRadius(18)
         .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 6)
@@ -68,8 +92,8 @@ struct MealSectionView: View {
         MealSectionView(
             meal: .breakfast,
             items: [
-                FoodItem(name: "Oatmeal with berries", calories: 245, description: "Oatmeal with berries"),
-                FoodItem(name: "Black coffee", calories: 0, description: "Black coffee")
+                FoodItem(name: "Oatmeal with berries", calories: 245, description: "100g", protein: 8.0, carbs: 45.0, fat: 5.0),
+                FoodItem(name: "Black coffee", calories: 0, description: "1 cup", protein: 0, carbs: 0, fat: 0)
             ],
             onAddFoodTap: {}
         )

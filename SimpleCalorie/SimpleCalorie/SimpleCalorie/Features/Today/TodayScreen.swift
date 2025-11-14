@@ -2,27 +2,19 @@ import SwiftUI
 
 struct TodayScreen: View {
     @EnvironmentObject var viewModel: TodayViewModel
+    @AppStorage("showAds") private var showAds: Bool = true
     @State private var isShowingDatePicker = false
     @State private var isShowingAddFood: Bool = false
     @State private var addFoodMeal: MealType = .breakfast
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Sticky header
-            TodayHeaderView(
-                selectedDate: $viewModel.selectedDate,
-                consumedCalories: viewModel.consumedCalories,
-                dailyGoalCalories: viewModel.dailyGoalCalories,
-                onDateTap: { isShowingDatePicker = true }
-            )
-
-            Divider().opacity(0)  // maintains spacing but keeps header visually clean
-
-            // Scrollable content
-            ZStack(alignment: .bottomTrailing) {
-                ScrollView {
-                    VStack(spacing: AppSpace.s16) {
+        ZStack(alignment: .bottomTrailing) {
+            ScrollView {
+                LazyVStack(spacing: AppSpace.s16, pinnedViews: [.sectionHeaders]) {
+                    Section {
                         MotivationCardView()
+                            .padding(.horizontal, AppSpace.s16)
+                            .padding(.top, AppSpace.s16)
 
                         // Interleave meals and ads
                         MealSectionView(
@@ -31,10 +23,17 @@ struct TodayScreen: View {
                             onAddFoodTap: {
                                 addFoodMeal = .breakfast
                                 isShowingAddFood = true
+                            },
+                            onDelete: { item in
+                                viewModel.remove(item, from: .breakfast)
                             }
                         )
+                        .padding(.horizontal, AppSpace.s16)
                         
-                        AdCardView(model: AdCardView.sampleAds[0])
+                        if showAds {
+                            AdCardView(model: AdCardView.sampleAds[0])
+                                .padding(.horizontal, AppSpace.s16)
+                        }
 
                         MealSectionView(
                             meal: .lunch,
@@ -42,10 +41,17 @@ struct TodayScreen: View {
                             onAddFoodTap: {
                                 addFoodMeal = .lunch
                                 isShowingAddFood = true
+                            },
+                            onDelete: { item in
+                                viewModel.remove(item, from: .lunch)
                             }
                         )
+                        .padding(.horizontal, AppSpace.s16)
                         
-                        AdCardView(model: AdCardView.sampleAds[1])
+                        if showAds {
+                            AdCardView(model: AdCardView.sampleAds[1])
+                                .padding(.horizontal, AppSpace.s16)
+                        }
 
                         MealSectionView(
                             meal: .dinner,
@@ -53,10 +59,17 @@ struct TodayScreen: View {
                             onAddFoodTap: {
                                 addFoodMeal = .dinner
                                 isShowingAddFood = true
+                            },
+                            onDelete: { item in
+                                viewModel.remove(item, from: .dinner)
                             }
                         )
+                        .padding(.horizontal, AppSpace.s16)
                         
-                        AdCardView(model: AdCardView.sampleAds[2])
+                        if showAds {
+                            AdCardView(model: AdCardView.sampleAds[2])
+                                .padding(.horizontal, AppSpace.s16)
+                        }
 
                         MealSectionView(
                             meal: .snacks,
@@ -64,25 +77,45 @@ struct TodayScreen: View {
                             onAddFoodTap: {
                                 addFoodMeal = .snacks
                                 isShowingAddFood = true
+                            },
+                            onDelete: { item in
+                                viewModel.remove(item, from: .snacks)
                             }
                         )
+                        .padding(.horizontal, AppSpace.s16)
                         
-                        AdCardView(model: AdCardView.sampleAds[3])
+                        if showAds {
+                            AdCardView(model: AdCardView.sampleAds[3])
+                                .padding(.horizontal, AppSpace.s16)
+                        }
 
                         Spacer(minLength: AppSpace.s24)
+                    } header: {
+                        TodayHeaderView(
+                            selectedDate: $viewModel.selectedDate,
+                            consumedCalories: viewModel.consumedCalories,
+                            dailyGoalCalories: viewModel.dailyGoalCalories,
+                            onDateTap: { isShowingDatePicker = true }
+                        )
+                        .environmentObject(viewModel)
+                        .background(
+                            Material.ultraThinMaterial
+                        )
+                        .overlay(
+                            Divider().offset(y: 1),
+                            alignment: .bottom
+                        )
                     }
-                    .padding(.horizontal, AppSpace.s16)
-                    .padding(.top, AppSpace.s16)
-                    .padding(.bottom, 80)
                 }
-
-                FloatingAddButton {
-                    addFoodMeal = .breakfast
-                    isShowingAddFood = true
-                }
-                .padding(.trailing, AppSpace.s24)
                 .padding(.bottom, 80)
             }
+
+            FloatingAddButton {
+                addFoodMeal = .breakfast
+                isShowingAddFood = true
+            }
+            .padding(.trailing, AppSpace.s24)
+            .padding(.bottom, 80)
         }
         .background(AppColor.bgScreen.ignoresSafeArea())
         .sheet(isPresented: $isShowingDatePicker) {

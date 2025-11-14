@@ -25,19 +25,17 @@ struct AdCardView: View {
                     .frame(width: 4, height: 40)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    if model.isAd {
-                        Text("AD")
-                            .font(.system(size: 10, weight: .semibold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(AppColor.bgScreen)
-                            )
-                            .foregroundStyle(AppColor.textMuted)
-                    }
+                    Text("AD")
+                        .font(.system(size: 10, weight: .semibold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(AppColor.bgScreen)
+                        )
+                        .foregroundStyle(AppColor.textMuted)
 
                     Text(model.title)
                         .font(.system(size: 13, weight: .semibold))

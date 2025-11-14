@@ -20,7 +20,7 @@ struct SearchBarView: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(AppColor.bgCard.opacity(0.8))
+                .fill(AppColor.bgScreen)
                 .overlay(
                     RoundedRectangle(cornerRadius: 18)
                         .stroke(AppColor.borderSubtle, lineWidth: 1)
