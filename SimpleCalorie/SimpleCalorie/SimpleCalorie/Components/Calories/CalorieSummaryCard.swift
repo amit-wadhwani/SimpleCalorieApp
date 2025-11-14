@@ -19,7 +19,7 @@ struct CalorieSummaryCard: View {
         }
         .padding(16)
         .background(AppColor.bgCard)
-        .cornerRadius(18)
+        .cornerRadius(AppRadius.card)
         .shadow(color: Color.black.opacity(0.05), radius: 16, x: 0, y: 8)
     }
 }

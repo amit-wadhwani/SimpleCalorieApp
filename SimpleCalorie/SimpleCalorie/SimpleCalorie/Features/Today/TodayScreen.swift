@@ -2,7 +2,6 @@ import SwiftUI
 
 struct TodayScreen: View {
     @EnvironmentObject var viewModel: TodayViewModel
-    @AppStorage("showAds") private var showAds: Bool = true
     @State private var isShowingAddFood: Bool = false
     @State private var addFoodMeal: MealType = .breakfast
 
@@ -12,9 +11,9 @@ struct TodayScreen: View {
             AppColor.bgScreen
                 .ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                // Top section: date + total calories + macros (single copy)
+            ScrollView(showsIndicators: false) {
                 VStack(spacing: AppSpace.s16) {
+                    // Date row
                     TodayHeaderView(
                         selectedDate: $viewModel.selectedDate,
                         onDateTap: {
@@ -22,102 +21,88 @@ struct TodayScreen: View {
                         }
                     )
                     .environmentObject(viewModel)
+                    .padding(.top, AppSpace.s16)
                     
+                    // Single calorie summary card
                     CalorieSummaryCard(
                         consumed: viewModel.consumedCalories,
                         goal: viewModel.dailyGoalCalories
                     )
                     
+                    // Single macros section
                     MacrosSectionView()
                         .environmentObject(viewModel)
+                    
+                    // Motivation card (always visible)
+                    MotivationCardView()
+                    
+                    // Meal sections with ads interleaved
+                    MealSectionView(
+                        meal: .breakfast,
+                        items: viewModel.meals[.breakfast] ?? [],
+                        onAddFoodTap: {
+                            addFoodMeal = .breakfast
+                            isShowingAddFood = true
+                        },
+                        onDelete: { item in
+                            viewModel.remove(item, from: .breakfast)
+                        }
+                    )
+                    
+                    if viewModel.showAds {
+                        AdCardView(model: AdCardView.sampleAds[0])
+                    }
+                    
+                    MealSectionView(
+                        meal: .lunch,
+                        items: viewModel.meals[.lunch] ?? [],
+                        onAddFoodTap: {
+                            addFoodMeal = .lunch
+                            isShowingAddFood = true
+                        },
+                        onDelete: { item in
+                            viewModel.remove(item, from: .lunch)
+                        }
+                    )
+                    
+                    if viewModel.showAds {
+                        AdCardView(model: AdCardView.sampleAds[1])
+                    }
+                    
+                    MealSectionView(
+                        meal: .dinner,
+                        items: viewModel.meals[.dinner] ?? [],
+                        onAddFoodTap: {
+                            addFoodMeal = .dinner
+                            isShowingAddFood = true
+                        },
+                        onDelete: { item in
+                            viewModel.remove(item, from: .dinner)
+                        }
+                    )
+                    
+                    if viewModel.showAds {
+                        AdCardView(model: AdCardView.sampleAds[2])
+                    }
+                    
+                    MealSectionView(
+                        meal: .snacks,
+                        items: viewModel.meals[.snacks] ?? [],
+                        onAddFoodTap: {
+                            addFoodMeal = .snacks
+                            isShowingAddFood = true
+                        },
+                        onDelete: { item in
+                            viewModel.remove(item, from: .snacks)
+                        }
+                    )
+                    
+                    // No ad after snacks per spec
+                    
+                    Spacer(minLength: 120) // breathing room above tab bar + FAB
                 }
                 .padding(.horizontal, AppSpace.s16)
-                .padding(.top, AppSpace.s16)
-                .padding(.bottom, AppSpace.s12)
-                
-                // Scrollable content: motivation + meals + ads
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: AppSpace.s16) {
-                        MotivationCardView()
-                            .padding(.horizontal, AppSpace.s16)
-                            .padding(.top, AppSpace.s16)
-                        
-                        // Interleave meals and ads
-                        MealSectionView(
-                            meal: .breakfast,
-                            items: viewModel.meals[.breakfast] ?? [],
-                            onAddFoodTap: {
-                                addFoodMeal = .breakfast
-                                isShowingAddFood = true
-                            },
-                            onDelete: { item in
-                                viewModel.remove(item, from: .breakfast)
-                            }
-                        )
-                        .padding(.horizontal, AppSpace.s16)
-                        
-                        if showAds {
-                            AdCardView(model: AdCardView.sampleAds[0])
-                                .padding(.horizontal, AppSpace.s16)
-                        }
-                        
-                        MealSectionView(
-                            meal: .lunch,
-                            items: viewModel.meals[.lunch] ?? [],
-                            onAddFoodTap: {
-                                addFoodMeal = .lunch
-                                isShowingAddFood = true
-                            },
-                            onDelete: { item in
-                                viewModel.remove(item, from: .lunch)
-                            }
-                        )
-                        .padding(.horizontal, AppSpace.s16)
-                        
-                        if showAds {
-                            AdCardView(model: AdCardView.sampleAds[1])
-                                .padding(.horizontal, AppSpace.s16)
-                        }
-                        
-                        MealSectionView(
-                            meal: .dinner,
-                            items: viewModel.meals[.dinner] ?? [],
-                            onAddFoodTap: {
-                                addFoodMeal = .dinner
-                                isShowingAddFood = true
-                            },
-                            onDelete: { item in
-                                viewModel.remove(item, from: .dinner)
-                            }
-                        )
-                        .padding(.horizontal, AppSpace.s16)
-                        
-                        if showAds {
-                            AdCardView(model: AdCardView.sampleAds[2])
-                                .padding(.horizontal, AppSpace.s16)
-                        }
-                        
-                        MealSectionView(
-                            meal: .snacks,
-                            items: viewModel.meals[.snacks] ?? [],
-                            onAddFoodTap: {
-                                addFoodMeal = .snacks
-                                isShowingAddFood = true
-                            },
-                            onDelete: { item in
-                                viewModel.remove(item, from: .snacks)
-                            }
-                        )
-                        .padding(.horizontal, AppSpace.s16)
-                        
-                        if showAds {
-                            AdCardView(model: AdCardView.sampleAds[3])
-                                .padding(.horizontal, AppSpace.s16)
-                        }
-                        
-                        Spacer(minLength: 120) // breathing room above tab bar + FAB
-                    }
-                }
+                .padding(.bottom, AppSpace.s16)
             }
             
             // FAB positioned above tab bar

@@ -28,7 +28,7 @@ struct MacroRow: View {
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(AppColor.borderSubtle)
+                        .fill(AppColor.borderSubtle.opacity(0.3))
                         .frame(height: 8)
 
                     Capsule()

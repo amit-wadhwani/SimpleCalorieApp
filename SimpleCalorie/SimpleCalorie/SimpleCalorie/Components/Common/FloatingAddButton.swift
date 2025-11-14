@@ -6,15 +6,16 @@ struct FloatingAddButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "plus")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-                .frame(width: 56, height: 56)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(20)
                 .background(
                     Circle()
                         .fill(AppColor.brandPrimary)
-                        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
                 )
         }
+        .buttonStyle(.plain)
     }
 }
 

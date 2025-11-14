@@ -72,7 +72,7 @@ struct MealSectionView: View {
 
                 Button(action: onAddFoodTap) {
                     HStack(spacing: 8) {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: "plus")
                             .font(.system(size: 14, weight: .bold))
                             .foregroundStyle(AppColor.brandPrimary)
                         Text("Add Food")
@@ -87,7 +87,7 @@ struct MealSectionView: View {
             }
         }
         .background(AppColor.bgCard)
-        .cornerRadius(18)
+        .cornerRadius(AppRadius.card)
         .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 6)
     }
 

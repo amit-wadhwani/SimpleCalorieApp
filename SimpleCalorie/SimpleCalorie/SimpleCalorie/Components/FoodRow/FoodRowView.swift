@@ -60,7 +60,7 @@ struct FoodRowView: View {
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.xl)
+            RoundedRectangle(cornerRadius: AppRadius.card)
                 .fill(AppColor.bgCard)
                 .shadow(color: AppColor.borderSubtle.opacity(0.4), radius: 6, x: 0, y: 2)
         )

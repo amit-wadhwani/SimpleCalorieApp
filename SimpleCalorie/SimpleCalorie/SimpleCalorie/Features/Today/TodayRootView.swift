@@ -36,16 +36,16 @@ struct WeeklyPlaceholderView: View {
 }
 
 struct SettingsView: View {
-    @AppStorage("showAds") private var showAds: Bool = true
+    @AppStorage("showAds") var showAds: Bool = true
 
     var body: some View {
         NavigationStack {
             List {
-                Section("App") {
+                Section("APP") {
                     Toggle("Show Ads", isOn: $showAds)
                 }
                 
-                Section("Account") {
+                Section("ACCOUNT") {
                     Text("Profile (coming soon)")
                 }
             }

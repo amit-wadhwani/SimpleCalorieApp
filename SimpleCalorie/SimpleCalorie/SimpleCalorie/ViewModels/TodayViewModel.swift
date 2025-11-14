@@ -5,6 +5,7 @@ import UIKit
 final class TodayViewModel: ObservableObject {
     @Published var selectedDate: Date = Date()
     @Published var isDatePickerPresented: Bool = false
+    @AppStorage("showAds") var showAds: Bool = true
     @Published var meals: [MealType: [FoodItem]] = [
         .breakfast: [
             FoodItem(name: "Oatmeal with berries", calories: 245, description: "100g", protein: 8.0, carbs: 45.0, fat: 5.0),

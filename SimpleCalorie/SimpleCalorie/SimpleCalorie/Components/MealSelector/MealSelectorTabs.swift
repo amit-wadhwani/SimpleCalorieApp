@@ -32,6 +32,10 @@ struct MealTabsView: View {
         .padding(4)
         .background(AppColor.bgScreen.opacity(0.8))
         .clipShape(Capsule())
+        .overlay(
+            Capsule()
+                .stroke(AppColor.borderSubtle.opacity(0.2), lineWidth: 1)
+        )
         .padding(.horizontal, AppSpace.s16)
         .padding(.top, AppSpace.s12)
     }

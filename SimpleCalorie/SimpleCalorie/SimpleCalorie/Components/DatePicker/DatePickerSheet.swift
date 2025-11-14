@@ -38,7 +38,7 @@ struct DatePickerSheet: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpace.s12)
                         .background(AppColor.bgCard)
-                        .cornerRadius(AppRadius.xl)
+                        .cornerRadius(AppRadius.card)
                 }
                 .padding(.horizontal, AppSpace.s16)
                 .padding(.bottom, AppSpace.s16)

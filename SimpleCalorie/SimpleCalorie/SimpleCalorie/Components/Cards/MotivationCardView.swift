@@ -23,11 +23,10 @@ struct MotivationCardView: View {
         }
         .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: AppRadius.xl)
+            RoundedRectangle(cornerRadius: AppRadius.card)
                 .fill(AppColor.bgCard)
                 .shadow(color: AppColor.borderSubtle.opacity(0.3), radius: 8, x: 0, y: 2)
         )
-        .padding(.horizontal, AppSpace.s16)
     }
 }
 
