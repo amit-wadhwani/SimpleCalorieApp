@@ -71,17 +71,11 @@ struct MealSectionView: View {
                 }
 
                 Button(action: onAddFoodTap) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(AppColor.brandPrimary)
-                        Text("Add Food")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(AppColor.brandPrimary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 12)
+                    Text("+ Add Food")
+                        .font(AppFont.bodySmSmall())
+                        .foregroundStyle(AppColor.brandPrimary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, AppSpace.sm)
                 }
                 .buttonStyle(.plain)
             }

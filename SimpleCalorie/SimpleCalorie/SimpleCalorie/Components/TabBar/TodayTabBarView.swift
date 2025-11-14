@@ -23,7 +23,7 @@ struct TodayTabBarView: View {
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: tab.systemImageName)
-                    .font(.system(size: 22, weight: .regular))
+                    .font(.system(size: 17, weight: .regular))
                 Text(tab.title)
                     .font(AppFont.labelCapsSm(11))
             }

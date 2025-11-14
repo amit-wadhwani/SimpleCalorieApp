@@ -42,13 +42,11 @@ struct MealSectionCard: View {
             }
 
             Button(action: onAdd) {
-                HStack(spacing: AppSpace.sm) {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Add Food")
-                }
-                .font(AppFont.bodySmSmall())
-                .foregroundStyle(AppColor.brandPrimary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                Text("+ Add Food")
+                    .font(AppFont.bodySmSmall())
+                    .foregroundStyle(AppColor.brandPrimary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, AppSpace.sm)
             }
             .buttonStyle(.plain)
         }

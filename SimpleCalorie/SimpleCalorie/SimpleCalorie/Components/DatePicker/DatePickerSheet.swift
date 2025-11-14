@@ -25,6 +25,7 @@ struct DatePickerSheet: View {
                     Button("Close") {
                         dismiss()
                     }
+                    .foregroundStyle(AppColor.brandPrimary)
                 }
             }
             .safeAreaInset(edge: .bottom) {
