@@ -25,39 +25,48 @@ struct MealSectionView: View {
             .padding(.top, 12)
 
             VStack(spacing: 0) {
-                ForEach(items) { item in
-                    HStack(alignment: .firstTextBaseline) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.name)
-                                .font(.system(size: 13, weight: .regular))
-                                .foregroundStyle(AppColor.textTitle)
+                if items.isEmpty {
+                    Text("No items yet. Tap \"Add Food\" to log this meal.")
+                        .font(AppFont.bodySm(12))
+                        .foregroundStyle(AppColor.textMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                } else {
+                    ForEach(items) { item in
+                        HStack(alignment: .firstTextBaseline) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.name)
+                                    .font(.system(size: 13, weight: .regular))
+                                    .foregroundStyle(AppColor.textTitle)
+                                
+                                if !item.description.isEmpty && item.description != item.name {
+                                    Text(item.description)
+                                        .font(.system(size: 11, weight: .regular))
+                                        .foregroundStyle(AppColor.textMuted)
+                                }
+                            }
                             
-                            if !item.description.isEmpty && item.description != item.name {
-                                Text(item.description)
-                                    .font(.system(size: 11, weight: .regular))
-                                    .foregroundStyle(AppColor.textMuted)
+                            Spacer()
+                            
+                            Text("\(item.calories) kcal")
+                                .font(.system(size: 11, weight: .regular))
+                                .foregroundStyle(AppColor.textMuted)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                onDelete?(item)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
                         }
-                        
-                        Spacer()
-                        
-                        Text("\(item.calories) kcal")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundStyle(AppColor.textMuted)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            onDelete?(item)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
 
-                    if item.id != items.last?.id {
-                        Divider()
-                            .padding(.leading, 12)
+                        if item.id != items.last?.id {
+                            Divider()
+                                .padding(.leading, 12)
+                        }
                     }
                 }
 

@@ -4,6 +4,7 @@ import UIKit
 
 final class TodayViewModel: ObservableObject {
     @Published var selectedDate: Date = Date()
+    @Published var isDatePickerPresented: Bool = false
     @Published var meals: [MealType: [FoodItem]] = [
         .breakfast: [
             FoodItem(name: "Oatmeal with berries", calories: 245, description: "100g", protein: 8.0, carbs: 45.0, fat: 5.0),
@@ -70,6 +71,14 @@ final class TodayViewModel: ObservableObject {
     
     func totalCalories(for meal: MealType) -> Int {
         Int(meals[meal]?.reduce(0) { $0 + $1.calories } ?? 0)
+    }
+    
+    func goToPreviousDay() {
+        selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+    }
+    
+    func goToNextDay() {
+        selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
     }
     
     private func haptic(_ type: UINotificationFeedbackGenerator.FeedbackType) {

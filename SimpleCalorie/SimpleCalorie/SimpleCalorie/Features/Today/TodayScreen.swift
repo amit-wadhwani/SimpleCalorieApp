@@ -3,19 +3,45 @@ import SwiftUI
 struct TodayScreen: View {
     @EnvironmentObject var viewModel: TodayViewModel
     @AppStorage("showAds") private var showAds: Bool = true
-    @State private var isShowingDatePicker = false
     @State private var isShowingAddFood: Bool = false
     @State private var addFoodMeal: MealType = .breakfast
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            ScrollView {
-                LazyVStack(spacing: AppSpace.s16, pinnedViews: [.sectionHeaders]) {
-                    Section {
+        ZStack(alignment: .bottom) {
+            // Background
+            AppColor.bgScreen
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Top section: date + total calories + macros (single copy)
+                VStack(spacing: AppSpace.s16) {
+                    TodayHeaderView(
+                        selectedDate: $viewModel.selectedDate,
+                        onDateTap: {
+                            viewModel.isDatePickerPresented = true
+                        }
+                    )
+                    .environmentObject(viewModel)
+                    
+                    CalorieSummaryCard(
+                        consumed: viewModel.consumedCalories,
+                        goal: viewModel.dailyGoalCalories
+                    )
+                    
+                    MacrosSectionView()
+                        .environmentObject(viewModel)
+                }
+                .padding(.horizontal, AppSpace.s16)
+                .padding(.top, AppSpace.s16)
+                .padding(.bottom, AppSpace.s12)
+                
+                // Scrollable content: motivation + meals + ads
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: AppSpace.s16) {
                         MotivationCardView()
                             .padding(.horizontal, AppSpace.s16)
                             .padding(.top, AppSpace.s16)
-
+                        
                         // Interleave meals and ads
                         MealSectionView(
                             meal: .breakfast,
@@ -34,7 +60,7 @@ struct TodayScreen: View {
                             AdCardView(model: AdCardView.sampleAds[0])
                                 .padding(.horizontal, AppSpace.s16)
                         }
-
+                        
                         MealSectionView(
                             meal: .lunch,
                             items: viewModel.meals[.lunch] ?? [],
@@ -52,7 +78,7 @@ struct TodayScreen: View {
                             AdCardView(model: AdCardView.sampleAds[1])
                                 .padding(.horizontal, AppSpace.s16)
                         }
-
+                        
                         MealSectionView(
                             meal: .dinner,
                             items: viewModel.meals[.dinner] ?? [],
@@ -70,7 +96,7 @@ struct TodayScreen: View {
                             AdCardView(model: AdCardView.sampleAds[2])
                                 .padding(.horizontal, AppSpace.s16)
                         }
-
+                        
                         MealSectionView(
                             meal: .snacks,
                             items: viewModel.meals[.snacks] ?? [],
@@ -88,37 +114,24 @@ struct TodayScreen: View {
                             AdCardView(model: AdCardView.sampleAds[3])
                                 .padding(.horizontal, AppSpace.s16)
                         }
-
-                        Spacer(minLength: AppSpace.s24)
-                    } header: {
-                        TodayHeaderView(
-                            selectedDate: $viewModel.selectedDate,
-                            consumedCalories: viewModel.consumedCalories,
-                            dailyGoalCalories: viewModel.dailyGoalCalories,
-                            onDateTap: { isShowingDatePicker = true }
-                        )
-                        .environmentObject(viewModel)
-                        .background(
-                            Material.ultraThinMaterial
-                        )
-                        .overlay(
-                            Divider().offset(y: 1),
-                            alignment: .bottom
-                        )
+                        
+                        Spacer(minLength: 120) // breathing room above tab bar + FAB
                     }
                 }
-                .padding(.bottom, 80)
             }
-
-            FloatingAddButton {
-                addFoodMeal = .breakfast
-                isShowingAddFood = true
+            
+            // FAB positioned above tab bar
+            HStack {
+                Spacer()
+                FloatingAddButton {
+                    addFoodMeal = .breakfast
+                    isShowingAddFood = true
+                }
+                .padding(.trailing, AppSpace.s16)
+                .padding(.bottom, 72) // sits above tab bar
             }
-            .padding(.trailing, AppSpace.s24)
-            .padding(.bottom, 80)
         }
-        .background(AppColor.bgScreen.ignoresSafeArea())
-        .sheet(isPresented: $isShowingDatePicker) {
+        .sheet(isPresented: $viewModel.isDatePickerPresented) {
             DatePickerSheet(selectedDate: $viewModel.selectedDate)
         }
         .sheet(isPresented: $isShowingAddFood) {

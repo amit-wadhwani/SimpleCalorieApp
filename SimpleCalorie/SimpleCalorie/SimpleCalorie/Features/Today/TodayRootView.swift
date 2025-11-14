@@ -5,25 +5,21 @@ struct TodayRootView: View {
     @State private var selectedTab: MainTab = .today
 
     var body: some View {
-        Group {
-            switch selectedTab {
-            case .today:
-                TodayScreen()
-                    .environmentObject(viewModel)
-                    .safeAreaInset(edge: .bottom) {
-                        TodayTabBarView(selectedTab: $selectedTab)
-                    }
-            case .weekly:
-                WeeklyPlaceholderView()
-                    .safeAreaInset(edge: .bottom) {
-                        TodayTabBarView(selectedTab: $selectedTab)
-                    }
-            case .settings:
-                SettingsView()
-                    .safeAreaInset(edge: .bottom) {
-                        TodayTabBarView(selectedTab: $selectedTab)
-                    }
+        ZStack(alignment: .bottom) {
+            Group {
+                switch selectedTab {
+                case .today:
+                    TodayScreen()
+                        .environmentObject(viewModel)
+                case .weekly:
+                    WeeklyPlaceholderView()
+                case .settings:
+                    SettingsView()
+                }
             }
+            
+            // Bottom tab bar pinned to bottom
+            TodayTabBarView(selectedTab: $selectedTab)
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }

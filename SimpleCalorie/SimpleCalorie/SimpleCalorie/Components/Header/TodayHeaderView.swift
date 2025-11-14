@@ -3,12 +3,10 @@ import SwiftUI
 struct TodayHeaderView: View {
     @EnvironmentObject var viewModel: TodayViewModel
     @Binding var selectedDate: Date
-    let consumedCalories: Double
-    let dailyGoalCalories: Double
     var onDateTap: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             // Top row - placeholder for future brand icon
             HStack {
                 // Placeholder for future brand icon
@@ -18,45 +16,32 @@ struct TodayHeaderView: View {
             }
 
             // Date row - tappable
-            HStack(spacing: 8) {
+            HStack(spacing: AppSpace.s12) {
                 Button {
-                    selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+                    viewModel.goToPreviousDay()
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(AppColor.textMuted)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(AppColor.brandPrimary)
                 }
                 
                 Button(action: onDateTap) {
                     Text(formattedDate())
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(AppColor.textMuted)
+                        .font(AppFont.titleSm(16))
+                        .foregroundStyle(AppColor.textTitle)
                 }
                 
                 Button {
-                    selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+                    viewModel.goToNextDay()
                 } label: {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(AppColor.textMuted)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(AppColor.brandPrimary)
                 }
                 
                 Spacer()
             }
-
-            // Calorie summary card
-            CalorieSummaryCard(
-                consumed: consumedCalories,
-                goal: dailyGoalCalories
-            )
-
-            // Macros section
-            MacrosSectionView()
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
-        .padding(.bottom, 8)
-        .background(AppColor.bgScreen)
     }
     
     private func formattedDate() -> String {
@@ -69,8 +54,6 @@ struct TodayHeaderView: View {
 #Preview {
     TodayHeaderView(
         selectedDate: .constant(Date()),
-        consumedCalories: 1320,
-        dailyGoalCalories: 1800,
         onDateTap: {}
     )
     .environmentObject(TodayViewModel())

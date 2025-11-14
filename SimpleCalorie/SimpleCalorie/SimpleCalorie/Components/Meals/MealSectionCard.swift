@@ -35,9 +35,7 @@ struct MealSectionCard: View {
                                 .font(AppFont.bodySmSmall())
                                 .foregroundStyle(AppColor.textTitle)
                             Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundStyle(AppColor.textMuted)
+                            // Removed chevron - no navigation destination
                         }
                     }
                 }

@@ -6,13 +6,13 @@ struct ResultsHeaderView: View {
     var body: some View {
         HStack {
             Text("\(count) RESULTS")
-                .font(.system(size: 11, weight: .medium))
+                .font(AppFont.labelCapsSm(11))
                 .foregroundStyle(AppColor.textMuted)
                 .textCase(.uppercase)
             Spacer()
         }
         .padding(.horizontal, AppSpace.s16)
-        .padding(.top, 8)
+        .padding(.top, AppSpace.sm)
     }
 }
 

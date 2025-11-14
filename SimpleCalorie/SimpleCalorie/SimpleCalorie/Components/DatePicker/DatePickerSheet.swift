@@ -14,24 +14,34 @@ struct DatePickerSheet: View {
                 )
                 .datePickerStyle(.graphical)
                 .labelsHidden()
+                .tint(AppColor.brandPrimary)
                 .padding()
 
                 Spacer()
             }
             .navigationTitle("Select Date")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Today") {
-                        let today = Date()
-                        selectedDate = today
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    selectedDate = Date()
+                    dismiss()
+                } label: {
+                    Text("Today")
+                        .font(AppFont.bodySm(14))
+                        .foregroundStyle(AppColor.brandPrimary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpace.s12)
+                        .background(AppColor.bgCard)
+                        .cornerRadius(AppRadius.xl)
                 }
+                .padding(.horizontal, AppSpace.s16)
+                .padding(.bottom, AppSpace.s16)
             }
         }
     }

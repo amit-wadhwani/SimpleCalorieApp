@@ -4,33 +4,36 @@ struct MealTabsView: View {
     @Binding var selectedMeal: MealType
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(MealType.allCases) { meal in
-                    Button {
-                        selectedMeal = meal
-                    } label: {
-                        Text(meal.title)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(
-                                selectedMeal == meal
-                                ? AppColor.textTitle
-                                : AppColor.textMuted
-                            )
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 14)
-                            .background(
-                                selectedMeal == meal
-                                ? AppColor.bgCard
-                                : Color.clear
-                            )
-                            .cornerRadius(14)
-                    }
+        HStack(spacing: 4) {
+            ForEach(MealType.allCases) { meal in
+                Button {
+                    selectedMeal = meal
+                } label: {
+                    Text(meal.title)
+                        .font(AppFont.bodySm(13))
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, AppSpace.s12)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            selectedMeal == meal
+                            ? AppColor.bgCard
+                            : Color.clear
+                        )
+                        .foregroundStyle(
+                            selectedMeal == meal
+                            ? AppColor.textTitle
+                            : AppColor.textMuted
+                        )
+                        .clipShape(Capsule())
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
         }
+        .padding(4)
+        .background(AppColor.bgScreen.opacity(0.8))
+        .clipShape(Capsule())
+        .padding(.horizontal, AppSpace.s16)
+        .padding(.top, AppSpace.s12)
     }
 }
 

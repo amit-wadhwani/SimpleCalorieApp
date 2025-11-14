@@ -15,7 +15,7 @@ struct MotivationCardView: View {
             }
 
             Text("If you ate like this every day... You'd lose 1.2 lbs/week")
-                .font(.system(size: 13, weight: .regular))
+                .font(AppFont.bodySm(13))
                 .foregroundStyle(AppColor.textTitle)
                 .fixedSize(horizontal: false, vertical: true)
             
@@ -23,13 +23,9 @@ struct MotivationCardView: View {
         }
         .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(AppColor.bgCard.opacity(0.8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(AppColor.brandPrimary.opacity(0.05))
-                )
-                .shadow(color: Color.black.opacity(0.03), radius: 10, x: 0, y: 4)
+            RoundedRectangle(cornerRadius: AppRadius.xl)
+                .fill(AppColor.bgCard)
+                .shadow(color: AppColor.borderSubtle.opacity(0.3), radius: 8, x: 0, y: 2)
         )
         .padding(.horizontal, AppSpace.s16)
     }

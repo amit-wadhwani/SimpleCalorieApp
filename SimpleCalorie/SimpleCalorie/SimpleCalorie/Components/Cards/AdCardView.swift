@@ -17,41 +17,41 @@ struct AdCardView: View {
     ]
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            // Left C-shaped vertical bar with rounded ends
-            VStack {
-                RoundedRectangle(cornerRadius: 999)
-                    .fill(AppColor.brandPrimary)
-                    .frame(width: 4, height: 40)
-            }
+        HStack(alignment: .top, spacing: AppSpace.s12) {
+            // Blue crescent accent
+            RoundedRectangle(cornerRadius: AppRadius.xl)
+                .fill(AppColor.brandPrimary)
+                .frame(width: 4)
+                .padding(.vertical, 8)
 
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: AppSpace.sm) {
+                HStack(spacing: AppSpace.sm) {
                     Text("AD")
-                        .font(.system(size: 10, weight: .semibold))
-                        .padding(.horizontal, 6)
+                        .font(AppFont.labelCapsSm(11))
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 8)
                         .padding(.vertical, 2)
                         .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(AppColor.bgScreen)
+                            Capsule()
+                                .fill(AppColor.brandPrimary.opacity(0.1))
                         )
-                        .foregroundStyle(AppColor.textMuted)
+                        .foregroundStyle(AppColor.brandPrimary)
 
                     Text(model.title)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(AppFont.bodySm(13))
                         .foregroundStyle(AppColor.textTitle)
+                        .lineLimit(2)
                 }
             }
 
             Spacer()
         }
-        .padding(16)
+        .padding(AppSpace.s16)
         .background(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: AppRadius.xl)
                 .fill(AppColor.bgCard)
-                .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                .shadow(color: AppColor.borderSubtle.opacity(0.4), radius: 8, x: 0, y: 2)
         )
-        .padding(.horizontal, AppSpace.s16)
     }
 }
 

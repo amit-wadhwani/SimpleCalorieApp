@@ -4,17 +4,17 @@ struct TodayTabBarView: View {
     @Binding var selectedTab: MainTab
 
     var body: some View {
-        HStack(spacing: 40) {
+        HStack(spacing: AppSpace.s16) {
             tabItem(.today)
             tabItem(.weekly)
             tabItem(.settings)
         }
-        .padding(.top, 10)
-        .padding(.bottom, 12)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, AppSpace.s16)
+        .padding(.top, AppSpace.sm)
+        .padding(.bottom, max(AppSpace.sm, 8))
         .frame(maxWidth: .infinity)
         .background(AppColor.bgCard.ignoresSafeArea(edges: .bottom))
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: -2)
+        .shadow(color: AppColor.borderSubtle.opacity(0.5), radius: 8, x: 0, y: -2)
     }
 
     private func tabItem(_ tab: MainTab) -> some View {
@@ -23,11 +23,12 @@ struct TodayTabBarView: View {
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: tab.systemImageName)
-                    .font(.system(size: 22, weight: .regular))
+                    .font(.system(size: 22, weight: .semibold))
                 Text(tab.title)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(AppFont.labelCapsSm(11))
             }
             .foregroundStyle(selectedTab == tab ? AppColor.brandPrimary : AppColor.textMuted)
+            .frame(maxWidth: .infinity)
         }
     }
 }

@@ -17,23 +17,27 @@ struct AddFoodView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
+        ZStack {
+            AppColor.bgScreen
+                .ignoresSafeArea()
+            
+            VStack(spacing: AppSpace.s12) {
                 TopBarView(title: "Add Food") {
                     dismiss()
                 }
-
+                
                 MealTabsView(selectedMeal: $activeMeal)
-
+                
                 SearchBarView(placeholder: "Search database...", text: $query)
                     .onChange(of: query) { _, newValue in
                         searchViewModel.query = newValue
                         Task { await searchViewModel.refresh() }
                     }
-
+                    .padding(.horizontal, AppSpace.s16)
+                
                 ResultsHeaderView(count: searchViewModel.rows.count)
-
-                ScrollView {
+                
+                ScrollView(showsIndicators: false) {
                     VStack(spacing: AppSpace.s12) {
                         ForEach(searchViewModel.rows) { row in
                             FoodRowView(props: row) {
@@ -47,6 +51,7 @@ struct AddFoodView: View {
                                     fat: parseMacro(row.fat)
                                 )
                                 
+                                // Add food to the correct meal
                                 withAnimation(.easeInOut(duration: 0.4)) {
                                     todayViewModel.add(foodItem, to: activeMeal)
                                 }
@@ -55,19 +60,16 @@ struct AddFoodView: View {
                                 let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                                 impactFeedback.impactOccurred()
                                 
+                                // Dismiss sheet
                                 dismiss()
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .padding(.horizontal, AppSpace.s16)
-
-                        Spacer(minLength: AppSpace.s24)
                     }
-                    .padding(.top, 8)
+                    .padding(.horizontal, AppSpace.s16)
+                    .padding(.bottom, AppSpace.s16)
                 }
-                .scrollIndicators(.never)
             }
-            .background(AppColor.bgScreen.ignoresSafeArea())
-            .navigationBarHidden(true)
         }
     }
     

@@ -13,21 +13,20 @@ struct SearchBarView: View {
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
-                .font(.system(size: 13, weight: .regular))
+                .font(AppFont.bodySm(13))
                 .foregroundStyle(AppColor.textTitle)
         }
         .padding(.horizontal, AppSpace.s12)
         .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(AppColor.bgScreen)
+            RoundedRectangle(cornerRadius: AppRadius.xl)
+                .fill(AppColor.bgCard)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18)
+                    RoundedRectangle(cornerRadius: AppRadius.xl)
                         .stroke(AppColor.borderSubtle, lineWidth: 1)
                 )
         )
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
+        .padding(.top, AppSpace.s12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text("Search"))
     }

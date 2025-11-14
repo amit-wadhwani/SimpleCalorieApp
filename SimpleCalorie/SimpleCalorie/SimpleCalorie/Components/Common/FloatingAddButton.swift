@@ -6,13 +6,13 @@ struct FloatingAddButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "plus")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(.white)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
                 .frame(width: 56, height: 56)
                 .background(
                     Circle()
                         .fill(AppColor.brandPrimary)
-                        .shadow(color: AppColor.brandPrimary.opacity(0.25), radius: 10, x: 0, y: 4)
+                        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                 )
         }
     }
