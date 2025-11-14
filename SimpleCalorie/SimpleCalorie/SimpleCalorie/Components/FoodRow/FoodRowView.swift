@@ -38,32 +38,32 @@ struct FoodRowView: View {
             Spacer(minLength: 12)
 
             // Right column
-            VStack(alignment: .trailing, spacing: 8) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
+            VStack(alignment: .trailing, spacing: 4) {
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
                     Text(props.kcal)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(AppColor.textTitle)
-
                     Text("kcal")
                         .font(.system(size: 11, weight: .regular))
                         .foregroundStyle(AppColor.textMuted)
                 }
 
-                Spacer()
+                Spacer(minLength: 0)
 
                 Button(action: onAdd) {
-                    ZStack {
-                        Circle()
-                            .fill(AppColor.brandPrimary)
-                            .frame(width: 30, height: 30)
-                        Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
+                    Image(systemName: "plus")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(AppColor.brandPrimary)
+                        .padding(8)
+                        .background(
+                            Circle()
+                                .fill(AppColor.brandPrimary.opacity(0.08))
+                        )
                 }
+                .buttonStyle(.plain)
                 .accessibilityLabel(Text("Add \(props.name)"))
             }
-            .frame(height: 60, alignment: .top)
+            .frame(maxHeight: .infinity, alignment: .center)
         }
         .padding(.horizontal, AppSpace.s16)
         .padding(.vertical, AppSpace.s12)
@@ -74,9 +74,9 @@ struct FoodRowView: View {
                     RoundedRectangle(cornerRadius: 18)
                         .stroke(AppColor.borderSubtle, lineWidth: 1)
                 )
-                .shadow(color: Color.black.opacity(0.02), radius: 6, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 6)
         )
-        .padding(.horizontal, 20)
+        .padding(.horizontal, AppSpace.s16)
     }
 
     @ViewBuilder

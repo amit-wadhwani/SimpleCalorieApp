@@ -17,17 +17,13 @@ struct AdCardView: View {
     ]
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            // Left blue crescent / pill
-            RoundedRectangle(cornerRadius: 10)
-                .fill(AppColor.brandPrimary.opacity(0.1))
-                .frame(width: 6)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.brandPrimary)
-                        .frame(width: 3),
-                    alignment: .center
-                )
+        HStack(alignment: .center, spacing: 12) {
+            // Left C-shaped vertical bar with rounded ends
+            VStack {
+                RoundedRectangle(cornerRadius: 999)
+                    .fill(AppColor.brandPrimary)
+                    .frame(width: 4, height: 40)
+            }
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
@@ -51,11 +47,11 @@ struct AdCardView: View {
 
             Spacer()
         }
-        .padding(14)
+        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 18)
                 .fill(AppColor.bgCard)
-                .shadow(color: Color.black.opacity(0.03), radius: 10, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
         )
         .padding(.horizontal, AppSpace.s16)
     }

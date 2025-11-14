@@ -5,7 +5,6 @@ struct TodayScreen: View {
     @State private var isShowingDatePicker = false
     @State private var isShowingAddFood: Bool = false
     @State private var addFoodMeal: MealType = .breakfast
-    @State private var showSettingsMenu: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -14,8 +13,7 @@ struct TodayScreen: View {
                 selectedDate: $viewModel.selectedDate,
                 consumedCalories: viewModel.consumedCalories,
                 dailyGoalCalories: viewModel.dailyGoalCalories,
-                onDateTap: { isShowingDatePicker = true },
-                onSettingsTap: { showSettingsMenu = true }
+                onDateTap: { isShowingDatePicker = true }
             )
 
             Divider().opacity(0)  // maintains spacing but keeps header visually clean
@@ -26,20 +24,50 @@ struct TodayScreen: View {
                     VStack(spacing: AppSpace.s16) {
                         MotivationCardView()
 
-                        ForEach(MealType.allCases) { meal in
-                            MealSectionView(
-                                meal: meal,
-                                items: viewModel.meals[meal] ?? [],
-                                onAddFoodTap: {
-                                    addFoodMeal = meal
-                                    isShowingAddFood = true
-                                }
-                            )
-                        }
+                        // Interleave meals and ads
+                        MealSectionView(
+                            meal: .breakfast,
+                            items: viewModel.meals[.breakfast] ?? [],
+                            onAddFoodTap: {
+                                addFoodMeal = .breakfast
+                                isShowingAddFood = true
+                            }
+                        )
+                        
+                        AdCardView(model: AdCardView.sampleAds[0])
 
-                        ForEach(AdCardView.sampleAds) { ad in
-                            AdCardView(model: ad)
-                        }
+                        MealSectionView(
+                            meal: .lunch,
+                            items: viewModel.meals[.lunch] ?? [],
+                            onAddFoodTap: {
+                                addFoodMeal = .lunch
+                                isShowingAddFood = true
+                            }
+                        )
+                        
+                        AdCardView(model: AdCardView.sampleAds[1])
+
+                        MealSectionView(
+                            meal: .dinner,
+                            items: viewModel.meals[.dinner] ?? [],
+                            onAddFoodTap: {
+                                addFoodMeal = .dinner
+                                isShowingAddFood = true
+                            }
+                        )
+                        
+                        AdCardView(model: AdCardView.sampleAds[2])
+
+                        MealSectionView(
+                            meal: .snacks,
+                            items: viewModel.meals[.snacks] ?? [],
+                            onAddFoodTap: {
+                                addFoodMeal = .snacks
+                                isShowingAddFood = true
+                            }
+                        )
+                        
+                        AdCardView(model: AdCardView.sampleAds[3])
 
                         Spacer(minLength: AppSpace.s24)
                     }
@@ -63,27 +91,6 @@ struct TodayScreen: View {
         .sheet(isPresented: $isShowingAddFood) {
             AddFoodView(selectedMeal: addFoodMeal)
                 .environmentObject(viewModel)
-        }
-        .sheet(isPresented: $showSettingsMenu) {
-            NavigationStack {
-                VStack(alignment: .leading, spacing: AppSpace.s16) {
-                    Toggle(isOn: .constant(true)) {
-                        Label("Show Sponsored Tips", systemImage: "eye")
-                    }
-                    .padding()
-                    
-                    Spacer()
-                }
-                .navigationTitle("Settings")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Done") {
-                            showSettingsMenu = false
-                        }
-                    }
-                }
-            }
         }
     }
 }

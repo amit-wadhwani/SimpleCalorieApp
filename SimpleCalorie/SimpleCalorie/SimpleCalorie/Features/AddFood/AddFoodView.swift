@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct AddFoodView: View {
     @EnvironmentObject var todayViewModel: TodayViewModel
@@ -42,10 +43,19 @@ struct AddFoodView: View {
                                     calories: Int(row.kcal) ?? 0,
                                     description: row.serving
                                 )
-                                todayViewModel.add(foodItem, to: activeMeal)
+                                
+                                withAnimation(.easeInOut(duration: 0.4)) {
+                                    todayViewModel.add(foodItem, to: activeMeal)
+                                }
+                                
+                                // Haptic feedback
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                                
+                                dismiss()
                             }
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 20)
 
                         Spacer(minLength: AppSpace.s24)
                     }

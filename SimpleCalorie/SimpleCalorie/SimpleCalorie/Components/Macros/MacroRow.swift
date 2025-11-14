@@ -37,6 +37,7 @@ struct MacroRow: View {
                 }
             }
             .frame(height: 8)
+            .animation(.easeInOut(duration: 0.4), value: progress)
         }
         .padding(.horizontal, AppSpace.s16)
     }

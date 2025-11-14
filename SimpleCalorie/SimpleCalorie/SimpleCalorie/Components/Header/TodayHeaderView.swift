@@ -5,24 +5,15 @@ struct TodayHeaderView: View {
     let consumedCalories: Double
     let dailyGoalCalories: Double
     var onDateTap: () -> Void
-    var onSettingsTap: (() -> Void)?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.s16) {
-            // Top row - no title, just settings
+        VStack(alignment: .leading, spacing: 12) {
+            // Top row - placeholder for future brand icon
             HStack {
                 // Placeholder for future brand icon
                 Spacer().frame(width: 24, height: 24)
 
                 Spacer()
-
-                Button {
-                    onSettingsTap?()
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(AppColor.textTitle)
-                }
             }
 
             // Date row - tappable
@@ -48,8 +39,8 @@ struct TodayHeaderView: View {
             // Macros section
             MacrosSectionView()
         }
-        .padding(.horizontal, AppSpace.s16)
-        .padding(.top, AppSpace.s16)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
         .padding(.bottom, 8)
         .background(AppColor.bgScreen)
     }

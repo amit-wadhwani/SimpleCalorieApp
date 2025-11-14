@@ -20,7 +20,14 @@ struct DatePickerSheet: View {
             }
             .navigationTitle("Select Date")
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Today") {
+                        let today = Date()
+                        selectedDate = today
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }

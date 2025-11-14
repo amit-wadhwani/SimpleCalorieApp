@@ -7,7 +7,7 @@ struct TodayTabBarView: View {
         HStack(spacing: 40) {
             tabItem(.today)
             tabItem(.weekly)
-            tabItem(.profile)
+            tabItem(.settings)
         }
         .padding(.top, 10)
         .padding(.bottom, 12)

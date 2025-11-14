@@ -18,8 +18,8 @@ struct TodayRootView: View {
                     .safeAreaInset(edge: .bottom) {
                         TodayTabBarView(selectedTab: $selectedTab)
                     }
-            case .profile:
-                ProfilePlaceholderView()
+            case .settings:
+                SettingsView()
                     .safeAreaInset(edge: .bottom) {
                         TodayTabBarView(selectedTab: $selectedTab)
                     }
@@ -39,11 +39,19 @@ struct WeeklyPlaceholderView: View {
     }
 }
 
-struct ProfilePlaceholderView: View {
+struct SettingsView: View {
     var body: some View {
         NavigationStack {
-            Text("Profile coming soon")
-                .navigationTitle("Profile")
+            List {
+                Section("Account") {
+                    Text("Profile (coming soon)")
+                }
+
+                Section("App") {
+                    Text("Preferences (coming soon)")
+                }
+            }
+            .navigationTitle("Settings")
         }
     }
 }

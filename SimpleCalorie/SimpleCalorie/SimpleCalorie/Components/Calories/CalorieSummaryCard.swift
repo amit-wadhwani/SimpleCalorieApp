@@ -42,6 +42,7 @@ struct SegmentedCalorieBar: View {
                     .frame(height: 6)
             }
         }
+        .animation(.easeInOut(duration: 0.4), value: filledSegments)
     }
 }
 

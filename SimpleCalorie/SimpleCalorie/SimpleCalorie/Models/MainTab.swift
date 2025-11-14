@@ -3,13 +3,13 @@ import Foundation
 enum MainTab: String, CaseIterable {
     case today
     case weekly
-    case profile
+    case settings
 
     var title: String {
         switch self {
         case .today: return "Today"
         case .weekly: return "Weekly"
-        case .profile: return "Profile"
+        case .settings: return "Settings"
         }
     }
 
@@ -17,7 +17,7 @@ enum MainTab: String, CaseIterable {
         switch self {
         case .today: return "house.fill"
         case .weekly: return "chart.bar.xaxis"
-        case .profile: return "person.crop.circle"
+        case .settings: return "gearshape"
         }
     }
 }
