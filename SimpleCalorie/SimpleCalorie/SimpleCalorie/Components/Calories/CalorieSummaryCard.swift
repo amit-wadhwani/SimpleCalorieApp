@@ -37,7 +37,7 @@ struct SegmentedCalorieBar: View {
             ForEach(0..<segments, id: \.self) { index in
                 Capsule()
                     .fill(index < filledSegments
-                          ? AppColor.brandPrimary
+                          ? AppColor.textTitle
                           : AppColor.borderSubtle)
                     .frame(height: 6)
             }

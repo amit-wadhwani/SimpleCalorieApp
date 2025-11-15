@@ -37,12 +37,12 @@ struct MealSectionView: View {
                         HStack(alignment: .firstTextBaseline) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.name)
-                                    .font(.system(size: 13, weight: .regular))
+                                    .font(.system(size: 14, weight: .regular))
                                     .foregroundStyle(AppColor.textTitle)
                                 
                                 if !item.description.isEmpty && item.description != item.name {
                                     Text(item.description)
-                                        .font(.system(size: 11, weight: .regular))
+                                        .font(.system(size: 12, weight: .regular))
                                         .foregroundStyle(AppColor.textMuted)
                                 }
                             }
@@ -50,7 +50,7 @@ struct MealSectionView: View {
                             Spacer()
                             
                             Text("\(item.calories) kcal")
-                                .font(.system(size: 11, weight: .regular))
+                                .font(.system(size: 12, weight: .regular))
                                 .foregroundStyle(AppColor.textMuted)
                         }
                         .padding(.horizontal, 12)
@@ -72,10 +72,10 @@ struct MealSectionView: View {
 
                 Button(action: onAddFoodTap) {
                     Text("+ Add Food")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(AppColor.brandPrimary)
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, AppSpace.sm)
+                        .padding(.vertical, AppSpace.s12)
                 }
                 .buttonStyle(.plain)
             }

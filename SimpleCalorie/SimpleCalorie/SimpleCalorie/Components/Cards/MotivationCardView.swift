@@ -15,7 +15,7 @@ struct MotivationCardView: View {
             }
 
             Text("If you ate like this every day... You'd lose 1.2 lbs/week")
-                .font(AppFont.bodySm(13))
+                .font(AppFont.bodySm(14))
                 .foregroundStyle(AppColor.textTitle)
                 .fixedSize(horizontal: false, vertical: true)
             

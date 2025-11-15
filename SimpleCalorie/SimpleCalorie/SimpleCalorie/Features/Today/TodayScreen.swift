@@ -24,7 +24,7 @@ struct TodayScreen: View {
                             } label: {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(AppColor.brandPrimary)
+                                    .foregroundStyle(AppColor.textTitle)
                             }
                             
                             Button {
@@ -40,7 +40,7 @@ struct TodayScreen: View {
                             } label: {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(AppColor.brandPrimary)
+                                    .foregroundStyle(AppColor.textTitle)
                             }
                         }
                         .foregroundStyle(AppColor.textTitle)

@@ -19,7 +19,7 @@ struct FoodRowView: View {
             // Top row: name, serving, calories, add button
             HStack(alignment: .top, spacing: AppSpace.s12) {
                 // Left column: name and serving
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(props.name)
                         .font(AppFont.value(15))
                         .foregroundStyle(AppColor.textTitle)
@@ -44,7 +44,7 @@ struct FoodRowView: View {
                             .frame(width: 32, height: 32)
                             .background(
                                 Circle()
-                                    .fill(AppColor.brandPrimary)
+                                    .fill(AppColor.textTitle)
                             )
                     }
                     .buttonStyle(.plain)
@@ -58,7 +58,7 @@ struct FoodRowView: View {
                 macroRow(label: "CARBS", value: props.carbs, color: AppColor.macroCarbs)
                 macroRow(label: "FAT", value: props.fat, color: AppColor.macroFat)
             }
-            .padding(.top, AppSpace.sm)
+            .padding(.top, 4)
         }
         .padding(AppSpace.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
