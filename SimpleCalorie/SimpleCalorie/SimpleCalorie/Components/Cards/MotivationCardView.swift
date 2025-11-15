@@ -4,23 +4,30 @@ struct MotivationCardView: View {
     var body: some View {
         CardContainer {
             HStack(alignment: .top, spacing: AppSpace.s12) {
-                // Chart icon
+                // Icon bubble
                 ZStack {
                     Circle()
-                        .fill(AppColor.brandPrimary.opacity(0.1))
+                        .fill(AppColor.brandPrimary.opacity(0.08))
                         .frame(width: 32, height: 32)
 
-                    Image(systemName: "chart.line.downtrend.xyaxis")
-                        .font(.system(size: 18, weight: .medium))
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(AppColor.brandPrimary)
                 }
 
-                Text("If you ate like this every day... You'd lose 1.2 lbs/week")
-                    .font(AppFont.bodySm(14))
-                    .foregroundStyle(AppColor.textTitle)
-                    .fixedSize(horizontal: false, vertical: true)
-                
-                Spacer()
+                // Text content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("If you ate like this every day... You'd lose 1.2 lbs/week")
+                        .font(AppFont.bodySm(14))              // matches Ad card body size
+                        .foregroundStyle(AppColor.textTitle)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text("Based on your current calorie target.")
+                        .font(AppFont.bodySm(12))
+                        .foregroundStyle(AppColor.textMuted)
+                }
+
+                Spacer(minLength: 0)
             }
         }
     }
@@ -28,6 +35,6 @@ struct MotivationCardView: View {
 
 #Preview {
     MotivationCardView()
+        .padding()
         .background(AppColor.bgScreen)
 }
-
