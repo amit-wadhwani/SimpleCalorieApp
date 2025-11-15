@@ -28,12 +28,18 @@ struct AdCardView: View {
     var body: some View {
         CardContainer {
             HStack(alignment: .top, spacing: AppSpace.s12) {
+                // AD badge (keep your existing badge if you have one)
                 AdBadge()
+                    .frame(width: 28, height: 28)
+                    .alignmentGuide(.top) { d in d[.top] }
 
+                // Ad copy
                 Text(model.title)
-                    .font(AppFont.bodySm(14))          // same size as Motivation main text
+                    .font(AppFont.bodySm(14))
                     .foregroundStyle(AppColor.textTitle)
                     .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+                    .layoutPriority(1)
 
                 Spacer(minLength: 0)
             }
