@@ -27,7 +27,7 @@ struct MealSectionView: View {
             VStack(spacing: 0) {
                 if items.isEmpty {
                     Text("No items yet. Tap \"Add Food\" to log this meal.")
-                        .font(AppFont.bodySm(12))
+                        .font(AppFont.bodySm(13))
                         .foregroundStyle(AppColor.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 12)

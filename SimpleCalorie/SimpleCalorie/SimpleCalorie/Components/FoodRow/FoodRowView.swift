@@ -31,6 +31,7 @@ struct FoodRowView: View {
                     macroColumn(label: "CARBS", value: props.carbs, color: AppColor.macroCarbs)
                     macroColumn(label: "FAT", value: props.fat, color: AppColor.macroFat)
                 }
+                .padding(.top, 2)
             }
 
             Spacer(minLength: AppSpace.s16)
