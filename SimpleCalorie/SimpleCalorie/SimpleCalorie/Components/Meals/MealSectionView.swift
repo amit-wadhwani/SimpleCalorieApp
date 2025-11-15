@@ -33,41 +33,40 @@ struct MealSectionView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                 } else {
-                    ForEach(items) { item in
-                        HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    ForEach(items, id: \.id) { item in
+                        HStack(alignment: .firstTextBaseline, spacing: 0) {
+                            // LEFT: name + detail
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.name)
                                     .font(.system(size: 14, weight: .regular))
                                     .foregroundStyle(AppColor.textTitle)
-
+                                
                                 if !item.description.isEmpty && item.description != item.name {
-                                    Text(item.description)
-                                        .font(.system(size: 12, weight: .regular))
+                                    Text(item.description) // e.g., "100g" or "1 cup"
+                                        .font(.system(size: 12))
                                         .foregroundStyle(AppColor.textMuted)
                                 }
                             }
 
-                            Spacer()
+                            Spacer(minLength: 8)
 
-                            HStack(spacing: 8) {
-                                Text("\(Int(item.calories)) kcal")
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundStyle(AppColor.textTitle)
-
-                                Button {
-                                    onDelete?(item)
-                                } label: {
-                                    Image(systemName: "trash")
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(AppColor.textMuted)
-                                }
-                                .buttonStyle(.plain)
-                                .contentShape(Rectangle())
-                            }
+                            // RIGHT: calories
+                            Text("\(Int(item.calories)) kcal") // e.g., "245 kcal"
+                                .font(.system(size: 12))
+                                .foregroundStyle(AppColor.textMuted)
                         }
+                        .contentShape(Rectangle()) // make whole row swipeable
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                onDelete?(item)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
 
+                        // divider between rows (keeps visual exactly as before)
                         if item.id != items.last?.id {
                             Divider()
                                 .padding(.leading, 12)

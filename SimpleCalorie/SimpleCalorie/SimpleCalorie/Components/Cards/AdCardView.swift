@@ -26,32 +26,33 @@ struct AdCardView: View {
     let model: AdCardModel
 
     var body: some View {
-        CardContainer {
-            HStack(alignment: .top, spacing: AppSpace.s12) {
-                // AD pill badge (non-truncating)
-                Text("AD")
-                    .font(AppFont.labelCapsSm(11))
-                    .foregroundStyle(AppColor.textMuted)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(AppColor.bgScreen)
-                    )
-                    .fixedSize() // prevents "..." truncation
-                    .alignmentGuide(.top) { d in d[.top] }
+        HStack(alignment: .top, spacing: AppSpace.s12) {
+            // AD pill badge (non-truncating)
+            Text("AD")
+                .font(AppFont.labelCapsSm(11))
+                .foregroundStyle(AppColor.textMuted)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(AppColor.bgScreen)
+                )
+                .fixedSize() // prevents "..." truncation
+                .alignmentGuide(.top) { d in d[.top] }
 
-                // Ad copy
-                Text(model.title)
-                    .font(AppFont.bodySm(14))
-                    .foregroundStyle(AppColor.textTitle)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.leading)
-                    .layoutPriority(1)
+            // Ad copy
+            Text(model.title)
+                .font(AppFont.bodySm(14))
+                .foregroundStyle(AppColor.textTitle)
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.leading)
+                .layoutPriority(1)
 
-                Spacer(minLength: 0)
-            }
+            Spacer(minLength: 0)
         }
+        .padding(12) // inside the card
+        .cardRowBackground(.single) // rounded shell + 16pt outer insets
+        .listRowSeparator(.hidden)
     }
 }
 
