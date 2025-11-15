@@ -49,19 +49,24 @@ struct MealSectionView: View {
 
                             Spacer()
 
-                            Text("\(Int(item.calories)) kcal")
-                                .font(.system(size: 12, weight: .regular))
-                                .foregroundStyle(AppColor.textTitle)
+                            HStack(spacing: 8) {
+                                Text("\(Int(item.calories)) kcal")
+                                    .font(.system(size: 12, weight: .regular))
+                                    .foregroundStyle(AppColor.textTitle)
+
+                                Button {
+                                    onDelete?(item)
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundStyle(AppColor.textMuted)
+                                }
+                                .buttonStyle(.plain)
+                                .contentShape(Rectangle())
+                            }
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                onDelete?(item)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
 
                         if item.id != items.last?.id {
                             Divider()

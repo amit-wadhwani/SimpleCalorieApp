@@ -31,23 +31,19 @@ struct AdCardView: View {
     ]
 
     var body: some View {
-        HStack(alignment: .top, spacing: AppSpace.s12) {
-            AdBadge()
-                .padding(.top, 2)
+        CardContainer {
+            HStack(alignment: .top, spacing: AppSpace.s12) {
+                AdBadge()
+                    .padding(.top, 2)
 
-            Text(model.title)
-                .font(AppFont.bodySm(14))
-                .foregroundStyle(AppColor.textTitle)
-                .lineLimit(2)
+                Text(model.title)
+                    .font(AppFont.bodySm(14))
+                    .foregroundStyle(AppColor.textTitle)
+                    .lineLimit(2)
 
-            Spacer()
+                Spacer()
+            }
         }
-        .padding(AppSpace.s16)
-        .background(
-            RoundedRectangle(cornerRadius: AppRadius.card)
-                .fill(AppColor.bgCard)
-                .shadow(color: AppColor.borderSubtle.opacity(0.4), radius: 8, x: 0, y: 2)
-        )
     }
 }
 

@@ -10,53 +10,48 @@ struct MealSectionCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.md) {
-            HStack {
-                Text(meal.rawValue)
-                    .font(AppFont.section())
-                    .foregroundStyle(AppColor.textTitle)
-                Spacer()
-                if totalCalories > 0 {
-                    Text("\(totalCalories) kcal")
+        CardContainer {
+            VStack(alignment: .leading, spacing: AppSpace.md) {
+                HStack {
+                    Text(meal.rawValue)
+                        .font(AppFont.section())
+                        .foregroundStyle(AppColor.textTitle)
+                    Spacer()
+                    if totalCalories > 0 {
+                        Text("\(totalCalories) kcal")
+                            .font(AppFont.bodySmSmall())
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                }
+
+                if items.isEmpty {
+                    Text("No items yet")
                         .font(AppFont.bodySmSmall())
                         .foregroundStyle(AppColor.textMuted)
-                }
-            }
-
-            if items.isEmpty {
-                Text("No items yet")
-                    .font(AppFont.bodySmSmall())
-                    .foregroundStyle(AppColor.textMuted)
-            } else {
-                VStack(alignment: .leading, spacing: AppSpace.sm) {
-                    ForEach(items) { item in
-                        HStack {
-                            Text(item.name)
-                                .font(AppFont.bodySmSmall())
-                                .foregroundStyle(AppColor.textTitle)
-                            Spacer()
-                            // Removed chevron - no navigation destination
+                } else {
+                    VStack(alignment: .leading, spacing: AppSpace.sm) {
+                        ForEach(items) { item in
+                            HStack {
+                                Text(item.name)
+                                    .font(AppFont.bodySmSmall())
+                                    .foregroundStyle(AppColor.textTitle)
+                                Spacer()
+                                // Removed chevron - no navigation destination
+                            }
                         }
                     }
                 }
-            }
 
-            Button(action: onAdd) {
-                Text("+ Add Food")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AppColor.brandPrimary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, AppSpace.s12)
+                Button(action: onAdd) {
+                    Text("+ Add Food")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(AppColor.brandPrimary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, AppSpace.s12)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
-        .padding(AppSpace.lg)
-        .background(AppColor.bgCard)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.xl)
-                .stroke(AppColor.borderSubtle, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl))
     }
 }
 

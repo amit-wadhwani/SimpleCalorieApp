@@ -26,6 +26,7 @@ final class TodayViewModel: ObservableObject {
     @Published var protein: Double = 0
     @Published var carbs: Double = 0
     @Published var fat: Double = 0
+    @Published var isMacrosCollapsed: Bool = false
     
     // Macro goals
     var proteinGoal: Double = 135

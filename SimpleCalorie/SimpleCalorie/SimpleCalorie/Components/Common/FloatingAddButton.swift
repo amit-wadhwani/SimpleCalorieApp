@@ -12,7 +12,12 @@ struct FloatingAddButton: View {
                 .background(
                     Circle()
                         .fill(AppColor.textTitle)
-                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                        .shadow(
+                            color: Color.black.opacity(0.18),
+                            radius: 18,
+                            x: 0,
+                            y: 8
+                        )
                 )
         }
         .buttonStyle(.plain)

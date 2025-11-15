@@ -2,7 +2,6 @@ import SwiftUI
 
 struct MacrosSectionView: View {
     @EnvironmentObject var viewModel: TodayViewModel
-    @State private var isCollapsed: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -16,15 +15,15 @@ struct MacrosSectionView: View {
 
                 Button {
                     withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                        isCollapsed.toggle()
+                        viewModel.isMacrosCollapsed.toggle()
                     }
                 } label: {
                     HStack(spacing: 4) {
-                        Text(isCollapsed ? "Show" : "Hide")
+                        Text(viewModel.isMacrosCollapsed ? "Show" : "Hide")
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(AppColor.textMuted)
 
-                        Image(systemName: isCollapsed ? "chevron.down" : "chevron.up")
+                        Image(systemName: viewModel.isMacrosCollapsed ? "chevron.down" : "chevron.up")
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(AppColor.textMuted)
                     }
@@ -38,7 +37,7 @@ struct MacrosSectionView: View {
             }
             .padding(.horizontal, AppSpace.s16)
 
-            if !isCollapsed {
+            if !viewModel.isMacrosCollapsed {
                 VStack(alignment: .leading, spacing: 12) {
                     MacroRow(
                         label: "Protein",
