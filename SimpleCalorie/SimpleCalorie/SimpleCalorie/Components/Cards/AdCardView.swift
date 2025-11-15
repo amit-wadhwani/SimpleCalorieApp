@@ -28,9 +28,17 @@ struct AdCardView: View {
     var body: some View {
         CardContainer {
             HStack(alignment: .top, spacing: AppSpace.s12) {
-                // AD badge (keep your existing badge if you have one)
-                AdBadge()
-                    .frame(width: 28, height: 28)
+                // AD pill badge (non-truncating)
+                Text("AD")
+                    .font(AppFont.labelCapsSm(11))
+                    .foregroundStyle(AppColor.textMuted)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(AppColor.bgScreen)
+                    )
+                    .fixedSize() // prevents "..." truncation
                     .alignmentGuide(.top) { d in d[.top] }
 
                 // Ad copy
