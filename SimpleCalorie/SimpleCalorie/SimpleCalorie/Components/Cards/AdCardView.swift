@@ -36,7 +36,7 @@ struct AdCardView: View {
                 .padding(.top, 2)
 
             Text(model.title)
-                .font(AppFont.bodySm(13))
+                .font(AppFont.bodySm(14))
                 .foregroundStyle(AppColor.textTitle)
                 .lineLimit(2)
 

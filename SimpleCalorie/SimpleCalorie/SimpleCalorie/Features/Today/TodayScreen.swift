@@ -15,40 +15,13 @@ struct TodayScreen: View {
                 // 1) Header: date row + kcal summary + macros (fixed)
                 VStack(spacing: AppSpace.s16) {
                     // Centered date row
-                    HStack {
-                        Spacer()
-                        
-                        HStack(spacing: AppSpace.s16) {
-                            Button {
-                                viewModel.goToPreviousDay()
-                            } label: {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(AppColor.textTitle)
-                            }
-                            
-                            Button {
-                                viewModel.isDatePickerPresented = true
-                            } label: {
-                                Text(formattedDate())
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundStyle(AppColor.textTitle)
-                            }
-                            
-                            Button {
-                                viewModel.goToNextDay()
-                            } label: {
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(AppColor.textTitle)
-                            }
+                    TodayHeaderView(
+                        selectedDate: $viewModel.selectedDate,
+                        onDateTap: {
+                            viewModel.isDatePickerPresented = true
                         }
-                        .foregroundStyle(AppColor.textTitle)
-                        .frame(maxWidth: .infinity)
-                        
-                        Spacer()
-                    }
-                    .padding(.horizontal, AppSpace.s16)
+                    )
+                    .environmentObject(viewModel)
                     .padding(.top, AppSpace.s12)
                     
                     // Single calorie summary card
@@ -62,10 +35,17 @@ struct TodayScreen: View {
                         .environmentObject(viewModel)
                 }
                 .padding(.horizontal, AppSpace.s16)
+                .background(AppColor.bgScreen)
+                .overlay(
+                    Rectangle()
+                        .fill(AppColor.borderSubtle.opacity(0.6))
+                        .frame(height: 0.5),
+                    alignment: .bottom
+                )
                 
                 // 2) Scrollable zone: meals + ads + everything else
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: AppSpace.s16) {
+                    VStack(spacing: AppSpace.s12) {
                         // Motivation card (always visible)
                         MotivationCardView()
                         

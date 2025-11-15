@@ -15,52 +15,52 @@ struct FoodRowView: View {
     var onAdd: () -> Void = {}
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpace.sm) {
-            // Top row: name, serving, calories, add button
-            HStack(alignment: .top, spacing: AppSpace.s12) {
-                // Left column: name and serving
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(props.name)
-                        .font(AppFont.value(15))
+        HStack(alignment: .center, spacing: AppSpace.s16) {
+            // LEFT: name, serving, macros
+            VStack(alignment: .leading, spacing: 4) {
+                Text(props.name)
+                    .font(AppFont.titleSm(15))
+                    .foregroundStyle(AppColor.textTitle)
+
+                Text(props.serving)
+                    .font(AppFont.bodySm(12))
+                    .foregroundStyle(AppColor.textMuted)
+
+                HStack(spacing: AppSpace.s24) {
+                    macroColumn(label: "PROTEIN", value: props.protein, color: AppColor.macroProtein)
+                    macroColumn(label: "CARBS", value: props.carbs, color: AppColor.macroCarbs)
+                    macroColumn(label: "FAT", value: props.fat, color: AppColor.macroFat)
+                }
+            }
+
+            Spacer(minLength: AppSpace.s16)
+
+            // RIGHT: kcal + plus
+            VStack(alignment: .trailing, spacing: AppSpace.sm) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(props.kcal)
+                        .font(AppFont.titleSm(15))
                         .foregroundStyle(AppColor.textTitle)
 
-                    Text(props.serving)
-                        .font(AppFont.bodySm(12))
+                    Text("kcal")
+                        .font(AppFont.bodySm(11))
                         .foregroundStyle(AppColor.textMuted)
                 }
 
-                Spacer()
-
-                // Calories + add button
-                VStack(alignment: .trailing, spacing: 8) {
-                    Text("\(props.kcal) kcal")
-                        .font(AppFont.value(14))
-                        .foregroundStyle(AppColor.textMuted)
-
-                    Button(action: onAdd) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(Color.white)
-                            .frame(width: 32, height: 32)
-                            .background(
-                                Circle()
-                                    .fill(AppColor.textTitle)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("Add \(props.name)"))
+                Button(action: onAdd) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+                        .background(AppColor.textTitle)
+                        .clipShape(Circle())
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Add \(props.name)"))
             }
-            
-            // Bottom row: macros in horizontal layout
-            HStack(spacing: AppSpace.s24) {
-                macroRow(label: "PROTEIN", value: props.protein, color: AppColor.macroProtein)
-                macroRow(label: "CARBS", value: props.carbs, color: AppColor.macroCarbs)
-                macroRow(label: "FAT", value: props.fat, color: AppColor.macroFat)
-            }
-            .padding(.top, 4)
         }
-        .padding(AppSpace.lg)
+        .padding(.horizontal, AppSpace.s16)
+        .padding(.vertical, AppSpace.s12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: AppRadius.xl)
@@ -70,7 +70,7 @@ struct FoodRowView: View {
     }
 
     @ViewBuilder
-    private func macroRow(label: String, value: String, color: Color) -> some View {
+    private func macroColumn(label: String, value: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
                 .font(AppFont.labelCapsSm(11))

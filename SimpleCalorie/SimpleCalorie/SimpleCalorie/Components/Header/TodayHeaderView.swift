@@ -15,29 +15,40 @@ struct TodayHeaderView: View {
                 Spacer()
             }
 
-            // Date row - tappable
-            HStack(spacing: AppSpace.s12) {
-                Button {
-                    viewModel.goToPreviousDay()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(AppColor.brandPrimary)
-                }
+            // Date row - tappable (centered)
+            HStack {
+                Spacer()
                 
-                Button(action: onDateTap) {
-                    Text(formattedDate())
-                        .font(AppFont.titleSm(16))
-                        .foregroundStyle(AppColor.textTitle)
+                HStack(spacing: AppSpace.s16) {
+                    Button {
+                        viewModel.goToPreviousDay()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(AppColor.textTitle)
+                    }
+                    
+                    Button(action: onDateTap) {
+                        Text(formattedDate())
+                            .font(AppFont.titleSm(16))
+                            .foregroundStyle(AppColor.textTitle)
+                            .padding(.horizontal, AppSpace.s12)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 999)
+                                    .fill(AppColor.bgCard.opacity(0.8))
+                            )
+                    }
+                    
+                    Button {
+                        viewModel.goToNextDay()
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(AppColor.textTitle)
+                    }
                 }
-                
-                Button {
-                    viewModel.goToNextDay()
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(AppColor.brandPrimary)
-                }
+                .frame(maxWidth: .infinity)
                 
                 Spacer()
             }

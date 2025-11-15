@@ -34,27 +34,27 @@ struct MealSectionView: View {
                         .padding(.vertical, 10)
                 } else {
                     ForEach(items) { item in
-                        HStack(alignment: .firstTextBaseline) {
+                        HStack(alignment: .firstTextBaseline, spacing: 12) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.name)
                                     .font(.system(size: 14, weight: .regular))
                                     .foregroundStyle(AppColor.textTitle)
-                                
+
                                 if !item.description.isEmpty && item.description != item.name {
                                     Text(item.description)
                                         .font(.system(size: 12, weight: .regular))
                                         .foregroundStyle(AppColor.textMuted)
                                 }
                             }
-                            
+
                             Spacer()
-                            
-                            Text("\(item.calories) kcal")
+
+                            Text("\(Int(item.calories)) kcal")
                                 .font(.system(size: 12, weight: .regular))
-                                .foregroundStyle(AppColor.textMuted)
+                                .foregroundStyle(AppColor.textTitle)
                         }
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, 6)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 onDelete?(item)
