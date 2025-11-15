@@ -16,7 +16,7 @@ struct MotivationCardView: View {
                 }
 
                 // Text content
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text("If you ate like this every day... You'd lose 1.2 lbs/week")
                         .font(AppFont.bodySm(14))              // matches Ad card body size
                         .foregroundStyle(AppColor.textTitle)

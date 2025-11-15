@@ -19,7 +19,7 @@ struct CardContainer<Content: View>: View {
             .overlay(
                 content
                     .padding(.horizontal, AppSpace.s16)
-                    .padding(.vertical, AppSpace.s12)
+                    .padding(.vertical, AppSpace.s16)
             )
     }
 }
