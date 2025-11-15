@@ -52,6 +52,10 @@ extension AdCardView {
         AdCardModel(
             title: "Smart Tip: High-protein dinners boost next-day energy.",
             isAd: true
+        ),
+        AdCardModel(
+            title: "Smart Tip: New under-200-calorie snacks to keep you on track.",
+            isAd: true
         )
     ]
 }
