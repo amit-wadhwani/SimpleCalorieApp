@@ -12,6 +12,8 @@ private struct FABButtonStyle: ButtonStyle {
 }
 
 struct FloatingAddButton: View {
+    static let diameter: CGFloat = 56  // expose for layout math
+    
     var action: () -> Void
 
     var body: some View {
@@ -22,7 +24,7 @@ struct FloatingAddButton: View {
             Image(systemName: "plus")
                 .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(.white)
-                .padding(20)
+                .frame(width: Self.diameter, height: Self.diameter)
                 .background(
                     Circle()
                         .fill(AppColor.textTitle)

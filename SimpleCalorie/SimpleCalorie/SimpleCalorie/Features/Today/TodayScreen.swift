@@ -220,9 +220,10 @@ struct TodayScreen: View {
                     .listRowSpacing(0) // kill all inter-row gaps; we'll add gaps explicitly
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
                     .safeAreaInset(edge: .bottom, spacing: 0) {
+                        // Use a generous inset; FAB is ~56pt plus shadow/margin. 148pt gives headroom.
                         Color.clear
-                            .frame(height: 120) // keep or 128 if you prefer
-                            .allowsHitTesting(false) // critical so taps pass through
+                            .frame(height: 148)
+                            .allowsHitTesting(false)
                     }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
@@ -251,15 +252,10 @@ struct TodayScreen: View {
             DatePickerSheet(selectedDate: $viewModel.selectedDate)
         }
         .sheet(isPresented: $isShowingAddFood) {
-            AddFoodView(
-                initialSelectedMeal: addFoodMeal ?? .breakfast
-            ) { item, meal in
-                // Route by returned meal
-                viewModel.add(item, to: meal)
-                // Toast with item name
-                toastCenter.show("Added \(item.name) to \(meal.displayName)")
-                // Auto-scroll to the right section
-                pendingScrollToMeal = meal
+            AddFoodView(initialSelectedMeal: addFoodMeal ?? .breakfast) { item, meal in
+                viewModel.add(item, to: meal)                   // route to the meal passed back
+                toastCenter.show("Added to \(meal.displayName)") // info toast, no Undo for add
+                pendingScrollToMeal = meal                      // autoscroll target
             }
             .environmentObject(viewModel)
         }

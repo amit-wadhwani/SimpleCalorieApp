@@ -87,14 +87,14 @@ struct MealSectionList: View {
             onAddTap?(meal)
         } label: {
             Text("+ Add Food")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 16, weight: .semibold)) // was 14; bump back to 16
                 .foregroundStyle(AppColor.brandPrimary)
-                .frame(maxWidth: .infinity, alignment: .center) // center visually
+                .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 12)
         }
         .buttonStyle(.plain)
-        .contentShape(Rectangle()) // keeps full-row hit target
-        .accessibilityLabel("Add Food to \(meal.title)")
+        .contentShape(Rectangle())
+        .accessibilityLabel("Add food to \(meal.displayName)")
         .overlay(alignment: .top) {
             Divider()
                 .padding(.horizontal, 12)
