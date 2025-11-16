@@ -81,10 +81,14 @@ struct TodayScreen: View {
                                     viewModel.remove(item, from: meal)
                                 }
                                 pendingScrollToMeal = meal
-                                // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
-                                    Haptics.light()
-                                    viewModel.add(item, to: meal)
+                                // DELETE: toast WITH UNDO - delay to let swipe animation settle
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 120_000_000)
+                                    toastCenter.show("Removed \(item.name) from \(meal.displayName).",
+                                                     actionTitle: "Undo") {
+                                        Haptics.light()
+                                        viewModel.add(item, to: meal)
+                                    }
                                 }
                             }
                         )
@@ -120,10 +124,14 @@ struct TodayScreen: View {
                                     viewModel.remove(item, from: meal)
                                 }
                                 pendingScrollToMeal = meal
-                                // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
-                                    Haptics.light()
-                                    viewModel.add(item, to: meal)
+                                // DELETE: toast WITH UNDO - delay to let swipe animation settle
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 120_000_000)
+                                    toastCenter.show("Removed \(item.name) from \(meal.displayName).",
+                                                     actionTitle: "Undo") {
+                                        Haptics.light()
+                                        viewModel.add(item, to: meal)
+                                    }
                                 }
                             }
                         )
@@ -159,10 +167,14 @@ struct TodayScreen: View {
                                     viewModel.remove(item, from: meal)
                                 }
                                 pendingScrollToMeal = meal
-                                // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
-                                    Haptics.light()
-                                    viewModel.add(item, to: meal)
+                                // DELETE: toast WITH UNDO - delay to let swipe animation settle
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 120_000_000)
+                                    toastCenter.show("Removed \(item.name) from \(meal.displayName).",
+                                                     actionTitle: "Undo") {
+                                        Haptics.light()
+                                        viewModel.add(item, to: meal)
+                                    }
                                 }
                             }
                         )
@@ -198,10 +210,14 @@ struct TodayScreen: View {
                                     viewModel.remove(item, from: meal)
                                 }
                                 pendingScrollToMeal = meal
-                                // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
-                                    Haptics.light()
-                                    viewModel.add(item, to: meal)
+                                // DELETE: toast WITH UNDO - delay to let swipe animation settle
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 120_000_000)
+                                    toastCenter.show("Removed \(item.name) from \(meal.displayName).",
+                                                     actionTitle: "Undo") {
+                                        Haptics.light()
+                                        viewModel.add(item, to: meal)
+                                    }
                                 }
                             }
                         )
@@ -251,9 +267,15 @@ struct TodayScreen: View {
         }
         .sheet(isPresented: $isShowingAddFood) {
             AddFoodView(initialSelectedMeal: addFoodMeal ?? .breakfast) { item, meal in
-                viewModel.add(item, to: meal)                   // route to the meal passed back
-                toastCenter.show("Added to \(meal.displayName)") // info toast, no Undo for add
-                pendingScrollToMeal = meal                      // autoscroll target
+                isShowingAddFood = false
+                viewModel.add(item, to: meal)
+                pendingScrollToMeal = meal
+                
+                // ADD: toast after sheet dismissal - delay to let sheet close and scroll settle
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 160_000_000)
+                    toastCenter.show("Added \(item.name) to \(meal.displayName).")
+                }
             }
             .environmentObject(viewModel)
         }

@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 final class ToastCenter: ObservableObject {
     struct Toast: Identifiable {
         let id = UUID()
@@ -8,23 +9,43 @@ final class ToastCenter: ObservableObject {
         let action: (() -> Void)?
     }
 
-    @Published private(set) var queue: [Toast] = []
+    @Published private(set) var current: Toast?
+    private var queue: [Toast] = []
+    private var showing = false
+    private var dismissTask: Task<Void, Never>?
 
-    func show(_ text: String, actionTitle: String? = nil, action: (() -> Void)? = nil) {
-        let t = Toast(text: text, actionTitle: actionTitle, action: action)
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) { queue.append(t) }
-        Haptics.success()
-        autoDismiss(t)
+    func show(_ text: String,
+              actionTitle: String? = nil,
+              action: (() -> Void)? = nil,
+              duration: TimeInterval = 2.2) {
+        let toast = Toast(text: text, actionTitle: actionTitle, action: action)
+        queue.append(toast)
+        process(duration: duration)
     }
 
-    func remove(_ toast: Toast) {
-        guard let i = queue.firstIndex(where: { $0.id == toast.id }) else { return }
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) { queue.remove(at: i) }
+    func dismiss() {
+        dismissTask?.cancel()
+        dismissTask = nil
+        current = nil
+        if !queue.isEmpty { queue.removeFirst() }
+        showing = false
+        // allow exit animation to complete before showing next
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 80_000_000)
+            process()
+        }
     }
 
-    private func autoDismiss(_ toast: Toast) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
-            self?.remove(toast)
+    private func process(duration: TimeInterval = 2.2) {
+        guard !showing, let next = queue.first else { return }
+        showing = true
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+            current = next
+        }
+        dismissTask?.cancel()
+        dismissTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
+            dismiss()
         }
     }
 }
@@ -35,7 +56,7 @@ private struct ToastPresenter: ViewModifier {
     func body(content: Content) -> some View {
         ZStack(alignment: .bottom) {
             content
-            ForEach(center.queue) { toast in
+            if let toast = center.current {
                 HStack(spacing: 12) {
                     Text(toast.text)
                         .font(.system(size: 14, weight: .semibold))
@@ -46,13 +67,14 @@ private struct ToastPresenter: ViewModifier {
                         Button(title) {
                             Haptics.light()
                             toast.action?()
-                            center.remove(toast)
+                            center.dismiss()
                         }
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 10).padding(.vertical, 6)
                         .background(Color.white.opacity(0.18))
                         .clipShape(Capsule())
+                        .allowsHitTesting(true) // button is tappable
                     }
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12)
@@ -63,6 +85,8 @@ private struct ToastPresenter: ViewModifier {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Notification")
+                .zIndex(999)
+                .allowsHitTesting(toast.actionTitle != nil) // banner doesn't block scrolling unless it has a button
             }
         }
     }
