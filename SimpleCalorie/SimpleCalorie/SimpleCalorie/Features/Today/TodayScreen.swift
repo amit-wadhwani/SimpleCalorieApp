@@ -218,29 +218,23 @@ struct TodayScreen: View {
                     .scrollContentBackground(.hidden)
                     .listRowSpacing(0) // kill all inter-row gaps; we'll add gaps explicitly
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        // Reserve space above the tab bar and render the FAB here.
-                        ZStack(alignment: .bottomTrailing) {
-                            // Transparent spacer that ensures the List content never sits under the FAB
-                            Color.clear
-                                .frame(height: 128) // 56 (FAB) + ~24 (clearance) + ~48 (tab bar/safe area allowance)
-
-                            // FAB anchored inside the inset; padded so it sits fully above the tab bar/home area
-                            FloatingAddButton {
-                                addFoodMeal = lastSelectedMeal // existing action, keep your current behavior
-                                isShowingAddFood = true
-                            }
-                            .padding(.trailing, AppSpace.s16) // keep right margin consistent
-                            .padding(.bottom, 24)             // lift FAB above the bottom bar
-                        }
-                        .background(Color.clear) // do NOT block taps behind the inset
-                    }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
                         withAnimation(.easeOut(duration: 0.3)) {
                             proxy.scrollTo(meal, anchor: .center)
                         }
                         pendingScrollToMeal = nil
+                    }
+                }
+                // Overlay FAB that always clears the home indicator / tab bar
+                .overlay(alignment: .bottomTrailing) {
+                    FABSafeAreaHost {
+                        FloatingAddButton {
+                            // keep existing action (set addFoodMeal = lastSelectedMeal, show sheet, etc.)
+                            addFoodMeal = lastSelectedMeal
+                            isShowingAddFood = true
+                        }
+                        .accessibilityLabel("Add food")
                     }
                 }
             }
