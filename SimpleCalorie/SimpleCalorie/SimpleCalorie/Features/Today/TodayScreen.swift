@@ -207,11 +207,8 @@ struct TodayScreen: View {
                         )
                         .id(MealType.snacks)
                         
-                        // Final spacer to push last "+ Add Food" above home area
+                        // Final small spacer to keep symmetry
                         SpacerRow(height: 24)
-                        
-                        // Extra scrollable padding so Snacks "+ Add Food" can scroll above FAB/home indicator
-                        SpacerRow(height: 128)
                             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
@@ -222,10 +219,22 @@ struct TodayScreen: View {
                     .listRowSpacing(0) // kill all inter-row gaps; we'll add gaps explicitly
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
                     .safeAreaInset(edge: .bottom, spacing: 0) {
-                        // Use a generous inset; FAB is ~56pt plus shadow/margin. 148pt gives headroom.
-                        Color.clear
-                            .frame(height: 148)
-                            .allowsHitTesting(false)
+                        // This inset RESERVES vertical space and HOSTS the FAB,
+                        // so list content never sits under the button.
+                        ZStack(alignment: .bottomTrailing) {
+                            // Transparent background to extend safely into home area
+                            Color.clear
+                                .frame(height: 96) // space for FAB (56) + margins; adjust if needed
+
+                            FloatingAddButton {
+                                addFoodMeal = lastSelectedMeal
+                                isShowingAddFood = true
+                                Haptics.light()
+                            }
+                            .padding(.trailing, AppSpace.s16)
+                            .padding(.bottom, 16) // above the home indicator
+                        }
+                        // Do NOT set allowsHitTesting(false) here; the FAB must be tappable.
                     }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
@@ -234,18 +243,6 @@ struct TodayScreen: View {
                         }
                         pendingScrollToMeal = nil
                     }
-                }
-                
-                // FAB positioned above tab bar
-                HStack {
-                    Spacer()
-                    FloatingAddButton {
-                        addFoodMeal = lastSelectedMeal
-                        isShowingAddFood = true
-                        Haptics.light()
-                    }
-                    .padding(.trailing, AppSpace.s16)
-                    .padding(.bottom, 72) // sits above tab bar
                 }
             }
             .toast(center: toastCenter)
