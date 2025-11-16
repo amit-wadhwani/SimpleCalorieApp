@@ -38,6 +38,9 @@ struct MacroRow: View {
             }
             .frame(height: 8)
             .animation(.easeInOut(duration: 0.35), value: value)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(label)
+            .accessibilityValue("\(value) of \(goal) grams")
         }
         .padding(.horizontal, AppSpace.s16)
     }

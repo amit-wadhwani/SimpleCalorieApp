@@ -6,13 +6,17 @@ struct AddFoodView: View {
     @StateObject private var searchViewModel: AddFoodViewModel
     @Environment(\.dismiss) private var dismiss
     let selectedMeal: MealType
+    var onFoodAdded: ((FoodItem) -> Void)? = nil
     
+    @AppStorage("addFood.lastTab") private var lastTabRaw: String = MealType.breakfast.rawValue
     @State private var activeMeal: MealType
     @State private var query: String = ""
 
-    init(selectedMeal: MealType) {
+    init(selectedMeal: MealType, onFoodAdded: ((FoodItem) -> Void)? = nil) {
         self.selectedMeal = selectedMeal
-        self._activeMeal = State(initialValue: selectedMeal)
+        self.onFoodAdded = onFoodAdded
+        let savedMeal = MealType(rawValue: UserDefaults.standard.string(forKey: "addFood.lastTab") ?? MealType.breakfast.rawValue) ?? selectedMeal
+        self._activeMeal = State(initialValue: savedMeal)
         self._searchViewModel = StateObject(wrappedValue: AddFoodViewModel(service: MockFoodSearchService()))
     }
 
@@ -27,8 +31,14 @@ struct AddFoodView: View {
                 }
                 
                 MealTabsView(selectedMeal: $activeMeal)
+                    .onChange(of: activeMeal) { oldValue, newValue in
+                        lastTabRaw = newValue.rawValue
+                    }
                 
                 SearchBarView(placeholder: "Search database...", text: $query)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .submitLabel(.search)
                     .onChange(of: query) { _, newValue in
                         searchViewModel.query = newValue
                         Task { await searchViewModel.refresh() }
@@ -56,9 +66,8 @@ struct AddFoodView: View {
                                     todayViewModel.add(foodItem, to: activeMeal)
                                 }
                                 
-                                // Haptic feedback
-                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                                impactFeedback.impactOccurred()
+                                // Call the onFoodAdded callback if provided
+                                onFoodAdded?(foodItem)
                                 
                                 // Dismiss sheet
                                 dismiss()
@@ -69,6 +78,7 @@ struct AddFoodView: View {
                     .padding(.horizontal, AppSpace.s16)
                     .padding(.bottom, AppSpace.s16)
                 }
+                .scrollDismissesKeyboard(.interactively)
             }
         }
     }

@@ -32,6 +32,7 @@ struct DatePickerSheet: View {
                 // Top-right: Done
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
+                        Haptics.success()
                         dismiss()
                     }
                     .foregroundStyle(AppColor.brandPrimary)

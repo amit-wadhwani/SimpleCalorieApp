@@ -4,6 +4,7 @@ struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
     var onAddTap: () -> Void
+    var onAddFood: ((FoodItem) -> Void)? = nil
     var onDelete: (FoodItem) -> Void
 
     // MARK: - Body
@@ -26,8 +27,10 @@ struct MealSectionList: View {
                     )
                     .cardRowBackground(.middle) // All item rows are middle; "Add Food" is bottom
                     .listRowSeparator(.hidden)
+                    .contentShape(Rectangle()) // generous hit area
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
+                            Haptics.rigid()
                             onDelete(item)
                         } label: {
                             Label("Delete", systemImage: "trash")
