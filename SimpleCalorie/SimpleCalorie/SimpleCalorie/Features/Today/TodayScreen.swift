@@ -219,22 +219,21 @@ struct TodayScreen: View {
                     .listRowSpacing(0) // kill all inter-row gaps; we'll add gaps explicitly
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
                     .safeAreaInset(edge: .bottom, spacing: 0) {
-                        // This inset RESERVES vertical space and HOSTS the FAB,
-                        // so list content never sits under the button.
+                        // Reserve space above the tab bar and render the FAB here.
                         ZStack(alignment: .bottomTrailing) {
-                            // Transparent background to extend safely into home area
+                            // Transparent spacer that ensures the List content never sits under the FAB
                             Color.clear
-                                .frame(height: 96) // space for FAB (56) + margins; adjust if needed
+                                .frame(height: 128) // 56 (FAB) + ~24 (clearance) + ~48 (tab bar/safe area allowance)
 
+                            // FAB anchored inside the inset; padded so it sits fully above the tab bar/home area
                             FloatingAddButton {
-                                addFoodMeal = lastSelectedMeal
+                                addFoodMeal = lastSelectedMeal // existing action, keep your current behavior
                                 isShowingAddFood = true
-                                Haptics.light()
                             }
-                            .padding(.trailing, AppSpace.s16)
-                            .padding(.bottom, 16) // above the home indicator
+                            .padding(.trailing, AppSpace.s16) // keep right margin consistent
+                            .padding(.bottom, 24)             // lift FAB above the bottom bar
                         }
-                        // Do NOT set allowsHitTesting(false) here; the FAB must be tappable.
+                        .background(Color.clear) // do NOT block taps behind the inset
                     }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
