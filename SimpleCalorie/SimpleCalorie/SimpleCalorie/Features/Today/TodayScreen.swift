@@ -218,6 +218,12 @@ struct TodayScreen: View {
                     .scrollContentBackground(.hidden)
                     .listRowSpacing(0) // kill all inter-row gaps; we'll add gaps explicitly
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        // transparent bumper that just creates scrollable space
+                        Color.clear
+                            .frame(height: 88) // ~56 (FAB) + 16–24 clearance; invisible space
+                            .allowsHitTesting(false)
+                    }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
                         withAnimation(.easeOut(duration: 0.3)) {
