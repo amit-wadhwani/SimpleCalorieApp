@@ -3,6 +3,7 @@ import SwiftUI
 struct DatePickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedDate: Date
+    var onDone: (() -> Void)?
 
     var body: some View {
         NavigationStack {
@@ -33,6 +34,7 @@ struct DatePickerSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
                         Haptics.success()
+                        onDone?()
                         dismiss()
                     }
                     .foregroundStyle(AppColor.brandPrimary)

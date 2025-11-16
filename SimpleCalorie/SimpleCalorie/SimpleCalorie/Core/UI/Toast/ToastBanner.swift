@@ -12,27 +12,38 @@ final class ToastCenter: ObservableObject {
     @Published private(set) var current: Toast?
     private var queue: [Toast] = []
     private var showing = false
-    private var dismissTask: Task<Void, Never>?
+    private var dismissWorkItems: [UUID: DispatchWorkItem] = [:]
+    private var lastEnqueue: (text: String, time: CFAbsoluteTime)?
 
+    @MainActor
     func show(_ text: String,
               actionTitle: String? = nil,
               action: (() -> Void)? = nil,
               duration: TimeInterval = 2.2) {
+        let now = CFAbsoluteTimeGetCurrent()
+        if let last = lastEnqueue, last.text == text, (now - last.time) < 0.2 {
+            return // coalesce identical messages within 200ms
+        }
+        lastEnqueue = (text, now)
         let toast = Toast(text: text, actionTitle: actionTitle, action: action)
         queue.append(toast)
         process(duration: duration)
     }
 
+    @MainActor
     func dismiss() {
-        dismissTask?.cancel()
-        dismissTask = nil
+        if let currentId = current?.id {
+            dismissWorkItems[currentId]?.cancel()
+            dismissWorkItems[currentId] = nil
+        }
         current = nil
         if !queue.isEmpty { queue.removeFirst() }
         showing = false
         // allow exit animation to complete before showing next
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 80_000_000)
-            process()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
+            Task { @MainActor in
+                self?.process()
+            }
         }
     }
 
@@ -42,11 +53,19 @@ final class ToastCenter: ObservableObject {
         withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
             current = next
         }
-        dismissTask?.cancel()
-        dismissTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
-            dismiss()
+        scheduleAutoDismiss(id: next.id, after: duration)
+    }
+    
+    private func scheduleAutoDismiss(id: UUID, after seconds: TimeInterval) {
+        dismissWorkItems[id]?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                guard let self = self, self.current?.id == id else { return }
+                self.dismiss()
+            }
         }
+        dismissWorkItems[id] = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
     }
 }
 
@@ -55,7 +74,14 @@ private struct ToastPresenter: ViewModifier {
 
     func body(content: Content) -> some View {
         ZStack(alignment: .bottom) {
+            // Full-screen pass-through base
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .allowsHitTesting(false)
+            
             content
+            
+            // The actual toast view (tappable if it has a button)
             if let toast = center.current {
                 HStack(spacing: 12) {
                     Text(toast.text)
@@ -74,7 +100,6 @@ private struct ToastPresenter: ViewModifier {
                         .padding(.horizontal, 10).padding(.vertical, 6)
                         .background(Color.white.opacity(0.18))
                         .clipShape(Capsule())
-                        .allowsHitTesting(true) // button is tappable
                     }
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12)
@@ -86,7 +111,6 @@ private struct ToastPresenter: ViewModifier {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Notification")
                 .zIndex(999)
-                .allowsHitTesting(toast.actionTitle != nil) // banner doesn't block scrolling unless it has a button
             }
         }
     }

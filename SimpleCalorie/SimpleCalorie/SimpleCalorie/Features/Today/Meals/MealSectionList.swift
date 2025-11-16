@@ -4,7 +4,6 @@ struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
     var onAddTap: ((MealType) -> Void)?
-    var onAddFood: ((FoodItem, MealType) -> Void)? = nil
     var onDelete: (FoodItem) -> Void
 
     // MARK: - Body
@@ -20,21 +19,28 @@ struct MealSectionList: View {
                     .listRowSeparator(.hidden)
             } else {
                 // 2) Item rows (each swipable)
-                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                    MealItemRowWithDivider(
+                ForEach(items, id: \.id) { item in
+                    EquatableView(content: MealItemRowWithDivider(
                         item: item,
-                        isLastItem: index == items.count - 1
-                    )
+                        isLastItem: item.id == items.last?.id
+                    ))
                     .cardRowBackground(.middle) // All item rows are middle; "Add Food" is bottom
                     .listRowSeparator(.hidden)
                     .contentShape(Rectangle()) // generous hit area
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             Haptics.rigid()
-                            onDelete(item)
+                            withAnimation(.easeInOut(duration: 0.18)) {
+                                onDelete(item)
+                            }
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(item.name), \(item.calories) calories")
+                    .accessibilityAction(named: "Delete") {
+                        onDelete(item)
                     }
                 }
             }
@@ -61,12 +67,12 @@ struct MealSectionList: View {
                     .foregroundStyle(AppColor.textTitle)
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.horizontal, AppSpace.s12)
+        .padding(.vertical, AppSpace.s12)
         .accessibilityElement(children: .combine)
         .overlay(alignment: .bottom) {
             Divider()
-                .padding(.horizontal, 12)
+                .padding(.horizontal, AppSpace.s12)
                 .foregroundStyle(AppColor.borderSubtle)
         }
         .cardRowBackground(.top)
@@ -77,9 +83,9 @@ struct MealSectionList: View {
         Text("No items yet. Tap \"Add Food\" to log this meal.")
             .font(AppFont.bodySm(13))
             .foregroundStyle(AppColor.textMuted)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, AppSpace.s12)
+        .padding(.vertical, AppSpace.sm)
     }
 
     private var addFoodRowWithDivider: some View {
@@ -97,7 +103,7 @@ struct MealSectionList: View {
         .accessibilityLabel("Add food to \(meal.displayName)")
         .overlay(alignment: .top) {
             Divider()
-                .padding(.horizontal, 12)
+                .padding(.horizontal, AppSpace.s12)
                 .foregroundStyle(AppColor.borderSubtle)
         }
         .cardRowBackground(.bottom)
@@ -109,9 +115,13 @@ struct MealSectionList: View {
     }
 }
 
-private struct MealItemRowWithDivider: View {
+private struct MealItemRowWithDivider: View, Equatable {
     let item: FoodItem
     let isLastItem: Bool
+    
+    static func == (lhs: MealItemRowWithDivider, rhs: MealItemRowWithDivider) -> Bool {
+        lhs.item.id == rhs.item.id && lhs.isLastItem == rhs.isLastItem
+    }
     
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -131,12 +141,12 @@ private struct MealItemRowWithDivider: View {
                 .font(.system(size: 12, weight: .regular))
                 .foregroundStyle(AppColor.textMuted)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, AppSpace.s12)
+        .padding(.vertical, AppSpace.sm)
         .overlay(alignment: .bottom) {
             if !isLastItem {
                 Divider()
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, AppSpace.s12)
                     .foregroundStyle(AppColor.borderSubtle)
             }
         }

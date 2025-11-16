@@ -5,7 +5,7 @@ struct MotivationCardView: View {
         HStack(alignment: .top, spacing: AppSpace.s12) {
             // Left icon
             ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.sm, style: .continuous)
                     .fill(AppColor.brandPrimary.opacity(0.08))
                 // Always show a weight-loss (down) trend for now
                 Image(systemName: "chart.line.downtrend.xyaxis")
@@ -25,7 +25,7 @@ struct MotivationCardView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(12) // inside the card
+        .padding(AppSpace.s12) // inside the card
         .cardRowBackground(.single) // rounded shell + 16pt outer insets
         .listRowSeparator(.hidden)
     }

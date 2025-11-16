@@ -31,10 +31,10 @@ struct AdCardView: View {
             Text("AD")
                 .font(AppFont.labelCapsSm(11))
                 .foregroundStyle(AppColor.textMuted)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
+                .padding(.horizontal, AppSpace.sm)
+                .padding(.vertical, AppSpace.xs)
                 .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: AppRadius.sm, style: .continuous)
                         .fill(AppColor.bgScreen)
                 )
                 .fixedSize() // prevents "..." truncation
@@ -50,7 +50,7 @@ struct AdCardView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(12) // inside the card
+        .padding(AppSpace.s12) // inside the card
         .cardRowBackground(.single) // rounded shell + 16pt outer insets
         .listRowSeparator(.hidden)
     }

@@ -7,7 +7,6 @@ struct AddFoodView: View {
     @Environment(\.dismiss) private var dismiss
     var onFoodAdded: ((FoodItem, MealType) -> Void)? = nil
     
-    @AppStorage("addFood.lastSelectedMeal") private var lastSelectedMealRaw: String = MealType.breakfast.rawValue
     @State private var activeMeal: MealType
     @State private var query: String = ""
 
@@ -75,10 +74,8 @@ struct AddFoodView: View {
     }
     
     private func add(_ item: FoodItem) {
-        // Fire callback to Today
+        // Fire callback to Today (which will update preferences)
         onFoodAdded?(item, activeMeal)
-        // Update FAB memory only after a successful add
-        lastSelectedMealRaw = activeMeal.rawValue
         Haptics.success()
         // Dismiss sheet
         dismiss()

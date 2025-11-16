@@ -1,16 +1,22 @@
 import SwiftUI
 
+enum TodaySheet: Identifiable, Equatable {
+    case datePicker
+    case addFood(initialMeal: MealType)
+
+    var id: String {
+        switch self {
+        case .datePicker: return "datePicker"
+        case .addFood(let m): return "addFood:\(m.rawValue)"
+        }
+    }
+}
+
 struct TodayScreen: View {
     @EnvironmentObject var viewModel: TodayViewModel
     @StateObject private var toastCenter = ToastCenter()
-    @State private var isShowingAddFood: Bool = false
-    @State private var addFoodMeal: MealType? = nil
+    @State private var activeSheet: TodaySheet?
     @State private var pendingScrollToMeal: MealType?
-    @AppStorage("addFood.lastSelectedMeal") private var lastSelectedMealRaw: String = MealType.breakfast.rawValue
-    
-    private var lastSelectedMeal: MealType {
-        MealType(rawValue: lastSelectedMealRaw) ?? .breakfast
-    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -26,7 +32,7 @@ struct TodayScreen: View {
                         TodayHeaderView(
                             selectedDate: $viewModel.selectedDate,
                             onDateTap: {
-                                viewModel.isDatePickerPresented = true
+                                activeSheet = .datePicker
                             }
                         )
                         .environmentObject(viewModel)
@@ -60,19 +66,9 @@ struct TodayScreen: View {
                         // Breakfast card
                         MealSectionList(
                             meal: .breakfast,
-                            items: viewModel.meals[.breakfast] ?? [],
+                            items: viewModel.meals.items(for: .breakfast),
                             onAddTap: { meal in
-                                addFoodMeal = meal
-                                isShowingAddFood = true
-                            },
-                            onAddFood: { item, meal in
-                                Haptics.light()
-                                withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: meal)
-                                }
-                                pendingScrollToMeal = meal
-                                // ADD: toast, NO UNDO
-                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
+                                activeSheet = .addFood(initialMeal: meal)
                             },
                             onDelete: { item in
                                 Haptics.rigid()
@@ -103,19 +99,9 @@ struct TodayScreen: View {
                         // Lunch card
                         MealSectionList(
                             meal: .lunch,
-                            items: viewModel.meals[.lunch] ?? [],
+                            items: viewModel.meals.items(for: .lunch),
                             onAddTap: { meal in
-                                addFoodMeal = meal
-                                isShowingAddFood = true
-                            },
-                            onAddFood: { item, meal in
-                                Haptics.light()
-                                withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: meal)
-                                }
-                                pendingScrollToMeal = meal
-                                // ADD: toast, NO UNDO
-                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
+                                activeSheet = .addFood(initialMeal: meal)
                             },
                             onDelete: { item in
                                 Haptics.rigid()
@@ -146,19 +132,9 @@ struct TodayScreen: View {
                         // Dinner card
                         MealSectionList(
                             meal: .dinner,
-                            items: viewModel.meals[.dinner] ?? [],
+                            items: viewModel.meals.items(for: .dinner),
                             onAddTap: { meal in
-                                addFoodMeal = meal
-                                isShowingAddFood = true
-                            },
-                            onAddFood: { item, meal in
-                                Haptics.light()
-                                withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: meal)
-                                }
-                                pendingScrollToMeal = meal
-                                // ADD: toast, NO UNDO
-                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
+                                activeSheet = .addFood(initialMeal: meal)
                             },
                             onDelete: { item in
                                 Haptics.rigid()
@@ -189,19 +165,9 @@ struct TodayScreen: View {
                         // Snacks card
                         MealSectionList(
                             meal: .snacks,
-                            items: viewModel.meals[.snacks] ?? [],
+                            items: viewModel.meals.items(for: .snacks),
                             onAddTap: { meal in
-                                addFoodMeal = meal
-                                isShowingAddFood = true
-                            },
-                            onAddFood: { item, meal in
-                                Haptics.light()
-                                withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: meal)
-                                }
-                                pendingScrollToMeal = meal
-                                // ADD: toast, NO UNDO
-                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
+                                activeSheet = .addFood(initialMeal: meal)
                             },
                             onDelete: { item in
                                 Haptics.rigid()
@@ -248,36 +214,41 @@ struct TodayScreen: View {
                         pendingScrollToMeal = nil
                     }
                 }
-                // Overlay FAB that always clears the home indicator / tab bar
-                .overlay(alignment: .bottomTrailing) {
-                    FABSafeAreaHost {
-                        FloatingAddButton {
-                            // keep existing action (set addFoodMeal = lastSelectedMeal, show sheet, etc.)
-                            addFoodMeal = lastSelectedMeal
-                            isShowingAddFood = true
-                        }
-                        .accessibilityLabel("Add food")
-                    }
-                }
             }
             .toast(center: toastCenter)
-        }
-        .sheet(isPresented: $viewModel.isDatePickerPresented) {
-            DatePickerSheet(selectedDate: $viewModel.selectedDate)
-        }
-        .sheet(isPresented: $isShowingAddFood) {
-            AddFoodView(initialSelectedMeal: addFoodMeal ?? .breakfast) { item, meal in
-                isShowingAddFood = false
-                viewModel.add(item, to: meal)
-                pendingScrollToMeal = meal
-                
-                // ADD: toast after sheet dismissal - delay to let sheet close and scroll settle
-                Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 160_000_000)
-                    toastCenter.show("Added \(item.name) to \(meal.displayName).")
+            // Overlay FAB that always clears the home indicator / tab bar
+            .overlay(alignment: .bottomTrailing) {
+                FABSafeAreaHost(trailing: 16, clearance: 32) {
+                    FloatingAddButton {
+                        Haptics.light()
+                        activeSheet = .addFood(initialMeal: AddFoodPreferences.lastSelected)
+                    }
+                    .accessibilityLabel("Add food")
                 }
             }
-            .environmentObject(viewModel)
+        }
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .datePicker:
+                DatePickerSheet(selectedDate: $viewModel.selectedDate) {
+                    viewModel.setDate(viewModel.selectedDate)
+                    activeSheet = nil
+                }
+            case .addFood(let initial):
+                AddFoodView(initialSelectedMeal: initial) { item, meal in
+                    withAnimation(.easeOut(duration: 0.22)) {
+                        viewModel.add(item, to: meal)
+                    }
+                    AddFoodPreferences.set(meal)
+                    pendingScrollToMeal = meal
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 160_000_000)
+                        toastCenter.show("Added \(item.name) to \(meal.displayName).")
+                    }
+                    activeSheet = nil
+                }
+                .environmentObject(viewModel)
+            }
         }
     }
     
