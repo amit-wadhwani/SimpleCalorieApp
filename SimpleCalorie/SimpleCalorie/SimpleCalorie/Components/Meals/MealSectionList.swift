@@ -87,8 +87,8 @@ struct MealSectionList: View {
             onAddTap?(meal)
         } label: {
             Text("+ Add Food")
-                .font(.system(size: 16, weight: .semibold)) // was 14; bump back to 16
-                .foregroundStyle(AppColor.brandPrimary)
+                .font(.system(size: 16, weight: .semibold)) // was 14 regular in a recent patch
+                .foregroundColor(AppColor.brandPrimary)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 12)
         }

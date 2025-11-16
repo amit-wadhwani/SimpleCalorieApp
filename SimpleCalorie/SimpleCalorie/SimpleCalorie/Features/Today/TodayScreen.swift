@@ -82,10 +82,9 @@ struct TodayScreen: View {
                                 }
                                 pendingScrollToMeal = meal
                                 // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: meal)
-                                    }
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
+                                    Haptics.light()
+                                    viewModel.add(item, to: meal)
                                 }
                             }
                         )
@@ -122,10 +121,9 @@ struct TodayScreen: View {
                                 }
                                 pendingScrollToMeal = meal
                                 // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: meal)
-                                    }
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
+                                    Haptics.light()
+                                    viewModel.add(item, to: meal)
                                 }
                             }
                         )
@@ -162,10 +160,9 @@ struct TodayScreen: View {
                                 }
                                 pendingScrollToMeal = meal
                                 // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: meal)
-                                    }
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
+                                    Haptics.light()
+                                    viewModel.add(item, to: meal)
                                 }
                             }
                         )
@@ -202,10 +199,9 @@ struct TodayScreen: View {
                                 }
                                 pendingScrollToMeal = meal
                                 // DELETE: toast WITH UNDO
-                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: meal)
-                                    }
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName).", actionTitle: "Undo") {
+                                    Haptics.light()
+                                    viewModel.add(item, to: meal)
                                 }
                             }
                         )
@@ -213,6 +209,12 @@ struct TodayScreen: View {
                         
                         // Final spacer to push last "+ Add Food" above home area
                         SpacerRow(height: 24)
+                        
+                        // Extra scrollable padding so Snacks "+ Add Food" can scroll above FAB/home indicator
+                        SpacerRow(height: 128)
+                            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                     }
                     .listStyle(.plain)
                     .listRowSeparator(.hidden)
