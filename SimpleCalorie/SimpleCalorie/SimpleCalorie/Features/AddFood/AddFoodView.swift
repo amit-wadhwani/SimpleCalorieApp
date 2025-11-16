@@ -5,14 +5,15 @@ struct AddFoodView: View {
     @EnvironmentObject var todayViewModel: TodayViewModel
     @StateObject private var searchViewModel: AddFoodViewModel
     @Environment(\.dismiss) private var dismiss
-    let selectedMeal: MealType
+    var onFoodAdded: ((FoodItem, MealType) -> Void)? = nil
     
+    @AppStorage("addFood.lastSelectedMeal") private var lastSelectedMealRaw: String = MealType.breakfast.rawValue
     @State private var activeMeal: MealType
     @State private var query: String = ""
 
-    init(selectedMeal: MealType) {
-        self.selectedMeal = selectedMeal
-        self._activeMeal = State(initialValue: selectedMeal)
+    init(initialSelectedMeal: MealType, onFoodAdded: ((FoodItem, MealType) -> Void)? = nil) {
+        self.onFoodAdded = onFoodAdded
+        self._activeMeal = State(initialValue: initialSelectedMeal) // source of truth on open
         self._searchViewModel = StateObject(wrappedValue: AddFoodViewModel(service: MockFoodSearchService()))
     }
 
@@ -29,6 +30,9 @@ struct AddFoodView: View {
                 MealTabsView(selectedMeal: $activeMeal)
                 
                 SearchBarView(placeholder: "Search database...", text: $query)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .submitLabel(.search)
                     .onChange(of: query) { _, newValue in
                         searchViewModel.query = newValue
                         Task { await searchViewModel.refresh() }
@@ -52,16 +56,7 @@ struct AddFoodView: View {
                                 )
                                 
                                 // Add food to the correct meal
-                                withAnimation(.easeInOut(duration: 0.4)) {
-                                    todayViewModel.add(foodItem, to: activeMeal)
-                                }
-                                
-                                // Haptic feedback
-                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                                impactFeedback.impactOccurred()
-                                
-                                // Dismiss sheet
-                                dismiss()
+                                add(foodItem)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -69,6 +64,7 @@ struct AddFoodView: View {
                     .padding(.horizontal, AppSpace.s16)
                     .padding(.bottom, AppSpace.s16)
                 }
+                .scrollDismissesKeyboard(.interactively)
             }
         }
     }
@@ -77,9 +73,19 @@ struct AddFoodView: View {
         let cleaned = str.replacingOccurrences(of: "g", with: "").trimmingCharacters(in: .whitespaces)
         return Double(cleaned) ?? 0
     }
+    
+    private func add(_ item: FoodItem) {
+        // Fire callback to Today
+        onFoodAdded?(item, activeMeal)
+        // Update FAB memory only after a successful add
+        lastSelectedMealRaw = activeMeal.rawValue
+        Haptics.success()
+        // Dismiss sheet
+        dismiss()
+    }
 }
 
 #Preview {
-    AddFoodView(selectedMeal: .breakfast)
+    AddFoodView(initialSelectedMeal: .breakfast)
         .environmentObject(TodayViewModel())
 }

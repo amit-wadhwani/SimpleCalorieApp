@@ -3,7 +3,8 @@ import SwiftUI
 struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
-    var onAddTap: () -> Void
+    var onAddTap: ((MealType) -> Void)?
+    var onAddFood: ((FoodItem, MealType) -> Void)? = nil
     var onDelete: (FoodItem) -> Void
 
     // MARK: - Body
@@ -26,8 +27,10 @@ struct MealSectionList: View {
                     )
                     .cardRowBackground(.middle) // All item rows are middle; "Add Food" is bottom
                     .listRowSeparator(.hidden)
+                    .contentShape(Rectangle()) // generous hit area
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
+                            Haptics.rigid()
                             onDelete(item)
                         } label: {
                             Label("Delete", systemImage: "trash")
@@ -80,16 +83,18 @@ struct MealSectionList: View {
     }
 
     private var addFoodRowWithDivider: some View {
-        Button(action: onAddTap) {
+        Button {
+            onAddTap?(meal)
+        } label: {
             Text("+ Add Food")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(AppColor.brandPrimary)
+                .font(.system(size: 16, weight: .semibold)) // was 14 regular in a recent patch
+                .foregroundColor(AppColor.brandPrimary)
                 .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 12)
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .accessibilityLabel("Add Food to \(meal.title)")
+        .contentShape(Rectangle())
+        .accessibilityLabel("Add food to \(meal.displayName)")
         .overlay(alignment: .top) {
             Divider()
                 .padding(.horizontal, 12)

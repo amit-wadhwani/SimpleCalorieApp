@@ -48,7 +48,11 @@ struct FoodRowView: View {
                         .foregroundStyle(AppColor.textMuted)
                 }
 
-                Button(action: onAdd) {
+                Button {
+                    Haptics.light()
+                    onAdd()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { Haptics.success() }
+                } label: {
                     Image(systemName: "plus")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.white)

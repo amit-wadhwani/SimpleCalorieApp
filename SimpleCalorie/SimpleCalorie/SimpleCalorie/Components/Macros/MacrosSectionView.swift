@@ -14,6 +14,7 @@ struct MacrosSectionView: View {
                 Spacer()
 
                 Button {
+                    Haptics.selection()
                     withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
                         viewModel.isMacrosCollapsed.toggle()
                     }
@@ -45,6 +46,7 @@ struct MacrosSectionView: View {
                         goal: Int(viewModel.proteinGoal),
                         color: AppColor.macroProtein
                     )
+                    .animation(.easeOut(duration: 0.4), value: viewModel.protein)
 
                     MacroRow(
                         label: "Carbs",
@@ -52,6 +54,7 @@ struct MacrosSectionView: View {
                         goal: Int(viewModel.carbsGoal),
                         color: AppColor.macroCarbs
                     )
+                    .animation(.easeOut(duration: 0.4), value: viewModel.carbs)
 
                     MacroRow(
                         label: "Fat",
@@ -59,6 +62,7 @@ struct MacrosSectionView: View {
                         goal: Int(viewModel.fatGoal),
                         color: AppColor.macroFat
                     )
+                    .animation(.easeOut(duration: 0.4), value: viewModel.fat)
                 }
                 .padding(.top, AppSpace.sm)
             }

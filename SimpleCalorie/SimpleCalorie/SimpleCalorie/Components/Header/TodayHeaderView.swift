@@ -21,6 +21,7 @@ struct TodayHeaderView: View {
                 
                 HStack(spacing: AppSpace.s16) {
                     Button {
+                        Haptics.light()
                         viewModel.goToPreviousDay()
                     } label: {
                         Image(systemName: "chevron.left")
@@ -41,6 +42,7 @@ struct TodayHeaderView: View {
                     }
                     
                     Button {
+                        Haptics.light()
                         viewModel.goToNextDay()
                     } label: {
                         Image(systemName: "chevron.right")

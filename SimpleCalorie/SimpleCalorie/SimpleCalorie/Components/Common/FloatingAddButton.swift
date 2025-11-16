@@ -1,26 +1,37 @@
 import SwiftUI
 
+private struct FABButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .shadow(color: Color.black.opacity(configuration.isPressed ? 0.18 : 0.22),
+                    radius: configuration.isPressed ? 12 : 18,
+                    x: 0, y: configuration.isPressed ? 6 : 8)
+            .animation(.spring(response: 0.25, dampingFraction: 0.9), value: configuration.isPressed)
+    }
+}
+
 struct FloatingAddButton: View {
+    static let diameter: CGFloat = 56  // expose for layout math
+    
     var action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            Haptics.light()
+            action()
+        } label: {
             Image(systemName: "plus")
                 .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(.white)
-                .padding(20)
+                .frame(width: Self.diameter, height: Self.diameter)
                 .background(
                     Circle()
                         .fill(AppColor.textTitle)
-                        .shadow(
-                            color: Color.black.opacity(0.18),
-                            radius: 18,
-                            x: 0,
-                            y: 8
-                        )
                 )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FABButtonStyle())
+        .accessibilityLabel("Add food")
     }
 }
 
