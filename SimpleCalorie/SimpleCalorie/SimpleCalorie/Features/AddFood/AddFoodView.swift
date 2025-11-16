@@ -5,18 +5,15 @@ struct AddFoodView: View {
     @EnvironmentObject var todayViewModel: TodayViewModel
     @StateObject private var searchViewModel: AddFoodViewModel
     @Environment(\.dismiss) private var dismiss
-    let selectedMeal: MealType
     var onFoodAdded: ((FoodItem, MealType) -> Void)? = nil
     
-    @AppStorage("addFood.lastTab") private var lastTabRaw: String = MealType.breakfast.rawValue
+    @AppStorage("addFood.lastSelectedMeal") private var lastSelectedMealRaw: String = MealType.breakfast.rawValue
     @State private var activeMeal: MealType
     @State private var query: String = ""
 
-    init(selectedMeal: MealType, onFoodAdded: ((FoodItem, MealType) -> Void)? = nil) {
-        self.selectedMeal = selectedMeal
+    init(initialSelectedMeal: MealType, onFoodAdded: ((FoodItem, MealType) -> Void)? = nil) {
         self.onFoodAdded = onFoodAdded
-        let savedMeal = MealType(rawValue: UserDefaults.standard.string(forKey: "addFood.lastTab") ?? MealType.breakfast.rawValue) ?? selectedMeal
-        self._activeMeal = State(initialValue: savedMeal)
+        self._activeMeal = State(initialValue: initialSelectedMeal) // source of truth on open
         self._searchViewModel = StateObject(wrappedValue: AddFoodViewModel(service: MockFoodSearchService()))
     }
 
@@ -31,9 +28,6 @@ struct AddFoodView: View {
                 }
                 
                 MealTabsView(selectedMeal: $activeMeal)
-                    .onChange(of: activeMeal) { oldValue, newValue in
-                        lastTabRaw = newValue.rawValue
-                    }
                 
                 SearchBarView(placeholder: "Search database...", text: $query)
                     .textInputAutocapitalization(.never)
@@ -62,15 +56,7 @@ struct AddFoodView: View {
                                 )
                                 
                                 // Add food to the correct meal
-                                withAnimation(.easeInOut(duration: 0.4)) {
-                                    todayViewModel.add(foodItem, to: activeMeal)
-                                }
-                                
-                                // Call the onFoodAdded callback if provided, passing the active meal
-                                onFoodAdded?(foodItem, activeMeal)
-                                
-                                // Dismiss sheet
-                                dismiss()
+                                add(foodItem)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -87,9 +73,19 @@ struct AddFoodView: View {
         let cleaned = str.replacingOccurrences(of: "g", with: "").trimmingCharacters(in: .whitespaces)
         return Double(cleaned) ?? 0
     }
+    
+    private func add(_ item: FoodItem) {
+        // Fire callback to Today
+        onFoodAdded?(item, activeMeal)
+        // Update FAB memory only after a successful add
+        lastSelectedMealRaw = activeMeal.rawValue
+        Haptics.success()
+        // Dismiss sheet
+        dismiss()
+    }
 }
 
 #Preview {
-    AddFoodView(selectedMeal: .breakfast)
+    AddFoodView(initialSelectedMeal: .breakfast)
         .environmentObject(TodayViewModel())
 }

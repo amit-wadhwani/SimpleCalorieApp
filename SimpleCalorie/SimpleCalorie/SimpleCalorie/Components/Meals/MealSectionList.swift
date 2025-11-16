@@ -3,7 +3,7 @@ import SwiftUI
 struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
-    var onAddTap: () -> Void
+    var onAddTap: ((MealType) -> Void)?
     var onAddFood: ((FoodItem, MealType) -> Void)? = nil
     var onDelete: (FoodItem) -> Void
 
@@ -83,18 +83,17 @@ struct MealSectionList: View {
     }
 
     private var addFoodRowWithDivider: some View {
-        Button(action: onAddTap) {
-            HStack(spacing: 8) {
-                Text("+ Add Food")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AppColor.brandPrimary)
-                Spacer()
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .contentShape(Rectangle()) // full-row tappable
+        Button {
+            onAddTap?(meal)
+        } label: {
+            Text("+ Add Food")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(AppColor.brandPrimary)
+                .frame(maxWidth: .infinity, alignment: .center) // center visually
+                .padding(.vertical, 12)
         }
-        .buttonStyle(.plain) // avoid default button insets
+        .buttonStyle(.plain)
+        .contentShape(Rectangle()) // keeps full-row hit target
         .accessibilityLabel("Add Food to \(meal.title)")
         .overlay(alignment: .top) {
             Divider()

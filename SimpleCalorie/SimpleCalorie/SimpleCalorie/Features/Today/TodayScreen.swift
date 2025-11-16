@@ -4,8 +4,13 @@ struct TodayScreen: View {
     @EnvironmentObject var viewModel: TodayViewModel
     @StateObject private var toastCenter = ToastCenter()
     @State private var isShowingAddFood: Bool = false
-    @State private var addFoodMeal: MealType = .breakfast
+    @State private var addFoodMeal: MealType? = nil
     @State private var pendingScrollToMeal: MealType?
+    @AppStorage("addFood.lastSelectedMeal") private var lastSelectedMealRaw: String = MealType.breakfast.rawValue
+    
+    private var lastSelectedMeal: MealType {
+        MealType(rawValue: lastSelectedMealRaw) ?? .breakfast
+    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -56,8 +61,8 @@ struct TodayScreen: View {
                         MealSectionList(
                             meal: .breakfast,
                             items: viewModel.meals[.breakfast] ?? [],
-                            onAddTap: {
-                                addFoodMeal = .breakfast
+                            onAddTap: { meal in
+                                addFoodMeal = meal
                                 isShowingAddFood = true
                             },
                             onAddFood: { item, meal in
@@ -96,8 +101,8 @@ struct TodayScreen: View {
                         MealSectionList(
                             meal: .lunch,
                             items: viewModel.meals[.lunch] ?? [],
-                            onAddTap: {
-                                addFoodMeal = .lunch
+                            onAddTap: { meal in
+                                addFoodMeal = meal
                                 isShowingAddFood = true
                             },
                             onAddFood: { item, meal in
@@ -136,8 +141,8 @@ struct TodayScreen: View {
                         MealSectionList(
                             meal: .dinner,
                             items: viewModel.meals[.dinner] ?? [],
-                            onAddTap: {
-                                addFoodMeal = .dinner
+                            onAddTap: { meal in
+                                addFoodMeal = meal
                                 isShowingAddFood = true
                             },
                             onAddFood: { item, meal in
@@ -176,8 +181,8 @@ struct TodayScreen: View {
                         MealSectionList(
                             meal: .snacks,
                             items: viewModel.meals[.snacks] ?? [],
-                            onAddTap: {
-                                addFoodMeal = .snacks
+                            onAddTap: { meal in
+                                addFoodMeal = meal
                                 isShowingAddFood = true
                             },
                             onAddFood: { item, meal in
@@ -205,16 +210,19 @@ struct TodayScreen: View {
                             }
                         )
                         .id(MealType.snacks)
+                        
+                        // Final spacer to push last "+ Add Food" above home area
+                        SpacerRow(height: 24)
                     }
                     .listStyle(.plain)
                     .listRowSeparator(.hidden)
                     .scrollContentBackground(.hidden)
                     .listRowSpacing(0) // kill all inter-row gaps; we'll add gaps explicitly
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
-                    .safeAreaInset(edge: .bottom) {
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
                         Color.clear
-                            .frame(height: 120) // 56 FAB + ~16 margin + ~24 home indicator + cushion
-                            .allowsHitTesting(false)
+                            .frame(height: 120) // keep or 128 if you prefer
+                            .allowsHitTesting(false) // critical so taps pass through
                     }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
@@ -229,8 +237,9 @@ struct TodayScreen: View {
                 HStack {
                     Spacer()
                     FloatingAddButton {
-                        addFoodMeal = .breakfast
+                        addFoodMeal = lastSelectedMeal
                         isShowingAddFood = true
+                        Haptics.light()
                     }
                     .padding(.trailing, AppSpace.s16)
                     .padding(.bottom, 72) // sits above tab bar
@@ -242,13 +251,15 @@ struct TodayScreen: View {
             DatePickerSheet(selectedDate: $viewModel.selectedDate)
         }
         .sheet(isPresented: $isShowingAddFood) {
-            AddFoodView(selectedMeal: addFoodMeal) { item, meal in
-                // This closure is called when food is added from AddFoodView
-                // AddFoodView already calls viewModel.add(), so we just handle toast/scroll here
-                // Use the meal from the callback (activeMeal from AddFoodView), not addFoodMeal
-                pendingScrollToMeal = meal
-                // ADD: toast, NO UNDO
+            AddFoodView(
+                initialSelectedMeal: addFoodMeal ?? .breakfast
+            ) { item, meal in
+                // Route by returned meal
+                viewModel.add(item, to: meal)
+                // Toast with item name
                 toastCenter.show("Added \(item.name) to \(meal.displayName)")
+                // Auto-scroll to the right section
+                pendingScrollToMeal = meal
             }
             .environmentObject(viewModel)
         }
