@@ -60,27 +60,26 @@ struct TodayScreen: View {
                                 addFoodMeal = .breakfast
                                 isShowingAddFood = true
                             },
-                            onAddFood: { item in
+                            onAddFood: { item, meal in
                                 Haptics.light()
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: .breakfast)
+                                    viewModel.add(item, to: meal)
                                 }
-                                pendingScrollToMeal = .breakfast
-                                toastCenter.show("Added \(item.name) to Breakfast", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.remove(item, from: .breakfast)
-                                    }
-                                }
+                                pendingScrollToMeal = meal
+                                // ADD: toast, NO UNDO
+                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
                             },
                             onDelete: { item in
                                 Haptics.rigid()
+                                let meal: MealType = .breakfast // this section's meal
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.remove(item, from: .breakfast)
+                                    viewModel.remove(item, from: meal)
                                 }
-                                pendingScrollToMeal = .breakfast
-                                toastCenter.show("Removed \(item.name) from Breakfast", actionTitle: "Undo") {
+                                pendingScrollToMeal = meal
+                                // DELETE: toast WITH UNDO
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: .breakfast)
+                                        viewModel.add(item, to: meal)
                                     }
                                 }
                             }
@@ -101,27 +100,26 @@ struct TodayScreen: View {
                                 addFoodMeal = .lunch
                                 isShowingAddFood = true
                             },
-                            onAddFood: { item in
+                            onAddFood: { item, meal in
                                 Haptics.light()
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: .lunch)
+                                    viewModel.add(item, to: meal)
                                 }
-                                pendingScrollToMeal = .lunch
-                                toastCenter.show("Added \(item.name) to Lunch", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.remove(item, from: .lunch)
-                                    }
-                                }
+                                pendingScrollToMeal = meal
+                                // ADD: toast, NO UNDO
+                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
                             },
                             onDelete: { item in
                                 Haptics.rigid()
+                                let meal: MealType = .lunch // this section's meal
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.remove(item, from: .lunch)
+                                    viewModel.remove(item, from: meal)
                                 }
-                                pendingScrollToMeal = .lunch
-                                toastCenter.show("Removed \(item.name) from Lunch", actionTitle: "Undo") {
+                                pendingScrollToMeal = meal
+                                // DELETE: toast WITH UNDO
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: .lunch)
+                                        viewModel.add(item, to: meal)
                                     }
                                 }
                             }
@@ -142,27 +140,26 @@ struct TodayScreen: View {
                                 addFoodMeal = .dinner
                                 isShowingAddFood = true
                             },
-                            onAddFood: { item in
+                            onAddFood: { item, meal in
                                 Haptics.light()
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: .dinner)
+                                    viewModel.add(item, to: meal)
                                 }
-                                pendingScrollToMeal = .dinner
-                                toastCenter.show("Added \(item.name) to Dinner", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.remove(item, from: .dinner)
-                                    }
-                                }
+                                pendingScrollToMeal = meal
+                                // ADD: toast, NO UNDO
+                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
                             },
                             onDelete: { item in
                                 Haptics.rigid()
+                                let meal: MealType = .dinner // this section's meal
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.remove(item, from: .dinner)
+                                    viewModel.remove(item, from: meal)
                                 }
-                                pendingScrollToMeal = .dinner
-                                toastCenter.show("Removed \(item.name) from Dinner", actionTitle: "Undo") {
+                                pendingScrollToMeal = meal
+                                // DELETE: toast WITH UNDO
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: .dinner)
+                                        viewModel.add(item, to: meal)
                                     }
                                 }
                             }
@@ -183,27 +180,26 @@ struct TodayScreen: View {
                                 addFoodMeal = .snacks
                                 isShowingAddFood = true
                             },
-                            onAddFood: { item in
+                            onAddFood: { item, meal in
                                 Haptics.light()
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.add(item, to: .snacks)
+                                    viewModel.add(item, to: meal)
                                 }
-                                pendingScrollToMeal = .snacks
-                                toastCenter.show("Added \(item.name) to Snacks", actionTitle: "Undo") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.remove(item, from: .snacks)
-                                    }
-                                }
+                                pendingScrollToMeal = meal
+                                // ADD: toast, NO UNDO
+                                toastCenter.show("Added \(item.name) to \(meal.displayName)")
                             },
                             onDelete: { item in
                                 Haptics.rigid()
+                                let meal: MealType = .snacks // this section's meal
                                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                    viewModel.remove(item, from: .snacks)
+                                    viewModel.remove(item, from: meal)
                                 }
-                                pendingScrollToMeal = .snacks
-                                toastCenter.show("Removed \(item.name) from Snacks", actionTitle: "Undo") {
+                                pendingScrollToMeal = meal
+                                // DELETE: toast WITH UNDO
+                                toastCenter.show("Removed \(item.name) from \(meal.displayName)", actionTitle: "Undo") {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        viewModel.add(item, to: .snacks)
+                                        viewModel.add(item, to: meal)
                                     }
                                 }
                             }
@@ -217,7 +213,8 @@ struct TodayScreen: View {
                     .environment(\.defaultMinListRowHeight, 0) // compact rows allowed
                     .safeAreaInset(edge: .bottom) {
                         Color.clear
-                            .frame(height: 112) // 56(FAB) + 16(margin) + 24(home indicator) + a little cushion
+                            .frame(height: 120) // 56 FAB + ~16 margin + ~24 home indicator + cushion
+                            .allowsHitTesting(false)
                     }
                     .onChange(of: pendingScrollToMeal) { oldValue, newValue in
                         guard let meal = newValue else { return }
@@ -245,16 +242,13 @@ struct TodayScreen: View {
             DatePickerSheet(selectedDate: $viewModel.selectedDate)
         }
         .sheet(isPresented: $isShowingAddFood) {
-            AddFoodView(selectedMeal: addFoodMeal) { item in
+            AddFoodView(selectedMeal: addFoodMeal) { item, meal in
                 // This closure is called when food is added from AddFoodView
                 // AddFoodView already calls viewModel.add(), so we just handle toast/scroll here
-                let meal = addFoodMeal
+                // Use the meal from the callback (activeMeal from AddFoodView), not addFoodMeal
                 pendingScrollToMeal = meal
-                toastCenter.show("Added \(item.name) to \(meal.title)", actionTitle: "Undo") {
-                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                        viewModel.remove(item, from: meal)
-                    }
-                }
+                // ADD: toast, NO UNDO
+                toastCenter.show("Added \(item.name) to \(meal.displayName)")
             }
             .environmentObject(viewModel)
         }

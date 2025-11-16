@@ -4,7 +4,7 @@ struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
     var onAddTap: () -> Void
-    var onAddFood: ((FoodItem) -> Void)? = nil
+    var onAddFood: ((FoodItem, MealType) -> Void)? = nil
     var onDelete: (FoodItem) -> Void
 
     // MARK: - Body
@@ -84,14 +84,17 @@ struct MealSectionList: View {
 
     private var addFoodRowWithDivider: some View {
         Button(action: onAddTap) {
-            Text("+ Add Food")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(AppColor.brandPrimary)
-                .frame(maxWidth: .infinity, alignment: .center)
+            HStack(spacing: 8) {
+                Text("+ Add Food")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(AppColor.brandPrimary)
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle()) // full-row tappable
         }
-        .buttonStyle(.plain)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .buttonStyle(.plain) // avoid default button insets
         .accessibilityLabel("Add Food to \(meal.title)")
         .overlay(alignment: .top) {
             Divider()

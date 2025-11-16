@@ -6,13 +6,13 @@ struct AddFoodView: View {
     @StateObject private var searchViewModel: AddFoodViewModel
     @Environment(\.dismiss) private var dismiss
     let selectedMeal: MealType
-    var onFoodAdded: ((FoodItem) -> Void)? = nil
+    var onFoodAdded: ((FoodItem, MealType) -> Void)? = nil
     
     @AppStorage("addFood.lastTab") private var lastTabRaw: String = MealType.breakfast.rawValue
     @State private var activeMeal: MealType
     @State private var query: String = ""
 
-    init(selectedMeal: MealType, onFoodAdded: ((FoodItem) -> Void)? = nil) {
+    init(selectedMeal: MealType, onFoodAdded: ((FoodItem, MealType) -> Void)? = nil) {
         self.selectedMeal = selectedMeal
         self.onFoodAdded = onFoodAdded
         let savedMeal = MealType(rawValue: UserDefaults.standard.string(forKey: "addFood.lastTab") ?? MealType.breakfast.rawValue) ?? selectedMeal
@@ -66,8 +66,8 @@ struct AddFoodView: View {
                                     todayViewModel.add(foodItem, to: activeMeal)
                                 }
                                 
-                                // Call the onFoodAdded callback if provided
-                                onFoodAdded?(foodItem)
+                                // Call the onFoodAdded callback if provided, passing the active meal
+                                onFoodAdded?(foodItem, activeMeal)
                                 
                                 // Dismiss sheet
                                 dismiss()
