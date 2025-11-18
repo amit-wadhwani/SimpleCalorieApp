@@ -71,6 +71,7 @@ final class ToastCenter: ObservableObject {
 
 private struct ToastPresenter: ViewModifier {
     @ObservedObject var center: ToastCenter
+    let avoidFAB: Bool
 
     func body(content: Content) -> some View {
         ZStack(alignment: .bottom) {
@@ -107,6 +108,7 @@ private struct ToastPresenter: ViewModifier {
                 .clipShape(Capsule())
                 .shadow(color: Color.black.opacity(0.25), radius: 18, x: 0, y: 8)
                 .padding(.bottom, 12 + 44) // above tab bar
+                .padding(.trailing, avoidFAB ? FABMetrics.trailingAvoidance : 0)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Notification")
@@ -117,8 +119,8 @@ private struct ToastPresenter: ViewModifier {
 }
 
 extension View {
-    func toast(center: ToastCenter) -> some View {
-        modifier(ToastPresenter(center: center))
+    func toast(center: ToastCenter, avoidFAB: Bool = false) -> some View {
+        modifier(ToastPresenter(center: center, avoidFAB: avoidFAB))
     }
 }
 

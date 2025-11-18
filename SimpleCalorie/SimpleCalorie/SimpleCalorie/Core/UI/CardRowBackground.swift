@@ -62,3 +62,42 @@ private struct AnyShape: Shape {
     func path(in rect: CGRect) -> Path { _path(rect) }
 }
 
+// MARK: - CardRowBackground View (for meal cards with asymmetric padding)
+
+struct CardRowBackgroundView<Content: View>: View {
+    let hPad: CGFloat
+    let topPad: CGFloat
+    let bottomPad: CGFloat
+    let content: Content
+    
+    init(
+        hPad: CGFloat = AppSpace.s12,
+        topPad: CGFloat = AppSpace.s12,
+        bottomPad: CGFloat = AppSpace.s12,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.hPad = hPad
+        self.topPad = topPad
+        self.bottomPad = bottomPad
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            content
+                .padding(.top, topPad)
+                .padding(.bottom, bottomPad)
+                .padding(.horizontal, hPad)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(AppColor.bgCard)
+                .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(AppColor.borderSubtle, lineWidth: 0.5)
+        )
+    }
+}
+
