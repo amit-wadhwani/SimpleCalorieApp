@@ -1,26 +1,32 @@
 import SwiftUI
 
 enum TodayLayout {
-    // V1-locked paddings (do not change without screenshot check)
-    static let v1CardInsetH: CGFloat = AppSpace.s12
-    static let v1AdTopBottom: CGFloat = AppSpace.s12
+    // Outer card margin so meal & motivation/ad cards align with the top summary card
+    static let v1CardInsetH: CGFloat = AppSpace.s16
     
-    // MARK: - Meal card fidelity (V1 locked)
-    // Header breathing (V1-locked; tiny lift tonight)
-    static let mealHeaderTopPad: CGFloat = 12   // was 10
-    static let mealHeaderBottomPad: CGFloat = 10 // was 8
-    // Meal header sizing
+    // Inner content paddings
+    static let mealHPad: CGFloat = 12
+    static let mealRowVPad: CGFloat = 8
+    
+    // Header breathing (title + total kcal)
+    static let mealHeaderTopPad: CGFloat = 16   // more space from top card edge
+    static let mealHeaderBottomPad: CGFloat = 12
+    
+    // Add row breathing
+    static let addRowTopGap: CGFloat = 8
+    static let addRowBottomPad: CGFloat = 10
+    
+    // Card corner
+    static let cardCorner: CGFloat = 12
+    
+    // Typography — keep your existing fonts/colors elsewhere;
+    // these are the two we explicitly control in the meal header and Add row.
     static let mealHeaderTitleFont: Font = .system(size: 15, weight: .semibold)
     static let mealHeaderKcalFont: Font = .system(size: 14, weight: .semibold)
-    // Card inner padding
-    static let mealCardInnerTopPad: CGFloat = AppSpace.xs  // 6pt
-    static let mealHPad: CGFloat = AppSpace.s12                                   // ensure left/right breathing
-    static let mealRowVPad: CGFloat = 10                  // per-row vertical padding
     static let addRowFont: Font = .system(size: 16, weight: .semibold)
-    static let addRowTopPadWhenItemsExist: CGFloat = 8
-    static let addRowBottomPad: CGFloat = 2              // tighter than before
-    // Card chrome tweaks (lets us trim bottom breathing)
-    static let mealCardInnerBottomPad: CGFloat = AppSpace.sm // 8pt
+    
+    // Legacy/other tokens
+    static let v1AdTopBottom: CGFloat = AppSpace.s12
     
     // MARK: - No-ads spacer styles
     enum DecorSpacerStyle: String, CaseIterable {

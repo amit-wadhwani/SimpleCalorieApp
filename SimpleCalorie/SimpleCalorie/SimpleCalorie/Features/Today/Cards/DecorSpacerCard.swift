@@ -1,13 +1,20 @@
 import SwiftUI
 
 struct DecorSpacerCard: View {
-    @AppStorage(TodayLayout.decorStyleKey) private var styleRaw: String = TodayLayout.DecorSpacerStyle.plain.rawValue
-    @AppStorage(TodayLayout.decorVariantKey) private var variantRaw: String = TodayLayout.DecorSpacerVariant.oneLine.rawValue
-    @AppStorage(TodayLayout.decorAlignKey) private var alignRaw: String = TodayLayout.DecorSpacerAlign.leading.rawValue
     @Environment(\.colorScheme) private var colorScheme
     
+    // Persisted style choices (set from the debug picker in TodayRootView)
+    @AppStorage(TodayLayout.decorStyleKey)
+    private var styleRaw: String = TodayLayout.DecorSpacerStyle.capsuleNewTuned.rawValue
+    
+    @AppStorage(TodayLayout.decorVariantKey)
+    private var variantRaw: String = TodayLayout.DecorSpacerVariant.oneLine.rawValue
+    
+    @AppStorage(TodayLayout.decorAlignKey)
+    private var alignRaw: String = TodayLayout.DecorSpacerAlign.center.rawValue
+    
     private var style: TodayLayout.DecorSpacerStyle {
-        TodayLayout.DecorSpacerStyle(rawValue: styleRaw) ?? .plain
+        TodayLayout.DecorSpacerStyle(rawValue: styleRaw) ?? .capsuleNewTuned
     }
     
     private var variant: TodayLayout.DecorSpacerVariant {
@@ -15,63 +22,124 @@ struct DecorSpacerCard: View {
     }
     
     private var align: TodayLayout.DecorSpacerAlign {
-        TodayLayout.DecorSpacerAlign(rawValue: alignRaw) ?? .leading
-    }
-    
-    private var rowHeight: CGFloat {
-        switch style {
-        case .plain: return TodayLayout.decorSpacerHeightPlain
-        case .divider: return TodayLayout.decorSpacerHeightDivider
-        case .capsule:
-            return (variant == .twoLine)
-                ? TodayLayout.decorSpacerHeightCapsuleTwo
-                : TodayLayout.decorSpacerHeightCapsuleOne
-        case .capsuleNewTuned:
-            // Single-line row with vertical padding
-            return TodayLayout.newCapsuleDefaultH + (TodayLayout.newCapsuleVPad * 2)
-        }
+        TodayLayout.DecorSpacerAlign(rawValue: alignRaw) ?? .center
     }
     
     var body: some View {
-        ZStack {
+        Group {
             switch style {
             case .plain:
-                Color.clear
+                plainSpacer
             case .divider:
-                // subtle full-width hairline with card insets handled by listRowInsets
-                Rectangle()
-                    .fill(AppColor.borderSubtle)
-                    .frame(height: 1)
-                    .padding(.horizontal, TodayLayout.v1CardInsetH)
-                    .opacity(0.9)
+                dividerSpacer
             case .capsule:
-                // centered handle (subtle, classy) - Old Capsule, unchanged
-                Capsule()
-                    .fill(AppColor.borderSubtle)
-                    .frame(width: 72, height: 6)
-                    .opacity(0.9)
-                    // center vs left inside the card's content width
-                    .frame(maxWidth: .infinity,
-                           alignment: (align == .center ? .center : .leading))
-                    .padding(.horizontal, TodayLayout.v1CardInsetH)
+                legacyCapsuleSpacer
             case .capsuleNewTuned:
-                let w = min(max(TodayLayout.newCapsuleDefaultW, TodayLayout.newCapsuleMinW), TodayLayout.newCapsuleMaxW)
-                let h = min(max(TodayLayout.newCapsuleDefaultH, TodayLayout.newCapsuleMinH), TodayLayout.newCapsuleMaxH)
-                let opacity = (colorScheme == .dark) ? TodayLayout.newCapsuleOpacityDark : TodayLayout.newCapsuleOpacityLight
-                
-                RoundedRectangle(cornerRadius: h / 2, style: .continuous)
-                    .fill(AppColor.borderSubtle.opacity(opacity))
-                    .frame(width: w, height: h)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, TodayLayout.newCapsuleVPad)
+                tunedCapsuleSpacer
             }
         }
-        .frame(height: rowHeight)
-        .accessibilityHidden(true)
+        // Transparent list row so no white strip shows up
+        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Variants
+    
+    /// Style: Invisible – just breathing room between cards
+    private var plainSpacer: some View {
+        Color.clear
+            .frame(height: TodayLayout.decorSpacerHeightPlain)
+    }
+    
+    /// Style: Divider – subtle hairline centered under the card gutter
+    private var dividerSpacer: some View {
+        HStack {
+            // Match the card's horizontal inset so the divider aligns with card edges
+            Spacer()
+                .frame(width: TodayLayout.v1CardInsetH)
+            Rectangle()
+                .fill(AppColor.borderSubtle) // no extra opacity so it's clearly visible
+                .frame(height: 1)            // 1pt hairline
+            Spacer()
+                .frame(width: TodayLayout.v1CardInsetH)
+        }
+        .frame(height: TodayLayout.decorSpacerHeightDivider)
+    }
+    
+    /// Style: Old Capsule – same size as new capsule, slightly bolder
+    private var legacyCapsuleSpacer: some View {
+        HStack {
+            switch align {
+            case .leading:
+                // Capsule hugs the left card edge (respecting the card inset)
+                Spacer()
+                    .frame(width: TodayLayout.v1CardInsetH)
+                legacyCapsuleShape
+                Spacer()
+            case .center:
+                Spacer()
+                legacyCapsuleShape
+                Spacer()
+            }
+        }
+        .frame(
+            height: variant == .oneLine
+            ? TodayLayout.decorSpacerHeightCapsuleOne
+            : TodayLayout.decorSpacerHeightCapsuleTwo
+        )
+    }
+    
+    /// Old capsule's visual: match newCapsule size but a touch darker
+    private var legacyCapsuleShape: some View {
+        Capsule()
+            .fill(
+                AppColor.borderSubtle.opacity(
+                    colorScheme == .dark
+                    ? TodayLayout.newCapsuleOpacityDark + 0.10   // ≈ 0.38
+                    : TodayLayout.newCapsuleOpacityLight + 0.10  // ≈ 0.32
+                )
+            )
+            .frame(
+                width: TodayLayout.newCapsuleDefaultW,
+                height: TodayLayout.newCapsuleDefaultH
+            )
+    }
+    
+    /// Style: New Capsule (tuned) – current preferred look
+    private var tunedCapsuleSpacer: some View {
+        HStack {
+            Spacer()
+            Capsule()
+                .fill(
+                    AppColor.borderSubtle.opacity(
+                        colorScheme == .dark
+                        ? TodayLayout.newCapsuleOpacityDark
+                        : TodayLayout.newCapsuleOpacityLight
+                    )
+                )
+                .frame(
+                    width: TodayLayout.newCapsuleDefaultW,
+                    height: TodayLayout.newCapsuleDefaultH
+                )
+            Spacer()
+        }
+        .padding(.vertical, TodayLayout.newCapsuleVPad)
     }
 }
 
-#Preview {
-    DecorSpacerCard()
+#if DEBUG
+struct DecorSpacerCard_Previews: PreviewProvider {
+    static var previews: some View {
+        ZStack {
+            AppColor.bgScreen.ignoresSafeArea()
+            List {
+                DecorSpacerCard()
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        }
+        .previewLayout(.sizeThatFits)
+    }
 }
-
+#endif

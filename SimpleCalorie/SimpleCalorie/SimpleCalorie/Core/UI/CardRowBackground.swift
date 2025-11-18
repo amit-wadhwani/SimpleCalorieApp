@@ -1,103 +1,94 @@
 import SwiftUI
 
-struct CardRowBackground: ViewModifier {
-    enum Position { case single, top, middle, bottom }
-    
-    let position: Position
-    let hInset: CGFloat = 16      // match other cards
-    let corner: CGFloat = AppRadius.xl
+public enum CardRowPosition {
+    case single, top, middle, bottom
+}
 
-    func shape() -> some Shape {
-        switch position {
+private struct AnyShape: Shape {
+    private let _path: (CGRect) -> Path
+    init<S: Shape>(_ shape: S) {
+        _path = { rect in shape.path(in: rect) }
+    }
+    func path(in rect: CGRect) -> Path {
+        _path(rect)
+    }
+}
+
+private extension CardRowPosition {
+    var shape: AnyShape {
+        let r = TodayLayout.cardCorner
+        
+        switch self {
         case .single:
-            return AnyShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-        case .top:
-            return AnyShape(UnevenRoundedRectangle(
-                cornerRadii: .init(
-                    topLeading: corner,
-                    bottomLeading: 0,
-                    bottomTrailing: 0,
-                    topTrailing: corner
+            return AnyShape(
+                RoundedRectangle(
+                    cornerRadius: r,
+                    style: .continuous
                 )
-            ))
+            )
+        case .top:
+            return AnyShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: r,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: r,
+                    style: .continuous
+                )
+            )
         case .middle:
             return AnyShape(Rectangle())
         case .bottom:
-            return AnyShape(UnevenRoundedRectangle(
-                cornerRadii: .init(
-                    topLeading: 0,
-                    bottomLeading: corner,
-                    bottomTrailing: corner,
-                    topTrailing: 0
+            return AnyShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: r,
+                    bottomTrailingRadius: r,
+                    topTrailingRadius: 0,
+                    style: .continuous
                 )
-            ))
+            )
         }
     }
-
-    func body(content: Content) -> some View {
-        content
-            .listRowInsets(EdgeInsets(top: 0, leading: hInset, bottom: 0, trailing: hInset))
-            .listRowBackground(Color.clear)
-            .background(
-                shape()
-                    .fill(AppColor.bgCard)
-                    .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
-            )
-            .contentShape(Rectangle()) // full-width swipe target
-            .mask(shape()) // hard-clip row content to card edge
-            .compositingGroup() // ensure sublayers respect the mask
-    }
 }
 
-extension View {
-    func cardRowBackground(_ position: CardRowBackground.Position) -> some View {
-        modifier(CardRowBackground(position: position))
-    }
-}
-
-/// Tiny utility so we can return Shape from a function
-private struct AnyShape: Shape {
-    private let _path: (CGRect) -> Path
-    init<S: Shape>(_ s: S) { _path = { s.path(in: $0) } }
-    func path(in rect: CGRect) -> Path { _path(rect) }
-}
-
-// MARK: - CardRowBackground View (for meal cards with asymmetric padding)
-
-struct CardRowBackgroundView<Content: View>: View {
-    let hPad: CGFloat
-    let topPad: CGFloat
-    let bottomPad: CGFloat
-    let content: Content
-    
-    init(
-        hPad: CGFloat = AppSpace.s12,
-        topPad: CGFloat = AppSpace.s12,
-        bottomPad: CGFloat = AppSpace.s12,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.hPad = hPad
-        self.topPad = topPad
-        self.bottomPad = bottomPad
-        self.content = content()
-    }
+private struct RowChrome: View {
+    let shape: AnyShape
     
     var body: some View {
-        VStack(spacing: 0) {
-            content
-                .padding(.top, topPad)
-                .padding(.bottom, bottomPad)
-                .padding(.horizontal, hPad)
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(AppColor.bgCard)
-                .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(AppColor.borderSubtle, lineWidth: 0.5)
-        )
+        shape
+            .fill(AppColor.bgCard)
+            // No outer stroke: avoids phantom divider lines at card joints
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 1)
+            .allowsHitTesting(false)
     }
 }
 
+public struct CardRowBackground: ViewModifier {
+    let position: CardRowPosition
+    
+    public func body(content: Content) -> some View {
+        let s = position.shape
+        
+        return content
+            // Draw the rounded card chrome directly behind the row content
+            // so the card and its chrome move together during swipe.
+            .background(
+                RowChrome(shape: s)
+            )
+            // Clip content + chrome + swipe action sheet to the same card shape.
+            .clipShape(s)
+            // Now apply horizontal breathing room so the visible card is inset.
+            .padding(.horizontal, TodayLayout.v1CardInsetH)
+            // The List row itself remains edge-to-edge; card width is controlled by padding.
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+    }
+}
+
+public extension View {
+    func cardRowBackground(_ pos: CardRowPosition) -> some View {
+        modifier(CardRowBackground(position: pos))
+    }
+}

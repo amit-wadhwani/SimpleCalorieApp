@@ -6,96 +6,94 @@ struct MealSectionList: View {
     var onAddTap: ((MealType) -> Void)?
     var onDelete: (FoodItem) -> Void
 
-    // MARK: - Body
     var body: some View {
-        CardRowBackgroundView(
-            hPad: TodayLayout.mealHPad,
-            topPad: TodayLayout.mealCardInnerTopPad,               // NEW (was 0)
-            bottomPad: TodayLayout.mealCardInnerBottomPad
-        ) {
-            VStack(spacing: 0) {
-                // 1) Header row
-                headerRow
+        Group {
+            // --- Header --------------------------------------------------------------
+            HStack(spacing: 8) {
+                Text(meal.title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AppColor.textTitle)
                 
-                // Single divider directly under the header
-                Divider()
+                Spacer(minLength: 0)
                 
-                if items.isEmpty {
-                    // 2) Placeholder row (when empty)
-                    emptyPlaceholderRow
-                } else {
-                    // 2) Item rows (each swipable) - dividers only between items
-                    ForEach(items.indices, id: \.self) { idx in
-                        MealItemRow(item: items[idx])
-                            .padding(.vertical, TodayLayout.mealRowVPad)
-                            .overlay(alignment: .bottom) {
-                                if idx < items.count - 1 {
-                                    Divider()
-                                }
-                            }
-                            .contentShape(Rectangle()) // generous hit area
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    Haptics.rigid()
-                                    withAnimation(.easeInOut(duration: 0.18)) {
-                                        onDelete(items[idx])
-                                    }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                            .accessibilityElement(children: .combine)
-                            .accessibilityLabel("\(items[idx].name), \(items[idx].calories) calories")
-                            .accessibilityAction(named: "Delete") {
-                                onDelete(items[idx])
-                            }
-                    }
-                }
-
-                // 3) + Add Food (correct size and tighter bottom space)
-                Button(action: { onAddTap?(meal) }) {
-                    Text("+ Add Food")
-                        .font(TodayLayout.addRowFont)
-                        .foregroundStyle(AppColor.brandPrimary)
-                }
-                .padding(.top, items.isEmpty ? 4 : TodayLayout.addRowTopPadWhenItemsExist)
-                .padding(.bottom, TodayLayout.addRowBottomPad)
-                .accessibilityLabel("Add Food")
-                .buttonStyle(.plain)
+                Text("\(totalCalories) kcal")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AppColor.textTitle)
             }
+            .padding(.top, TodayLayout.mealHeaderTopPad)
+            .padding(.bottom, TodayLayout.mealHeaderBottomPad)
+            .padding(.horizontal, TodayLayout.mealHPad)
+            .overlay(alignment: .bottom) {
+                // Header divider: content-width only (from "Breakfast" to "245 kcal")
+                Rectangle()
+                    .fill(AppColor.borderSubtle)
+                    .frame(height: 1)            // full pixel for clearer visibility
+                    .opacity(0.35)                // slightly softer while still visible
+                    .padding(.horizontal, TodayLayout.mealHPad)
+            }
+            .cardRowBackground(.top)
+            .accessibilityHeading(.h2)
+            
+            if items.isEmpty {
+                // Empty placeholder
+                Text("No items yet. Tap \"Add Food\" to log this meal.")
+                    .font(AppFont.bodySm(13))
+                    .foregroundStyle(AppColor.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, AppSpace.sm)
+                    .padding(.horizontal, TodayLayout.mealHPad)
+                    .cardRowBackground(.middle)
+            } else {
+                // MARK: Items
+                ForEach(items.indices, id: \.self) { idx in
+                    let item = items[idx]
+                    let isLast = idx == items.count - 1
+                    
+                    MealItemRow(item: item)
+                        .padding(.vertical, TodayLayout.mealRowVPad)
+                        .padding(.horizontal, TodayLayout.mealHPad)
+                        .contentShape(Rectangle())
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) { onDelete(item) } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .overlay(alignment: .bottom) {
+                            if !isLast {
+                                // Inter-item divider: content-width only (under text span)
+                                Rectangle()
+                                    .fill(AppColor.borderSubtle)
+                                    .frame(height: 1)        // full pixel
+                                    .opacity(0.25)            // slightly softer while still visible
+                                    .padding(.horizontal, TodayLayout.mealHPad)
+                            }
+                        }
+                        .cardRowBackground(.middle)                // bottom chrome belongs to Add row
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(item.name), \(Int(item.calories)) calories")
+                        .accessibilityAction(named: "Delete") {
+                            onDelete(item)
+                        }
+                }
+            }
+            
+            // --- "+ Add Food" (no bottom divider) -----------------------------------
+            Button(action: { onAddTap?(meal) }) {
+                Text("+ Add Food")
+                    .font(.system(size: 16, weight: .semibold))
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .foregroundStyle(AppColor.brandPrimary)    // keep your blue
+            }
+            .buttonStyle(.plain)
+            .padding(.top, TodayLayout.addRowTopGap)
+            .padding(.bottom, TodayLayout.addRowBottomPad)
+            .padding(.horizontal, TodayLayout.mealHPad)
+            .cardRowBackground(.bottom)  // bottom chrome, no line under
+            .accessibilityLabel("Add Food")
+            .accessibilityAddTraits(.isButton)
         }
-        .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-        .listRowSeparator(.hidden)
     }
-
-    // MARK: - Rows
-
-    private var headerRow: some View {
-        // Header
-        HStack(alignment: .firstTextBaseline) {
-            Text(meal.title)
-                .font(TodayLayout.mealHeaderTitleFont)
-                .foregroundStyle(AppColor.textTitle)
-            Spacer(minLength: 0)
-            Text("\(Double(totalCalories), specifier: "%.0f") kcal")
-                .font(TodayLayout.mealHeaderKcalFont)
-                .foregroundStyle(AppColor.textTitle)
-        }
-        .padding(.top, TodayLayout.mealHeaderTopPad)
-        .padding(.bottom, TodayLayout.mealHeaderBottomPad)
-        .accessibilityHeading(.h2)
-    }
-
-    private var emptyPlaceholderRow: some View {
-        Text("No items yet. Tap \"Add Food\" to log this meal.")
-            .font(AppFont.bodySm(13))
-            .foregroundStyle(AppColor.textMuted)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, AppSpace.sm)
-            // No horizontal padding - CardRowBackgroundView provides it
-    }
-
-
+    
     private var totalCalories: Int {
         items.reduce(0) { $0 + $1.calories }
     }
@@ -128,4 +126,3 @@ private struct MealItemRow: View, Equatable {
         }
     }
 }
-

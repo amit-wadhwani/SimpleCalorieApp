@@ -61,6 +61,7 @@ struct TodayScreen: View {
                     List {
                         // Motivation card
                         MotivationCardView()
+                            .cardRowBackground(.single)
                         SpacerRow(height: 8)
                         
                         // Breakfast card
@@ -88,21 +89,16 @@ struct TodayScreen: View {
                                 }
                             }
                         )
-                        .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                        .listRowBackground(Color.clear)
                         .id(MealType.breakfast)
                         
                         if viewModel.showAds {
                             SpacerRow(height: TodayLayout.v1AdTopBottom)
                             AdCardView(model: AdCardView.sampleAds[0])
-                                .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                                .listRowBackground(Color.clear)
+                                .cardRowBackground(.single)
                             SpacerRow(height: TodayLayout.v1AdTopBottom)
                         } else {
                             // No-ads path: insert decor spacer to preserve rhythm
                             DecorSpacerCard()
-                                .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                                .listRowBackground(Color.clear)
                         }
                         
                         // Lunch card
@@ -130,21 +126,16 @@ struct TodayScreen: View {
                                 }
                             }
                         )
-                        .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                        .listRowBackground(Color.clear)
                         .id(MealType.lunch)
                         
                         if viewModel.showAds {
                             SpacerRow(height: TodayLayout.v1AdTopBottom)
                             AdCardView(model: AdCardView.sampleAds[1])
-                                .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                                .listRowBackground(Color.clear)
+                                .cardRowBackground(.single)
                             SpacerRow(height: TodayLayout.v1AdTopBottom)
                         } else {
                             // No-ads path: insert decor spacer to preserve rhythm
                             DecorSpacerCard()
-                                .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                                .listRowBackground(Color.clear)
                         }
                         
                         // Dinner card
@@ -172,21 +163,16 @@ struct TodayScreen: View {
                                 }
                             }
                         )
-                        .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                        .listRowBackground(Color.clear)
                         .id(MealType.dinner)
                         
                         if viewModel.showAds {
                             SpacerRow(height: TodayLayout.v1AdTopBottom)
                             AdCardView(model: AdCardView.sampleAds[2])
-                                .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                                .listRowBackground(Color.clear)
+                                .cardRowBackground(.single)
                             SpacerRow(height: TodayLayout.v1AdTopBottom)
                         } else {
                             // No-ads path: insert decor spacer to preserve rhythm
                             DecorSpacerCard()
-                                .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                                .listRowBackground(Color.clear)
                         }
                         
                         // Snacks card
@@ -214,8 +200,6 @@ struct TodayScreen: View {
                                 }
                             }
                         )
-                        .listRowInsets(.init(top: 0, leading: TodayLayout.v1CardInsetH, bottom: 0, trailing: TodayLayout.v1CardInsetH))
-                        .listRowBackground(Color.clear)
                         .id(MealType.snacks)
                         
                         // Final small spacer to keep symmetry
