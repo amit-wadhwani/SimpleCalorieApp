@@ -4,27 +4,27 @@ struct DecorSpacerCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        legacyCapsuleSpacer
+        capsuleSeparator
         // Transparent list row so no white strip shows up
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
     }
-    
+
     // MARK: - Spacer
-    
+
     /// Style: Old Capsule – same size as new capsule, slightly bolder
-    private var legacyCapsuleSpacer: some View {
+    private var capsuleSeparator: some View {
         HStack {
             Spacer()
-            legacyCapsuleShape
+            capsuleSeparatorShape
             Spacer()
         }
         .frame(height: TodayLayout.decorSpacerHeightCapsuleOne)
     }
-    
+
     /// Old capsule's visual: match newCapsule size but a touch darker
-    private var legacyCapsuleShape: some View {
+    private var capsuleSeparatorShape: some View {
         Capsule()
             .fill(
                 AppColor.borderSubtle.opacity(
