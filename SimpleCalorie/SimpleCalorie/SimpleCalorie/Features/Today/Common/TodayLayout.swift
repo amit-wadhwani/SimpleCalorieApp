@@ -28,39 +28,11 @@ enum TodayLayout {
     // Legacy/other tokens
     static let v1AdTopBottom: CGFloat = AppSpace.s12
     
-    // MARK: - No-ads spacer styles
-    enum DecorSpacerStyle: String, CaseIterable {
-        case plain, divider, capsule, capsuleNewTuned
-    }
-    
-    enum DecorSpacerVariant: String, CaseIterable {
-        case oneLine, twoLine
-    }
-    
-    enum DecorSpacerAlign: String, CaseIterable {
-        case leading, center
-    }
-    
-    // AppStorage keys (unchanged names; values may be "plain", "divider", "capsule")
-    static let decorStyleKey = "today.decor.style"
-    static let decorVariantKey = "today.decor.variant" // "oneLine" or "twoLine"
-    static let decorAlignKey = "today.decor.align"
-    
-    // Heights
-    static let decorSpacerHeightPlain: CGFloat = 40  // invisible line height
-    static let decorSpacerHeightDivider: CGFloat = 24  // short row for hairline divider
+    // MARK: - Today separator (single fixed capsule style)
+    // These constants define the single Today card separator style, a subtle capsule between cards when there are no ads.
     static let decorSpacerHeightCapsuleOne: CGFloat = 36
-    static let decorSpacerHeightCapsuleTwo: CGFloat = 56
-    
-    // MARK: - Spacer: New Capsule (tuned)
-    static let newCapsuleMinW: CGFloat = 56
-    static let newCapsuleMaxW: CGFloat = 72
     static let newCapsuleDefaultW: CGFloat = 64
-    static let newCapsuleMinH: CGFloat = 6
-    static let newCapsuleMaxH: CGFloat = 8
     static let newCapsuleDefaultH: CGFloat = 7
-    /// breathing above and below the capsule (total row stays one-line)
-    static let newCapsuleVPad: CGFloat = 11
     /// opacity range (auto-inverts)
     static let newCapsuleOpacityLight: CGFloat = 0.22
     static let newCapsuleOpacityDark: CGFloat = 0.28
