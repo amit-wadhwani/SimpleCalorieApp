@@ -31,13 +31,13 @@ final class TodayViewModel: ObservableObject {
         set { date = newValue }
     }
     
-    init(repo: FoodRepository = InMemoryFoodRepository(), date: Date = Date()) {
+    init(repo: FoodRepository = InMemoryFoodRepository(), date: Date = Date(), seedDemoData: Bool = true) {
         self.repo = repo
         self.date = date
         
         // Load initial demo data if empty
         let loaded = repo.loadMeals(on: date)
-        if loaded.breakfast.isEmpty && loaded.lunch.isEmpty && loaded.dinner.isEmpty && loaded.snacks.isEmpty {
+        if seedDemoData && loaded.breakfast.isEmpty && loaded.lunch.isEmpty && loaded.dinner.isEmpty && loaded.snacks.isEmpty {
             // Seed with demo data
             let demoMeals = Meals(
                 breakfast: [

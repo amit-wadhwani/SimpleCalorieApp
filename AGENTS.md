@@ -42,7 +42,7 @@ Automated agents should **not** change project settings or bundle identifiers.
 
 ## Tests
 
-(Currently minimal or none.)
+We now have a small but growing test suite: `SimpleCalorieTests` for unit tests and `SimpleCalorieUITests` for UI smoke tests.
 
 - If you add tests, use XCTest:
   - Test target names like `SimpleCalorieTests` (or create if missing).
@@ -76,3 +76,32 @@ Automated agents should **not** change project settings or bundle identifiers.
 If in doubt about choices, prefer:
 - Native iOS patterns (e.g., List swipe actions, sheets)
 - Clear, readable code over cleverness.
+
+## Tests & Workflow
+
+- **Unit tests:**
+  - Target: `SimpleCalorieTests`.
+  - How to run:
+    - In Xcode: select the `SimpleCalorie` scheme and press **Cmd+U**.
+    - CLI example (requires macOS + Xcode):
+      ```
+      xcodebuild -scheme "SimpleCalorie" \
+        -destination 'platform=iOS Simulator,name=iPhone 16' \
+        -only-testing:SimpleCalorieTests test
+      ```
+    - Simulator name can vary; adjust to an installed iOS 17+ simulator.
+  - Expectation: after any code change, Codex/Cursor should run unit tests and ensure they pass.
+
+- **UI tests:**
+  - Target: `SimpleCalorieUITests` (smoke coverage for Today + Add Food flows).
+  - How to run:
+    - In Xcode: run via the Test navigator or **Cmd+U** with the UI test target included.
+    - CLI example:
+      ```
+      xcodebuild -scheme "SimpleCalorie" \
+        -destination 'platform=iOS Simulator,name=iPhone 16' \
+        -only-testing:SimpleCalorieUITests test
+      ```
+  - Expectation: UI tests are slower and **not** required on every change. Run them before important releases or when a task explicitly targets UI flows. If a change breaks UI tests, open/follow a dedicated task to repair and re-run them.
+
+> Note: This Linux sandbox cannot run `xcodebuild`; execute the above commands on macOS or in CI.

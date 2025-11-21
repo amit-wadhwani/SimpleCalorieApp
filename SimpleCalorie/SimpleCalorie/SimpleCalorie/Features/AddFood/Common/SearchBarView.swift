@@ -15,6 +15,7 @@ struct SearchBarView: View {
                 .disableAutocorrection(true)
                 .font(AppFont.bodySm(13))
                 .foregroundStyle(AppColor.textTitle)
+                .accessibilityIdentifier("searchField")
         }
         .padding(.horizontal, AppSpace.s12)
         .padding(.vertical, 10)

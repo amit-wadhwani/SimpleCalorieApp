@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "072C5CC0-4484-4AA8-BDAF-03FFD4918667",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:SimpleCalorie.xcodeproj",
+      "identifier" : "975D9F342EC402C200F14220",
+      "name" : "SimpleCalorie"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:SimpleCalorie.xcodeproj",
+        "identifier" : "975D9F432EC402C300F14220",
+        "name" : "SimpleCalorieTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:SimpleCalorie.xcodeproj",
+        "identifier" : "975D9F4D2EC402C300F14220",
+        "name" : "SimpleCalorieUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

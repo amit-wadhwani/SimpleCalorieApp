@@ -215,12 +215,26 @@ enum AppRadius { static let xl: CGFloat = 16; static let full: CGFloat = 999 }
 
 
 Step order (what to do first to last)
-	1.	Create folders & files (tree above) + .gitignore.
-	2.	Implement Design shims (Colors, Typography, Spacing, Radius) with token TODOs.
-	3.	Build Components (TopBar, SearchBar, ResultsHeader, FoodRow) with previews using hardcoded props.
-	4.	Add Models + Mock service + ViewModels.
-	5.	Compose AddFoodView using the components and mock VM.
-	6.	AppRootView shows AddFoodView.
-	7.	Add fixtures to Resources/PreviewContent/Fixtures.json and use them in previews.
-	8.	Accessibility labels & minimum hit targets (≥44pt).
-	9.	Run build; ensure previews render.
+        1.      Create folders & files (tree above) + .gitignore.
+        2.      Implement Design shims (Colors, Typography, Spacing, Radius) with token TODOs.
+        3.      Build Components (TopBar, SearchBar, ResultsHeader, FoodRow) with previews using hardcoded props.
+        4.      Add Models + Mock service + ViewModels.
+        5.      Compose AddFoodView using the components and mock VM.
+        6.      AppRootView shows AddFoodView.
+        7.      Add fixtures to Resources/PreviewContent/Fixtures.json and use them in previews.
+        8.      Accessibility labels & minimum hit targets (≥44pt).
+        9.      Run build; ensure previews render.
+
+## Standard workflow for Cursor/Codex on this repo
+
+1. Read `AGENTS.md` before touching code to understand conventions and test expectations.
+2. Keep changes minimal and focused on the assigned task.
+3. After applying changes:
+   - Ensure the project builds.
+   - Run the unit tests (`SimpleCalorieTests`) and fix any failures.
+4. UI tests (`SimpleCalorieUITests`) are opt-in:
+   - Run them when a task explicitly covers UI flows or before major releases.
+   - If a change breaks UI tests, either fix them within the task or file a dedicated follow-up task to repair and re-run.
+5. If you cannot run tests in this environment (for example, missing macOS/Xcode or simulators):
+   - Call out the limitation in your summary.
+   - Paste the exact CLI commands from `AGENTS.md` (e.g., `xcodebuild -scheme "SimpleCalorie" -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:SimpleCalorieTests test`) so they can be run locally.

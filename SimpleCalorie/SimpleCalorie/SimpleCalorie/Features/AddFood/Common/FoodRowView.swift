@@ -72,6 +72,7 @@ struct FoodRowView: View {
                 .fill(AppColor.bgCard)
                 .shadow(color: AppColor.borderSubtle.opacity(0.4), radius: 6, x: 0, y: 2)
         )
+        .accessibilityIdentifier("foodRow-\(props.name)")
     }
 
     @ViewBuilder

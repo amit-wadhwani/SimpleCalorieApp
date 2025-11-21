@@ -8,29 +8,27 @@
 import XCTest
 @testable import SimpleCalorie
 
-final class SimpleCalorieTests: XCTestCase {
+final class MealsModelTests: XCTestCase {
+    func testItemsForMealReturnsExpectedList() {
+        let breakfast = [FoodItem(name: "Oats", calories: 200, description: "1 cup")]
+        let lunch = [FoodItem(name: "Salad", calories: 300, description: "bowl")]
+        let meals = Meals(breakfast: breakfast, lunch: lunch, dinner: [], snacks: [])
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        XCTAssertEqual(meals.items(for: .breakfast), breakfast)
+        XCTAssertEqual(meals.items(for: .lunch), lunch)
+        XCTAssertTrue(meals.items(for: .dinner).isEmpty)
+        XCTAssertTrue(meals.items(for: .snacks).isEmpty)
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+    func testAllItemsAggregatesEveryMeal() {
+        let meals = Meals(
+            breakfast: [FoodItem(name: "Oats", calories: 200, description: "1 cup")],
+            lunch: [FoodItem(name: "Salad", calories: 300, description: "bowl")],
+            dinner: [FoodItem(name: "Soup", calories: 180, description: "cup")],
+            snacks: [FoodItem(name: "Apple", calories: 95, description: "1 medium")]
+        )
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+        XCTAssertEqual(meals.allItems.count, 4)
+        XCTAssertEqual(meals.allItems.map { $0.name }, ["Oats", "Salad", "Soup", "Apple"])
     }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }
