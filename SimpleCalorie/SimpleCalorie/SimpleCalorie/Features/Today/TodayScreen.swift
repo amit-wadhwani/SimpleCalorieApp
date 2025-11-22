@@ -87,7 +87,8 @@ struct TodayScreen: View {
                                         viewModel.add(item, to: meal)
                                     }
                                 }
-                            }
+                            },
+                            viewModel: viewModel
                         )
                         .id(MealType.breakfast)
                         
@@ -124,7 +125,8 @@ struct TodayScreen: View {
                                         viewModel.add(item, to: meal)
                                     }
                                 }
-                            }
+                            },
+                            viewModel: viewModel
                         )
                         .id(MealType.lunch)
                         
@@ -161,7 +163,8 @@ struct TodayScreen: View {
                                         viewModel.add(item, to: meal)
                                     }
                                 }
-                            }
+                            },
+                            viewModel: viewModel
                         )
                         .id(MealType.dinner)
                         
@@ -198,7 +201,8 @@ struct TodayScreen: View {
                                         viewModel.add(item, to: meal)
                                     }
                                 }
-                            }
+                            },
+                            viewModel: viewModel
                         )
                         .id(MealType.snacks)
                         
@@ -262,6 +266,9 @@ struct TodayScreen: View {
                 }
                 .environmentObject(viewModel)
             }
+        }
+        .sheet(isPresented: $viewModel.isCopyFromDateSheetPresented) {
+            CopyFromDateSheet(viewModel: viewModel)
         }
     }
     

@@ -60,6 +60,39 @@ We now have a small but growing test suite: `SimpleCalorieTests` for unit tests 
   - `Cards/DecorSpacerCard.swift` — visual spacer between sections
 - **Meals list:** `Meals/MealSectionList.swift`
 
+### Today Screen – Quick Add (Smart Suggestions + Swipe)
+
+The Today screen supports two complementary "quick add" mechanisms for meals:
+
+- **Smart Suggestions** – a row of subtle pills inside each meal card (Breakfast, Lunch, Dinner, Snacks) that offer:
+  - Yesterday's <Meal> (shown only if data is available)
+  - Last Week's <Meal> (Breakfast, Dinner, Snacks) / Last Night's Dinner (for Lunch) (shown only if data is available)
+  - Copy from Date… (always shown)
+
+- **Swipe Actions** – trailing swipe actions (right-to-left) on the meal cards with colored tiles:
+  - Yesterday (shown only if data is available)
+  - Last Week / Last Night (shown only if data is available)
+  - Choose (Copy from Date…) (always shown)
+
+**Important:** SmartSuggestionsRow and swipe actions are only shown when the meal is empty (no food items). Once items are added, quick add options are hidden.
+
+These two behaviors are controlled by `TodayQuickAddMode`:
+- `.suggestions` – show SmartSuggestionsRow only (default)
+- `.swipe` – enable swipe actions only
+- `.both` – show SmartSuggestionsRow and swipe actions
+
+The mode is stored via `@AppStorage(TodayQuickAddMode.storageKey)` and can be changed from the Today Settings UI (Quick Add Style segmented control).
+
+**Layout Mode:** SmartSuggestionsRow supports horizontal and vertical layouts, controlled by `TodaySuggestionsLayoutMode` (default: horizontal). This can be changed in Settings.
+
+**Availability:** The view model exposes boolean properties (`hasYesterdayBreakfast`, `hasLastWeekBreakfast`, etc.) that gate which suggestions are visible. These are currently placeholders that return `true`; they will be implemented with actual data checks once persistence is in place.
+
+When extending quick add behavior, agents should:
+- Reuse `SmartSuggestionsRow` and swipe actions rather than reinventing UI.
+- Route new behaviors through `TodayViewModel.handleMealSuggestion(_:)` and `presentCopyFromDatePicker(for:)`.
+- Avoid hard-coding date logic in views; keep it in view models and data layers.
+- Check availability booleans before showing suggestion chips/buttons.
+
 ### No-Ads Separator (current behavior)
 
 - Today card sections are separated by a single, fixed “no-ads separator.”

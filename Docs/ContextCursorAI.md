@@ -225,6 +225,32 @@ Step order (what to do first to last)
         8.      Accessibility labels & minimum hit targets (≥44pt).
         9.      Run build; ensure previews render.
 
+## Today quick add experiments (SmartSuggestionsRow + swipe actions)
+
+- Quick add for meals is implemented in two ways:
+  - `SmartSuggestionsRow` (in `Features/Today/Meals/SmartSuggestionsRow.swift`).
+  - `swipeActions` attached to the meal cards in `MealSectionList`.
+
+- The active behavior is controlled by `TodayQuickAddMode` (`suggestions`, `swipe`, `both`), stored in `@AppStorage(TodayQuickAddMode.storageKey)` and exposed in the Today settings screen as a segmented control.
+
+- **Visibility rules:**
+  - SmartSuggestionsRow and swipe actions are only shown when the meal is empty (no food items).
+  - Individual suggestion chips/buttons are gated by availability booleans in `TodayViewModel` (`hasYesterdayBreakfast`, `hasLastWeekBreakfast`, etc.).
+  - "Copy from Date" is always visible.
+
+- **Layout mode:** SmartSuggestionsRow layout is controlled by `TodaySuggestionsLayoutMode` (horizontal/vertical); when changing layout, respect this enum and AppStorage key instead of hard-coding. Default is horizontal.
+
+- **Snacks support:** Snacks now has Smart Suggestions and swipe actions, just like Breakfast, Lunch, and Dinner.
+
+- When implementing new quick-add flows (copying meals from other dates, adding recurring meals, etc.), Cursor/agents should:
+  - Prefer adding cases to `TodayViewModel.MealSuggestion` and implementing logic in `handleMealSuggestion(_:)`.
+  - Use `presentCopyFromDatePicker(for:)` and related view-model APIs for date-picking flows.
+  - Keep the SmartSuggestionsRow layout and swipe actions visually consistent with the Figma designs (Variation C for chips, Variation B for swipe).
+  - Check meal emptiness (`items.isEmpty`) before showing quick add options.
+  - Use availability booleans to conditionally show suggestion chips/buttons.
+
+- Do NOT delete or restyle SmartSuggestionsRow or swipe actions without also updating Figma, AGENTS.md, and this document.
+
 ## Standard workflow for Cursor/Codex on this repo
 
 1. Read `AGENTS.md` before touching code to understand conventions and test expectations.

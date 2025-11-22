@@ -37,12 +37,72 @@ struct WeeklyPlaceholderView: View {
 
 struct SettingsView: View {
     @AppStorage("showAds") var showAds: Bool = true
+    
+    @AppStorage(TodayQuickAddMode.storageKey)
+    private var quickAddModeRaw: String = TodayQuickAddMode.suggestions.rawValue
+    
+    private var quickAddMode: TodayQuickAddMode {
+        get { TodayQuickAddMode(rawValue: quickAddModeRaw) ?? .suggestions }
+        set { quickAddModeRaw = newValue.rawValue }
+    }
+    
+    @AppStorage(TodaySuggestionsLayoutMode.storageKey)
+    private var suggestionsLayoutRaw: String = TodaySuggestionsLayoutMode.horizontal.rawValue
+    
+    private var suggestionsLayoutMode: TodaySuggestionsLayoutMode {
+        get { TodaySuggestionsLayoutMode(rawValue: suggestionsLayoutRaw) ?? .horizontal }
+        set { suggestionsLayoutRaw = newValue.rawValue }
+    }
+    
+    @AppStorage(TodaySwipeEdgeMode.storageKey)
+    private var swipeEdgeRaw: String = TodaySwipeEdgeMode.trailing.rawValue
+    
+    private var swipeEdgeMode: TodaySwipeEdgeMode {
+        get { TodaySwipeEdgeMode(rawValue: swipeEdgeRaw) ?? .trailing }
+        set { swipeEdgeRaw = newValue.rawValue }
+    }
 
     var body: some View {
         NavigationStack {
             List {
                 Section("APP") {
                     Toggle("Show Ads", isOn: $showAds)
+                }
+                
+                Section("QUICK ADD STYLE") {
+                    Picker("Quick Add", selection: Binding(
+                        get: { quickAddMode },
+                        set: { quickAddModeRaw = $0.rawValue }
+                    )) {
+                        ForEach(TodayQuickAddMode.allCases, id: \.self) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+                
+                Section("SUGGESTION LAYOUT") {
+                    Picker("Layout", selection: Binding(
+                        get: { suggestionsLayoutMode },
+                        set: { suggestionsLayoutRaw = $0.rawValue }
+                    )) {
+                        ForEach(TodaySuggestionsLayoutMode.allCases, id: \.self) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+                
+                Section("SWIPE DIRECTION") {
+                    Picker("Swipe Direction", selection: Binding(
+                        get: { swipeEdgeMode },
+                        set: { swipeEdgeRaw = $0.rawValue }
+                    )) {
+                        ForEach(TodaySwipeEdgeMode.allCases, id: \.self) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
                 }
 
                 Section("ACCOUNT") {

@@ -1,10 +1,46 @@
 import SwiftUI
 
+private let emeraldColor = Color(red: 52/255, green: 211/255, blue: 153/255)   // #34D399
+private let indigoColor  = Color(red: 129/255, green: 140/255, blue: 248/255) // #818CF8
+private let skyColor     = Color(red: 56/255, green: 189/255, blue: 248/255)  // #38BDF8
+private let amberColor   = Color(red: 251/255, green: 191/255, blue: 36/255)  // #FBBF24
+
 struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
     var onAddTap: ((MealType) -> Void)?
     var onDelete: (FoodItem) -> Void
+    @ObservedObject var viewModel: TodayViewModel
+    
+    @AppStorage(TodayQuickAddMode.storageKey)
+    private var quickAddModeRaw: String = TodayQuickAddMode.suggestions.rawValue
+    
+    private var quickAddMode: TodayQuickAddMode {
+        TodayQuickAddMode(rawValue: quickAddModeRaw) ?? .suggestions
+    }
+    
+    @AppStorage(TodaySuggestionsLayoutMode.storageKey)
+    private var suggestionsLayoutRaw: String = TodaySuggestionsLayoutMode.horizontal.rawValue
+    
+    private var suggestionsLayoutMode: TodaySuggestionsLayoutMode {
+        TodaySuggestionsLayoutMode(rawValue: suggestionsLayoutRaw) ?? .horizontal
+    }
+    
+    @AppStorage(TodaySwipeEdgeMode.storageKey)
+    private var swipeEdgeRaw: String = TodaySwipeEdgeMode.trailing.rawValue
+    
+    private var swipeEdgeMode: TodaySwipeEdgeMode {
+        TodaySwipeEdgeMode(rawValue: swipeEdgeRaw) ?? .trailing
+    }
+    
+    private var mealKind: SmartSuggestionsRow.MealKind? {
+        switch meal {
+        case .breakfast: return .breakfast
+        case .lunch:     return .lunch
+        case .dinner:    return .dinner
+        case .snacks:    return .snacks
+        }
+    }
 
     var body: some View {
         Group {
@@ -24,25 +60,65 @@ struct MealSectionList: View {
             .padding(.bottom, TodayLayout.mealHeaderBottomPad)
             .padding(.horizontal, TodayLayout.mealHPad)
             .overlay(alignment: .bottom) {
-                // Header divider: content-width only (from "Breakfast" to "245 kcal")
                 Rectangle()
                     .fill(AppColor.borderSubtle)
-                    .frame(height: 1)            // full pixel for clearer visibility
-                    .opacity(0.35)                // slightly softer while still visible
+                    .frame(height: 1)
+                    .opacity(0.35)
                     .padding(.horizontal, TodayLayout.mealHPad)
             }
             .cardRowBackground(.top)
             .accessibilityHeading(.h2)
             
+            // --- Smart Suggestions Row (only when meal is empty) --------------------
+            if let kind = mealKind,
+               items.isEmpty,
+               (quickAddMode == .suggestions || quickAddMode == .both) {
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    SmartSuggestionsRow(
+                        mealKind: kind,
+                        layoutMode: suggestionsLayoutMode,
+                        hasYesterday: hasYesterdayAvailability(for: kind),
+                        hasLastWeekOrNight: hasLastWeekOrNightAvailability(for: kind),
+                        onYesterdayTapped: {
+                            handleYesterdaySuggestion(for: kind)
+                        },
+                        onLastWeekOrLastNightTapped: {
+                            handleLastWeekOrNightSuggestion(for: kind)
+                        },
+                        onCopyFromDateTapped: {
+                            viewModel.presentCopyFromDatePicker(for: kind)
+                        }
+                    )
+                    .padding(.top, 8)
+                    .padding(.bottom, 12)
+                    .padding(.horizontal, TodayLayout.mealHPad)
+                    
+                    Divider()
+                        .opacity(0.1)
+                        .padding(.horizontal, TodayLayout.mealHPad)
+                }
+                .cardRowBackground(.middle)
+            }
+            
+            // --- Empty state vs items ----------------------------------------------
             if items.isEmpty {
-                // Empty placeholder
-                Text("No items yet. Tap \"Add Food\" to log this meal.")
+                let swipeDirectionText = swipeEdgeMode == .leading ? "right" : "left"
+                
+                Text("No items yet. Swipe \(swipeDirectionText) or tap \"Add Food\" to log this meal.")
                     .font(AppFont.bodySm(13))
                     .foregroundStyle(AppColor.textMuted)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, AppSpace.sm)
                     .padding(.horizontal, TodayLayout.mealHPad)
                     .cardRowBackground(.middle)
+                    .swipeActions(edge: swipeEdgeMode == .leading ? .leading : .trailing,
+                                  allowsFullSwipe: false) {
+                        if let kind = mealKind,
+                           (quickAddMode == .swipe || quickAddMode == .both) {
+                            swipeActionsForMeal(kind)
+                        }
+                    }
             } else {
                 // MARK: Items
                 ForEach(items.indices, id: \.self) { idx in
@@ -54,27 +130,30 @@ struct MealSectionList: View {
                         .padding(.horizontal, TodayLayout.mealHPad)
                         .contentShape(Rectangle())
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) { onDelete(item) } label: {
+                            Button(role: .destructive) {
+                                onDelete(item)
+                            } label: {
                                 Label("Delete", systemImage: "trash")
                             }
                         }
                         .overlay(alignment: .bottom) {
                             if !isLast {
-                                // Inter-item divider: content-width only (under text span)
                                 Rectangle()
                                     .fill(AppColor.borderSubtle)
-                                    .frame(height: 1)        // full pixel
-                                    .opacity(0.25)            // slightly softer while still visible
+                                    .frame(height: 1)
+                                    .opacity(0.25)
                                     .padding(.horizontal, TodayLayout.mealHPad)
                             }
                         }
-                        .cardRowBackground(.middle)                // bottom chrome belongs to Add row
+                        .cardRowBackground(.middle)
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("\(item.name), \(Int(item.calories)) calories")
                         .accessibilityAction(named: "Delete") {
                             onDelete(item)
                         }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
+                .animation(.easeInOut(duration: 0.25), value: items.count)
             }
             
             // --- "+ Add Food" (no bottom divider) -----------------------------------
@@ -82,13 +161,13 @@ struct MealSectionList: View {
                 Text("+ Add Food")
                     .font(.system(size: 16, weight: .semibold))
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .foregroundStyle(AppColor.brandPrimary)    // keep your blue
+                    .foregroundStyle(AppColor.brandPrimary)
             }
             .buttonStyle(.plain)
             .padding(.top, TodayLayout.addRowTopGap)
             .padding(.bottom, TodayLayout.addRowBottomPad)
             .padding(.horizontal, TodayLayout.mealHPad)
-            .cardRowBackground(.bottom)  // bottom chrome, no line under
+            .cardRowBackground(.bottom)
             .accessibilityLabel("Add Food")
             .accessibilityAddTraits(.isButton)
         }
@@ -96,6 +175,160 @@ struct MealSectionList: View {
     
     private var totalCalories: Int {
         items.reduce(0) { $0 + $1.calories }
+    }
+    
+    // MARK: - Quick Add Helpers
+    
+    private func hasYesterdayAvailability(for kind: SmartSuggestionsRow.MealKind) -> Bool {
+        switch kind {
+        case .breakfast: return viewModel.hasYesterdayBreakfast
+        case .lunch:     return viewModel.hasYesterdayLunch
+        case .dinner:    return viewModel.hasYesterdayDinner
+        case .snacks:    return viewModel.hasYesterdaySnacks
+        }
+    }
+    
+    private func hasLastWeekOrNightAvailability(for kind: SmartSuggestionsRow.MealKind) -> Bool {
+        switch kind {
+        case .breakfast: return viewModel.hasLastWeekBreakfast
+        case .lunch:     return viewModel.hasLastNightDinnerForLunch
+        case .dinner:    return viewModel.hasLastWeekDinner
+        case .snacks:    return viewModel.hasLastWeekSnacks
+        }
+    }
+    
+    private func handleYesterdaySuggestion(for kind: SmartSuggestionsRow.MealKind) {
+        switch kind {
+        case .breakfast:
+            viewModel.handleMealSuggestion(.yesterdayBreakfast)
+        case .lunch:
+            viewModel.handleMealSuggestion(.yesterdayLunch)
+        case .dinner:
+            viewModel.handleMealSuggestion(.yesterdayDinner)
+        case .snacks:
+            viewModel.handleMealSuggestion(.yesterdaySnacks)
+        }
+    }
+    
+    private func handleLastWeekOrNightSuggestion(for kind: SmartSuggestionsRow.MealKind) {
+        switch kind {
+        case .breakfast:
+            viewModel.handleMealSuggestion(.lastWeekBreakfast)
+        case .lunch:
+            viewModel.handleMealSuggestion(.lastNightDinner)
+        case .dinner:
+            viewModel.handleMealSuggestion(.lastWeekDinner)
+        case .snacks:
+            viewModel.handleMealSuggestion(.lastWeekSnacks)
+        }
+    }
+    
+    // MARK: - Swipe Actions (icon-only tiles)
+    
+    private func swipeActionsForMeal(_ kind: SmartSuggestionsRow.MealKind) -> some View {
+        Group {
+            switch kind {
+            case .breakfast:
+                Button {
+                    viewModel.handleMealSuggestion(.yesterdayBreakfast)
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(emeraldColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.lastWeekBreakfast)
+                } label: {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(indigoColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.copyFromDateBreakfast)
+                } label: {
+                    Image(systemName: "calendar.badge.plus")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(amberColor)
+                
+            case .lunch:
+                Button {
+                    viewModel.handleMealSuggestion(.lastNightDinner)
+                } label: {
+                    Image(systemName: "moon.stars")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(skyColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.yesterdayLunch)
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(emeraldColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.copyFromDateLunch)
+                } label: {
+                    Image(systemName: "calendar.badge.plus")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(amberColor)
+                
+            case .dinner:
+                Button {
+                    viewModel.handleMealSuggestion(.yesterdayDinner)
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(emeraldColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.lastWeekDinner)
+                } label: {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(indigoColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.copyFromDateDinner)
+                } label: {
+                    Image(systemName: "calendar.badge.plus")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(amberColor)
+                
+            case .snacks:
+                Button {
+                    viewModel.handleMealSuggestion(.yesterdaySnacks)
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(emeraldColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.lastWeekSnacks)
+                } label: {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(indigoColor)
+                
+                Button {
+                    viewModel.handleMealSuggestion(.copyFromDateSnacks)
+                } label: {
+                    Image(systemName: "calendar.badge.plus")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .tint(amberColor)
+            }
+        }
     }
 }
 
@@ -114,7 +347,7 @@ private struct MealItemRow: View, Equatable {
                     .foregroundStyle(AppColor.textTitle)
                 
                 if !item.description.isEmpty && item.description != item.name {
-                    Text(item.description) // e.g., "1 cup"
+                    Text(item.description)
                         .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(AppColor.textMuted)
                 }

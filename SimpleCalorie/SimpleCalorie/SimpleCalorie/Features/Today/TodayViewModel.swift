@@ -10,6 +10,9 @@ final class TodayViewModel: ObservableObject {
     @Published var date: Date
     @Published var meals: Meals
     @Published var isDatePickerPresented: Bool = false
+    @Published var isCopyFromDateSheetPresented: Bool = false
+    @Published var copyFromDateSelectedDate: Date = Date()
+    @Published var copyFromDateTargetMealKind: MealSuggestionTargetMealKind? = nil
     @AppStorage("showAds") var showAds: Bool = true
     
     // Basic demo values
@@ -139,5 +142,237 @@ final class TodayViewModel: ObservableObject {
         date = newDate
         didChangeDate()
     }
+}
+
+// MARK: - Quick Add Meal Suggestions
+extension TodayViewModel {
+    enum MealSuggestionTargetMealKind: String, CaseIterable {
+        case breakfast, lunch, dinner, snacks
+        
+        var displayName: String {
+            switch self {
+            case .breakfast: return "Breakfast"
+            case .lunch: return "Lunch"
+            case .dinner: return "Dinner"
+            case .snacks: return "Snacks"
+            }
+        }
+    }
+    
+    enum MealSuggestion {
+        case yesterdayBreakfast
+        case lastWeekBreakfast
+        case yesterdayLunch
+        case lastNightDinner
+        case yesterdayDinner
+        case lastWeekDinner
+        case yesterdaySnacks
+        case lastWeekSnacks
+        case copyFromDateBreakfast
+        case copyFromDateLunch
+        case copyFromDateDinner
+        case copyFromDateSnacks
+    }
+    
+    func handleMealSuggestion(_ suggestion: MealSuggestion) {
+        let targetDate = date
+        let items: [FoodItem]
+        let targetMeal: MealType
+        
+        switch suggestion {
+        case .yesterdayBreakfast:
+            items = sourceItemsForYesterday(mealKind: .breakfast)
+            targetMeal = .breakfast
+        case .lastWeekBreakfast:
+            items = sourceItemsForLastWeek(mealKind: .breakfast)
+            targetMeal = .breakfast
+        case .yesterdayLunch:
+            items = sourceItemsForYesterday(mealKind: .lunch)
+            targetMeal = .lunch
+        case .lastNightDinner:
+            items = sourceItemsForLastNightDinner()
+            targetMeal = .lunch
+        case .yesterdayDinner:
+            items = sourceItemsForYesterday(mealKind: .dinner)
+            targetMeal = .dinner
+        case .lastWeekDinner:
+            items = sourceItemsForLastWeek(mealKind: .dinner)
+            targetMeal = .dinner
+        case .yesterdaySnacks:
+            items = sourceItemsForYesterday(mealKind: .snacks)
+            targetMeal = .snacks
+        case .lastWeekSnacks:
+            items = sourceItemsForLastWeek(mealKind: .snacks)
+            targetMeal = .snacks
+        case .copyFromDateBreakfast,
+             .copyFromDateLunch,
+             .copyFromDateDinner,
+             .copyFromDateSnacks:
+            // For this task you can still defer actual date picker logic;
+            // just leave TODO and return for now. The UI will still call presentCopyFromDatePicker(for:).
+            return
+        }
+        
+        // Only copy if there are items to copy
+        if !items.isEmpty {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                addItems(items, to: targetMeal, on: targetDate)
+            }
+        }
+    }
+    
+    func presentCopyFromDatePicker(for mealKind: SmartSuggestionsRow.MealKind) {
+        let initialMealKind: MealSuggestionTargetMealKind
+        switch mealKind {
+        case .breakfast: initialMealKind = .breakfast
+        case .lunch:     initialMealKind = .lunch
+        case .dinner:    initialMealKind = .dinner
+        case .snacks:    initialMealKind = .snacks
+        }
+        
+        copyFromDateSelectedDate = date
+        
+        // Auto-select: if the initial meal has items, use it; otherwise use first available
+        if hasItems(on: date, mealKind: initialMealKind) {
+            copyFromDateTargetMealKind = initialMealKind
+        } else {
+            copyFromDateTargetMealKind = firstMealKindWithItems(on: date) ?? initialMealKind
+        }
+        
+        isCopyFromDateSheetPresented = true
+    }
+    
+    func firstMealKindWithItems(on date: Date) -> MealSuggestionTargetMealKind? {
+        for kind in MealSuggestionTargetMealKind.allCases {
+            if hasItems(on: date, mealKind: kind) {
+                return kind
+            }
+        }
+        return nil
+    }
+    
+    var previewItemsForCopyFromDate: [FoodItem] {
+        guard let targetMealKind = copyFromDateTargetMealKind else { return [] }
+        return sourceItems(for: targetMealKind, on: copyFromDateSelectedDate)
+    }
+    
+    var previewTotalCaloriesForCopyFromDate: Int {
+        previewItemsForCopyFromDate.reduce(0) { $0 + $1.calories }
+    }
+    
+    var canConfirmCopyFromDate: Bool {
+        !previewItemsForCopyFromDate.isEmpty
+    }
+    
+    func hasItems(on date: Date, mealKind: MealSuggestionTargetMealKind) -> Bool {
+        !sourceItems(for: mealKind, on: date).isEmpty
+    }
+    
+    func confirmCopyFromDate() {
+        guard let targetMealKind = copyFromDateTargetMealKind else { return }
+        let items = previewItemsForCopyFromDate
+        let targetMeal: MealType
+        
+        switch targetMealKind {
+        case .breakfast: targetMeal = .breakfast
+        case .lunch: targetMeal = .lunch
+        case .dinner: targetMeal = .dinner
+        case .snacks: targetMeal = .snacks
+        }
+        
+        if !items.isEmpty {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                addItems(items, to: targetMeal, on: date)
+            }
+        }
+        
+        isCopyFromDateSheetPresented = false
+        copyFromDateTargetMealKind = nil
+    }
+    
+    private func sourceItems(for mealKind: MealSuggestionTargetMealKind, on date: Date) -> [FoodItem] {
+        let meals = repo.loadMeals(on: date)
+        switch mealKind {
+        case .breakfast: return meals.breakfast
+        case .lunch: return meals.lunch
+        case .dinner: return meals.dinner
+        case .snacks: return meals.snacks
+        }
+    }
+    
+    private func sourceItems(for mealKind: MealKind, on date: Date) -> [FoodItem] {
+        let meals = repo.loadMeals(on: date)
+        switch mealKind {
+        case .breakfast: return meals.breakfast
+        case .lunch: return meals.lunch
+        case .dinner: return meals.dinner
+        case .snacks: return meals.snacks
+        }
+    }
+    
+    // MARK: - Quick Add Source Meal Lookup
+    
+    enum MealKind {
+        case breakfast, lunch, dinner, snacks
+    }
+    
+    func sourceItemsForYesterday(mealKind: MealKind) -> [FoodItem] {
+        guard let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: date) else {
+            return []
+        }
+        let yesterdayMeals = repo.loadMeals(on: yesterday)
+        switch mealKind {
+        case .breakfast: return yesterdayMeals.breakfast
+        case .lunch: return yesterdayMeals.lunch
+        case .dinner: return yesterdayMeals.dinner
+        case .snacks: return yesterdayMeals.snacks
+        }
+    }
+    
+    func sourceItemsForLastWeek(mealKind: MealKind) -> [FoodItem] {
+        guard let lastWeek = Calendar.current.date(byAdding: .day, value: -7, to: date) else {
+            return []
+        }
+        let lastWeekMeals = repo.loadMeals(on: lastWeek)
+        switch mealKind {
+        case .breakfast: return lastWeekMeals.breakfast
+        case .lunch: return lastWeekMeals.lunch
+        case .dinner: return lastWeekMeals.dinner
+        case .snacks: return lastWeekMeals.snacks
+        }
+    }
+    
+    func sourceItemsForLastNightDinner() -> [FoodItem] {
+        guard let lastNight = Calendar.current.date(byAdding: .day, value: -1, to: date) else {
+            return []
+        }
+        let lastNightMeals = repo.loadMeals(on: lastNight)
+        return lastNightMeals.dinner
+    }
+    
+    private func addItems(_ items: [FoodItem], to meal: MealType, on targetDate: Date) {
+        for item in items {
+            _ = repo.add(item, to: meal, on: targetDate)
+        }
+        // Reload meals for current date if we're adding to current date
+        if targetDate == date {
+            meals = repo.loadMeals(on: date)
+            recalcTotals()
+        }
+    }
+    
+    // MARK: - Quick Add Availability
+    
+    var hasYesterdayBreakfast: Bool { !sourceItemsForYesterday(mealKind: .breakfast).isEmpty }
+    var hasLastWeekBreakfast: Bool { !sourceItemsForLastWeek(mealKind: .breakfast).isEmpty }
+    var hasYesterdayLunch: Bool { !sourceItemsForYesterday(mealKind: .lunch).isEmpty }
+    var hasLastNightDinnerForLunch: Bool { !sourceItemsForLastNightDinner().isEmpty }
+    var hasYesterdayDinner: Bool { !sourceItemsForYesterday(mealKind: .dinner).isEmpty }
+    var hasLastWeekDinner: Bool { !sourceItemsForLastWeek(mealKind: .dinner).isEmpty }
+    var hasYesterdaySnacks: Bool { !sourceItemsForYesterday(mealKind: .snacks).isEmpty }
+    var hasLastWeekSnacks: Bool { !sourceItemsForLastWeek(mealKind: .snacks).isEmpty }
+    
+    // Legacy property name for backward compatibility
+    var hasLastNightDinner: Bool { hasLastNightDinnerForLunch }
 }
 
