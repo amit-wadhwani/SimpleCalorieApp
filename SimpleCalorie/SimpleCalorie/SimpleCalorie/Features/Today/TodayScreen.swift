@@ -13,7 +13,7 @@ enum TodaySheet: Identifiable, Equatable {
 }
 
 struct TodayScreen: View {
-    @EnvironmentObject var viewModel: TodayViewModel
+    @ObservedObject var viewModel: TodayViewModel
     @StateObject private var toastCenter = ToastCenter()
     @State private var activeSheet: TodaySheet?
     @State private var pendingScrollToMeal: MealType?
@@ -267,9 +267,6 @@ struct TodayScreen: View {
                 .environmentObject(viewModel)
             }
         }
-        .sheet(isPresented: $viewModel.isCopyFromDateSheetPresented) {
-            CopyFromDateSheet(viewModel: viewModel)
-        }
     }
     
     private func formattedDate() -> String {
@@ -280,6 +277,5 @@ struct TodayScreen: View {
 }
 
 #Preview {
-    TodayScreen()
-        .environmentObject(TodayViewModel())
+    TodayScreen(viewModel: TodayViewModel())
 }

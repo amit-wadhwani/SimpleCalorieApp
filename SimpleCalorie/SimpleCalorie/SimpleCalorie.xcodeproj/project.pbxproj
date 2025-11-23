@@ -27,7 +27,6 @@
 		975D9F352EC402C200F14220 /* SimpleCalorie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleCalorie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		975D9F442EC402C300F14220 /* SimpleCalorieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SimpleCalorieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		975D9F4E2EC402C300F14220 /* SimpleCalorieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SimpleCalorieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		97793A5F2ED1125E002D64FD /* SimpleCalorieUITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SimpleCalorieUITests.xctestplan; sourceTree = "<group>"; };
 		97A6B8E02ED0D30800131998 /* SimpleCalorie.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SimpleCalorie.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,7 +76,6 @@
 		975D9F2C2EC402C200F14220 = {
 			isa = PBXGroup;
 			children = (
-				97793A5F2ED1125E002D64FD /* SimpleCalorieUITests.xctestplan */,
 				97A6B8E02ED0D30800131998 /* SimpleCalorie.xctestplan */,
 				975D9F372EC402C200F14220 /* SimpleCalorie */,
 				975D9F472EC402C300F14220 /* SimpleCalorieTests */,

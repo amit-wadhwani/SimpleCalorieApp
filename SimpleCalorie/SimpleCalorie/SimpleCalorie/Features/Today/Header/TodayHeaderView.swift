@@ -28,7 +28,8 @@ struct TodayHeaderView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(AppColor.textTitle)
                     }
-                    
+                    .accessibilityIdentifier("previousDayButton")
+
                     Button(action: onDateTap) {
                         Text(formattedDate())
                             .font(AppFont.titleSm(16))
@@ -40,7 +41,8 @@ struct TodayHeaderView: View {
                                     .fill(AppColor.bgCard.opacity(0.8))
                             )
                     }
-                    
+                    .accessibilityIdentifier("todayDateButton")
+
                     Button {
                         Haptics.light()
                         viewModel.goToNextDay()
@@ -49,6 +51,7 @@ struct TodayHeaderView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(AppColor.textTitle)
                     }
+                    .accessibilityIdentifier("nextDayButton")
                 }
                 .frame(maxWidth: .infinity)
                 

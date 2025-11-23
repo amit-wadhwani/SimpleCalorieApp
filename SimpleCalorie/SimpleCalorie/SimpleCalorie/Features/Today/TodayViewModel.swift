@@ -222,24 +222,36 @@ extension TodayViewModel {
     }
     
     func presentCopyFromDatePicker(for mealKind: SmartSuggestionsRow.MealKind) {
-        let initialMealKind: MealSuggestionTargetMealKind
+        // Map SmartSuggestionsRow.MealKind -> internal target meal kind
+        let targetKind: MealSuggestionTargetMealKind
         switch mealKind {
-        case .breakfast: initialMealKind = .breakfast
-        case .lunch:     initialMealKind = .lunch
-        case .dinner:    initialMealKind = .dinner
-        case .snacks:    initialMealKind = .snacks
+        case .breakfast: targetKind = .breakfast
+        case .lunch:     targetKind = .lunch
+        case .dinner:    targetKind = .dinner
+        case .snacks:    targetKind = .snacks
         }
         
-        copyFromDateSelectedDate = date
+        // Choose a default source date.
+        // Prefer "yesterday" if that meal has items; otherwise fall back to today.
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        var chosenDate = today
         
-        // Auto-select: if the initial meal has items, use it; otherwise use first available
-        if hasItems(on: date, mealKind: initialMealKind) {
-            copyFromDateTargetMealKind = initialMealKind
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: today),
+           hasItems(on: yesterday, mealKind: targetKind) {
+            // Prefer yesterday when there are items for this meal.
+            chosenDate = yesterday
         } else {
-            copyFromDateTargetMealKind = firstMealKindWithItems(on: date) ?? initialMealKind
+            // If yesterday has no items, just default to today.
+            chosenDate = today
         }
         
-        isCopyFromDateSheetPresented = true
+        // Update copy-from-date state
+        self.copyFromDateSelectedDate = chosenDate
+        self.copyFromDateTargetMealKind = targetKind
+        
+        // Always present the sheet; let the sheet decide whether Copy is enabled.
+        self.isCopyFromDateSheetPresented = true
     }
     
     func firstMealKindWithItems(on date: Date) -> MealSuggestionTargetMealKind? {

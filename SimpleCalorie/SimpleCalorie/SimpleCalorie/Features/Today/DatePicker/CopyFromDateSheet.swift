@@ -41,6 +41,7 @@ struct CopyFromDateSheet: View {
                     .datePickerStyle(.graphical)
                     .labelsHidden()
                     .tint(AppColor.brandPrimary)
+                    .accessibilityIdentifier("copyFromDateDatePicker")
                 }
                 .padding(.horizontal)
                 
@@ -71,6 +72,7 @@ struct CopyFromDateSheet: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .accessibilityIdentifier("copyFromDateMealTypePicker")
                     .onChange(of: viewModel.copyFromDateSelectedDate) { _, newDate in
                         if let currentKind = viewModel.copyFromDateTargetMealKind,
                            !viewModel.hasItems(on: newDate, mealKind: currentKind) {
@@ -93,13 +95,15 @@ struct CopyFromDateSheet: View {
                         .fontWeight(.medium)
                         .foregroundStyle(AppColor.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    
+                        .accessibilityIdentifier("copyFromDatePreviewSummary")
+
                     if viewModel.previewItemsForCopyFromDate.isEmpty {
                         Text("No items for this date and meal.")
                             .font(.subheadline)
                             .foregroundStyle(AppColor.textMuted)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 8)
+                            .accessibilityIdentifier("copyFromDatePreviewEmpty")
                     } else {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 4) {
@@ -118,6 +122,7 @@ struct CopyFromDateSheet: View {
                             }
                         }
                         .frame(maxHeight: 200)
+                        .accessibilityIdentifier("copyFromDatePreviewList")
                     }
                 }
                 .padding(.horizontal)
@@ -125,6 +130,7 @@ struct CopyFromDateSheet: View {
                 Spacer()
             }
             .navigationTitle("Copy from Date")
+            .accessibilityIdentifier("copyFromDateSheetTitle")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -143,6 +149,7 @@ struct CopyFromDateSheet: View {
                     .foregroundStyle(viewModel.canConfirmCopyFromDate ? AppColor.brandPrimary : AppColor.textMuted)
                     .opacity(viewModel.canConfirmCopyFromDate ? 1.0 : 0.4)
                     .disabled(!viewModel.canConfirmCopyFromDate)
+                    .accessibilityIdentifier("copyFromDateCopyButton")
                 }
             }
         }

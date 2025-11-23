@@ -68,6 +68,7 @@ struct MealSectionList: View {
             }
             .cardRowBackground(.top)
             .accessibilityHeading(.h2)
+            .accessibilityIdentifier("\(meal.title)Header")
             
             // --- Smart Suggestions Row (only when meal is empty) --------------------
             if let kind = mealKind,
@@ -112,6 +113,7 @@ struct MealSectionList: View {
                     .padding(.vertical, AppSpace.sm)
                     .padding(.horizontal, TodayLayout.mealHPad)
                     .cardRowBackground(.middle)
+                    .accessibilityIdentifier("\(meal.title)EmptyState")
                     .swipeActions(edge: swipeEdgeMode == .leading ? .leading : .trailing,
                                   allowsFullSwipe: false) {
                         if let kind = mealKind,
@@ -169,6 +171,7 @@ struct MealSectionList: View {
             .padding(.horizontal, TodayLayout.mealHPad)
             .cardRowBackground(.bottom)
             .accessibilityLabel("Add Food")
+            .accessibilityIdentifier("addFoodButton-\(meal.title)")
             .accessibilityAddTraits(.isButton)
         }
     }
@@ -236,7 +239,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(emeraldColor)
-                
+                .accessibilityIdentifier("swipeYesterday-breakfast")
+
                 Button {
                     viewModel.handleMealSuggestion(.lastWeekBreakfast)
                 } label: {
@@ -244,7 +248,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(indigoColor)
-                
+                .accessibilityIdentifier("swipeLastWeek-breakfast")
+
                 Button {
                     viewModel.handleMealSuggestion(.copyFromDateBreakfast)
                 } label: {
@@ -252,7 +257,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(amberColor)
-                
+                .accessibilityIdentifier("swipeChoose-breakfast")
+
             case .lunch:
                 Button {
                     viewModel.handleMealSuggestion(.lastNightDinner)
@@ -261,7 +267,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(skyColor)
-                
+                .accessibilityIdentifier("swipeLastNight-lunch")
+
                 Button {
                     viewModel.handleMealSuggestion(.yesterdayLunch)
                 } label: {
@@ -269,7 +276,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(emeraldColor)
-                
+                .accessibilityIdentifier("swipeYesterday-lunch")
+
                 Button {
                     viewModel.handleMealSuggestion(.copyFromDateLunch)
                 } label: {
@@ -277,7 +285,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(amberColor)
-                
+                .accessibilityIdentifier("swipeChoose-lunch")
+
             case .dinner:
                 Button {
                     viewModel.handleMealSuggestion(.yesterdayDinner)
@@ -286,7 +295,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(emeraldColor)
-                
+                .accessibilityIdentifier("swipeYesterday-dinner")
+
                 Button {
                     viewModel.handleMealSuggestion(.lastWeekDinner)
                 } label: {
@@ -294,7 +304,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(indigoColor)
-                
+                .accessibilityIdentifier("swipeLastWeek-dinner")
+
                 Button {
                     viewModel.handleMealSuggestion(.copyFromDateDinner)
                 } label: {
@@ -302,7 +313,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(amberColor)
-                
+                .accessibilityIdentifier("swipeChoose-dinner")
+
             case .snacks:
                 Button {
                     viewModel.handleMealSuggestion(.yesterdaySnacks)
@@ -311,7 +323,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(emeraldColor)
-                
+                .accessibilityIdentifier("swipeYesterday-snacks")
+
                 Button {
                     viewModel.handleMealSuggestion(.lastWeekSnacks)
                 } label: {
@@ -319,7 +332,8 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(indigoColor)
-                
+                .accessibilityIdentifier("swipeLastWeek-snacks")
+
                 Button {
                     viewModel.handleMealSuggestion(.copyFromDateSnacks)
                 } label: {
@@ -327,6 +341,7 @@ struct MealSectionList: View {
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .tint(amberColor)
+                .accessibilityIdentifier("swipeChoose-snacks")
             }
         }
     }

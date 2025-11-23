@@ -21,6 +21,7 @@ struct SmartSuggestionsRow: View {
             Text("SMART SUGGESTIONS")
                 .font(.caption2.smallCaps())
                 .foregroundColor(Color(uiColor: .secondaryLabel))
+                .accessibilityIdentifier("smartSuggestionsLabel")
 
             chipLayout
         }
@@ -76,6 +77,7 @@ struct SmartSuggestionsRow: View {
             label: "Copy from Date…",
             action: onCopyFromDateTapped
         )
+        .accessibilityIdentifier("copyFromDateChip")
     }
 }
 
