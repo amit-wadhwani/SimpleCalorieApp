@@ -4,24 +4,6 @@ struct MacrosSectionView: View {
     @EnvironmentObject var viewModel: TodayViewModel
     @Environment(\.colorScheme) private var colorScheme
     
-    @AppStorage(TodayCollapsedMacrosStyle.storageKey)
-    private var collapsedMacrosRaw: String = TodayCollapsedMacrosStyle.capsule.rawValue
-    
-    private var collapsedMacrosStyle: TodayCollapsedMacrosStyle {
-        if let style = TodayCollapsedMacrosStyle(rawValue: collapsedMacrosRaw) {
-            return style
-        } else if collapsedMacrosRaw == "minimalistLines" {
-            return .verticalLines
-        } else if collapsedMacrosRaw == "coloredBadgeRounded" {
-            // Migrate Badge Rounded to Badge Fill
-            return .badgeFill
-        } else if collapsedMacrosRaw == "inline" || collapsedMacrosRaw == "coloredBadges" || collapsedMacrosRaw == "dotProgress" || collapsedMacrosRaw == "filledCapsules" || collapsedMacrosRaw == "coloredBadgeFill" {
-            // Migrate old styles to capsule (simple)
-            return .capsule
-        } else {
-            return .capsule
-        }
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -93,36 +75,8 @@ struct MacrosSectionView: View {
         .padding(.vertical, AppSpace.s16)
     }
     
-    @ViewBuilder
     private var collapsedSummaryView: some View {
-        switch collapsedMacrosStyle {
-        case .capsule:
-            capsuleSummarySimple
-        case .capsuleWithGoals:
-            capsuleSummaryWithGoals
-        case .capsuleWithGoalsAndProgress:
-            capsuleSummaryWithGoalsAndProgress
-        case .capsuleProgressHighContrast:
-            capsuleSummaryProgressHighContrast
-        case .capsuleProgressGradient:
-            capsuleSummaryProgressGradient
-            
-        case .badgeFill:
-            badgeFillSummaryView
-        case .badgeFillBold:
-            badgeFillBoldSummaryView
-        case .badgeFillBoldNoUnits:
-            badgeFillBoldNoUnitsSummaryView
-        case .badgeFillWithProgress:
-            badgeFillWithProgressSummaryView
-        case .badgeLeftAccent:
-            badgeLeftAccentSummaryView
-            
-        case .verticalLines:
-            verticalLinesSummaryView
-        case .horizontalLines:
-            horizontalLinesSummaryView
-        }
+        capsuleSummaryWithGoals
     }
     
     // MARK: - Capsule Variants (Indicator-Left Design)

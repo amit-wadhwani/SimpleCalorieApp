@@ -1,10 +1,5 @@
 import SwiftUI
 
-private let emeraldColor = Color(red: 52/255, green: 211/255, blue: 153/255)   // #34D399
-private let indigoColor  = Color(red: 129/255, green: 140/255, blue: 248/255) // #818CF8
-private let skyColor     = Color(red: 56/255, green: 189/255, blue: 248/255)  // #38BDF8
-private let amberColor   = Color(red: 251/255, green: 191/255, blue: 36/255)  // #FBBF24
-
 struct MealSectionList: View {
     let meal: MealType
     let items: [FoodItem]
@@ -12,26 +7,6 @@ struct MealSectionList: View {
     var onDelete: (FoodItem) -> Void
     @ObservedObject var viewModel: TodayViewModel
     
-    @AppStorage(TodayQuickAddMode.storageKey)
-    private var quickAddModeRaw: String = TodayQuickAddMode.suggestions.rawValue
-    
-    private var quickAddMode: TodayQuickAddMode {
-        TodayQuickAddMode(rawValue: quickAddModeRaw) ?? .suggestions
-    }
-    
-    @AppStorage(TodaySuggestionsLayoutMode.storageKey)
-    private var suggestionsLayoutRaw: String = TodaySuggestionsLayoutMode.horizontal.rawValue
-    
-    private var suggestionsLayoutMode: TodaySuggestionsLayoutMode {
-        TodaySuggestionsLayoutMode(rawValue: suggestionsLayoutRaw) ?? .horizontal
-    }
-    
-    @AppStorage(TodaySwipeEdgeMode.storageKey)
-    private var swipeEdgeRaw: String = TodaySwipeEdgeMode.trailing.rawValue
-    
-    private var swipeEdgeMode: TodaySwipeEdgeMode {
-        TodaySwipeEdgeMode(rawValue: swipeEdgeRaw) ?? .trailing
-    }
     
     private var mealKind: SmartSuggestionsRow.MealKind? {
         switch meal {
@@ -71,14 +46,12 @@ struct MealSectionList: View {
             .accessibilityIdentifier("\(meal.title)Header")
             
             // --- Smart Suggestions Row (only when meal is empty) --------------------
-            if let kind = mealKind,
-               items.isEmpty,
-               (quickAddMode == .suggestions || quickAddMode == .both) {
+            if let kind = mealKind, items.isEmpty {
                 
                 VStack(alignment: .leading, spacing: 0) {
                     SmartSuggestionsRow(
                         mealKind: kind,
-                        layoutMode: suggestionsLayoutMode,
+                        layoutMode: .vertical,
                         hasYesterday: hasYesterdayAvailability(for: kind),
                         hasLastWeekOrNight: hasLastWeekOrNightAvailability(for: kind),
                         hasTodayLunch: (kind == .dinner) ? viewModel.hasTodayLunchForDinner : false,
@@ -110,9 +83,7 @@ struct MealSectionList: View {
             
             // --- Empty state vs items ----------------------------------------------
             if items.isEmpty {
-                let swipeDirectionText = swipeEdgeMode == .leading ? "right" : "left"
-                
-                Text("No items yet. Swipe \(swipeDirectionText) or tap \"Add Food\" to log this meal.")
+                Text("No items yet. Tap \"Add Food\" to log this meal.")
                     .font(AppFont.bodySm(13))
                     .foregroundStyle(AppColor.textMuted)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -120,13 +91,6 @@ struct MealSectionList: View {
                     .padding(.horizontal, TodayLayout.mealHPad)
                     .cardRowBackground(.middle)
                     .accessibilityIdentifier("\(meal.title)EmptyState")
-                    .swipeActions(edge: swipeEdgeMode == .leading ? .leading : .trailing,
-                                  allowsFullSwipe: false) {
-                        if let kind = mealKind,
-                           (quickAddMode == .swipe || quickAddMode == .both) {
-                            swipeActionsForMeal(kind)
-                        }
-                    }
             } else {
                 // MARK: Items
                 ForEach(items.indices, id: \.self) { idx in
@@ -232,125 +196,6 @@ struct MealSectionList: View {
         }
     }
     
-    // MARK: - Swipe Actions (icon-only tiles)
-    
-    private func swipeActionsForMeal(_ kind: SmartSuggestionsRow.MealKind) -> some View {
-        Group {
-            switch kind {
-            case .breakfast:
-                Button {
-                    viewModel.handleMealSuggestion(.yesterdayBreakfast)
-                } label: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(emeraldColor)
-                .accessibilityIdentifier("swipeYesterday-breakfast")
-
-                Button {
-                    viewModel.handleMealSuggestion(.lastWeekBreakfast)
-                } label: {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(indigoColor)
-                .accessibilityIdentifier("swipeLastWeek-breakfast")
-
-                Button {
-                    viewModel.handleMealSuggestion(.copyFromDateBreakfast)
-                } label: {
-                    Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(amberColor)
-                .accessibilityIdentifier("swipeChoose-breakfast")
-
-            case .lunch:
-                Button {
-                    viewModel.handleMealSuggestion(.lastNightDinner)
-                } label: {
-                    Image(systemName: "moon.stars")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(skyColor)
-                .accessibilityIdentifier("swipeLastNight-lunch")
-
-                Button {
-                    viewModel.handleMealSuggestion(.yesterdayLunch)
-                } label: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(emeraldColor)
-                .accessibilityIdentifier("swipeYesterday-lunch")
-
-                Button {
-                    viewModel.handleMealSuggestion(.copyFromDateLunch)
-                } label: {
-                    Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(amberColor)
-                .accessibilityIdentifier("swipeChoose-lunch")
-
-            case .dinner:
-                Button {
-                    viewModel.handleMealSuggestion(.yesterdayDinner)
-                } label: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(emeraldColor)
-                .accessibilityIdentifier("swipeYesterday-dinner")
-
-                Button {
-                    viewModel.handleMealSuggestion(.lastWeekDinner)
-                } label: {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(indigoColor)
-                .accessibilityIdentifier("swipeLastWeek-dinner")
-
-                Button {
-                    viewModel.handleMealSuggestion(.copyFromDateDinner)
-                } label: {
-                    Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(amberColor)
-                .accessibilityIdentifier("swipeChoose-dinner")
-
-            case .snacks:
-                Button {
-                    viewModel.handleMealSuggestion(.yesterdaySnacks)
-                } label: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(emeraldColor)
-                .accessibilityIdentifier("swipeYesterday-snacks")
-
-                Button {
-                    viewModel.handleMealSuggestion(.lastWeekSnacks)
-                } label: {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(indigoColor)
-                .accessibilityIdentifier("swipeLastWeek-snacks")
-
-                Button {
-                    viewModel.handleMealSuggestion(.copyFromDateSnacks)
-                } label: {
-                    Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
-                }
-                .tint(amberColor)
-                .accessibilityIdentifier("swipeChoose-snacks")
-            }
-        }
-    }
 }
 
 private struct MealItemRow: View, Equatable {
