@@ -7,7 +7,7 @@ struct CopyFromDateSheet: View {
     var body: some View {
         let mealTypeBinding = Binding<TodayViewModel.MealSuggestionTargetMealKind>(
             get: {
-                let current = viewModel.copyFromDateTargetMealKind ?? .breakfast
+                let current = viewModel.copyFromDateSourceMealKind ?? .breakfast
                 if viewModel.hasItems(on: viewModel.copyFromDateSelectedDate, mealKind: current) {
                     return current
                 } else if let firstAvailable = TodayViewModel.MealSuggestionTargetMealKind.allCases.first(where: {
@@ -20,18 +20,28 @@ struct CopyFromDateSheet: View {
             },
             set: { newValue in
                 if viewModel.hasItems(on: viewModel.copyFromDateSelectedDate, mealKind: newValue) {
-                    viewModel.copyFromDateTargetMealKind = newValue
+                    viewModel.copyFromDateSourceMealKind = newValue
                 }
             }
         )
 
         return NavigationStack {
-            VStack(spacing: 24) {
-                // Date picker
+            VStack(spacing: 16) {
+                // Date picker with Today button
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Select Date")
-                        .font(.headline)
-                        .foregroundStyle(AppColor.textTitle)
+                    HStack {
+                        Text("Select Date")
+                            .font(.headline)
+                            .foregroundStyle(AppColor.textTitle)
+                        
+                        Spacer()
+                        
+                        Button("Today") {
+                            viewModel.copyFromDateSelectedDate = Date()
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(AppColor.brandPrimary)
+                    }
                     
                     DatePicker(
                         "",
@@ -74,10 +84,10 @@ struct CopyFromDateSheet: View {
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("copyFromDateMealTypePicker")
                     .onChange(of: viewModel.copyFromDateSelectedDate) { _, newDate in
-                        if let currentKind = viewModel.copyFromDateTargetMealKind,
+                        if let currentKind = viewModel.copyFromDateSourceMealKind,
                            !viewModel.hasItems(on: newDate, mealKind: currentKind) {
                             if let firstAvailable = viewModel.firstMealKindWithItems(on: newDate) {
-                                viewModel.copyFromDateTargetMealKind = firstAvailable
+                                viewModel.copyFromDateSourceMealKind = firstAvailable
                             }
                         }
                     }
@@ -96,40 +106,15 @@ struct CopyFromDateSheet: View {
                         .foregroundStyle(AppColor.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityIdentifier("copyFromDatePreviewSummary")
-
-                    if viewModel.previewItemsForCopyFromDate.isEmpty {
-                        Text("No items for this date and meal.")
-                            .font(.subheadline)
-                            .foregroundStyle(AppColor.textMuted)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 8)
-                            .accessibilityIdentifier("copyFromDatePreviewEmpty")
-                    } else {
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 4) {
-                                ForEach(viewModel.previewItemsForCopyFromDate) { item in
-                                    HStack {
-                                        Text(item.name)
-                                            .font(.subheadline)
-                                            .foregroundStyle(AppColor.textTitle)
-                                        Spacer()
-                                        Text("\(Int(item.calories)) kcal")
-                                            .font(.subheadline)
-                                            .foregroundStyle(AppColor.textMuted)
-                                    }
-                                    .padding(.vertical, 2)
-                                }
-                            }
-                        }
-                        .frame(maxHeight: 200)
-                        .accessibilityIdentifier("copyFromDatePreviewList")
-                    }
+                    
+                    previewListScrollable
                 }
                 .padding(.horizontal)
                 
-                Spacer()
+                // Copy button (pinned at bottom)
+                copyCTAButton
             }
-            .navigationTitle("Copy from Date")
+            .padding(.bottom, 16)
             .accessibilityIdentifier("copyFromDateSheetTitle")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -152,6 +137,72 @@ struct CopyFromDateSheet: View {
                     .accessibilityIdentifier("copyFromDateCopyButton")
                 }
             }
+        }
+    }
+    
+    private var previewListScrollable: some View {
+        Group {
+            if viewModel.previewItemsForCopyFromDate.isEmpty {
+                Text("No items for this date and meal.")
+                    .font(.subheadline)
+                    .foregroundStyle(AppColor.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 8)
+                    .accessibilityIdentifier("copyFromDatePreviewEmpty")
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(viewModel.previewItemsForCopyFromDate) { item in
+                            HStack {
+                                Text(item.name)
+                                    .font(.subheadline)
+                                    .foregroundStyle(AppColor.textTitle)
+                                Spacer()
+                                Text("\(Int(item.calories)) kcal")
+                                    .font(.subheadline)
+                                    .foregroundStyle(AppColor.textMuted)
+                            }
+                            .padding(.vertical, 2)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 4)
+                }
+                .frame(maxHeight: 220)
+                .accessibilityIdentifier("copyFromDatePreviewList")
+            }
+        }
+    }
+    
+    private var copyCTAButton: some View {
+        Button(action: {
+            if viewModel.canConfirmCopyFromDate {
+                Haptics.success()
+                viewModel.confirmCopyFromDate()
+                dismiss()
+            }
+        }) {
+            Text("Copy to \(destinationMealDisplayName())")
+                .font(.system(size: 16, weight: .semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(viewModel.canConfirmCopyFromDate ? AppColor.brandPrimary : AppColor.borderSubtle)
+                )
+                .foregroundStyle(Color.white.opacity(viewModel.canConfirmCopyFromDate ? 1.0 : 0.6))
+        }
+        .disabled(!viewModel.canConfirmCopyFromDate)
+        .padding(.horizontal)
+    }
+    
+    private func destinationMealDisplayName() -> String {
+        switch viewModel.copyFromDateDestinationMealKind {
+        case .breakfast: return "Breakfast"
+        case .lunch:     return "Lunch"
+        case .dinner:    return "Dinner"
+        case .snacks:    return "Snacks"
+        case nil:        return "Meal"
         }
     }
 }

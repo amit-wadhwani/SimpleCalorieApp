@@ -12,8 +12,10 @@ struct SmartSuggestionsRow: View {
     let layoutMode: TodaySuggestionsLayoutMode
     let hasYesterday: Bool
     let hasLastWeekOrNight: Bool
+    let hasTodayLunch: Bool
     let onYesterdayTapped: () -> Void
     let onLastWeekOrLastNightTapped: () -> Void
+    let onTodayLunchTapped: () -> Void
     let onCopyFromDateTapped: () -> Void
     
     var body: some View {
@@ -67,6 +69,19 @@ struct SmartSuggestionsRow: View {
             )
         }
         
+        // Today's Lunch (only for dinner)
+        if mealKind == .dinner, hasTodayLunch {
+            suggestionChip(
+                icon: AnyView(
+                    Image(systemName: "fork.knife.circle")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(teal)
+                ),
+                label: "Today's Lunch",
+                action: onTodayLunchTapped
+            )
+        }
+        
         // Copy from Date is always visible
         suggestionChip(
             icon: AnyView(
@@ -97,6 +112,10 @@ private extension SmartSuggestionsRow {
     
     var amber: Color {
         Color(red: 1.00, green: 0.75, blue: 0.14) // #FBBF24-ish
+    }
+    
+    var teal: Color {
+        Color(red: 0.10, green: 0.75, blue: 0.75) // Teal/cyan for Today's Lunch
     }
     
     var yesterdayLabel: String {
@@ -174,8 +193,10 @@ struct SmartSuggestionsRow_Previews: PreviewProvider {
                 layoutMode: .horizontal,
                 hasYesterday: true,
                 hasLastWeekOrNight: true,
+                hasTodayLunch: false,
                 onYesterdayTapped: {},
                 onLastWeekOrLastNightTapped: {},
+                onTodayLunchTapped: {},
                 onCopyFromDateTapped: {}
             )
             .previewLayout(.sizeThatFits)
@@ -186,8 +207,10 @@ struct SmartSuggestionsRow_Previews: PreviewProvider {
                 layoutMode: .horizontal,
                 hasYesterday: true,
                 hasLastWeekOrNight: true,
+                hasTodayLunch: false,
                 onYesterdayTapped: {},
                 onLastWeekOrLastNightTapped: {},
+                onTodayLunchTapped: {},
                 onCopyFromDateTapped: {}
             )
             .previewLayout(.sizeThatFits)
@@ -198,8 +221,10 @@ struct SmartSuggestionsRow_Previews: PreviewProvider {
                 layoutMode: .vertical,
                 hasYesterday: true,
                 hasLastWeekOrNight: true,
+                hasTodayLunch: true,
                 onYesterdayTapped: {},
                 onLastWeekOrLastNightTapped: {},
+                onTodayLunchTapped: {},
                 onCopyFromDateTapped: {}
             )
             .previewLayout(.sizeThatFits)
@@ -210,8 +235,10 @@ struct SmartSuggestionsRow_Previews: PreviewProvider {
                 layoutMode: .horizontal,
                 hasYesterday: false,
                 hasLastWeekOrNight: true,
+                hasTodayLunch: false,
                 onYesterdayTapped: {},
                 onLastWeekOrLastNightTapped: {},
+                onTodayLunchTapped: {},
                 onCopyFromDateTapped: {}
             )
             .previewLayout(.sizeThatFits)

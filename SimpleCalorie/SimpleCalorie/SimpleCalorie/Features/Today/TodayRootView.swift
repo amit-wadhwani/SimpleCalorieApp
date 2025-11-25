@@ -94,6 +94,28 @@ struct SettingsView: View {
         get { TodaySwipeEdgeMode(rawValue: swipeEdgeRaw) ?? .trailing }
         set { swipeEdgeRaw = newValue.rawValue }
     }
+    
+    @AppStorage(TodayCollapsedMacrosStyle.storageKey)
+    private var collapsedMacrosRaw: String = TodayCollapsedMacrosStyle.capsule.rawValue
+    
+    private var collapsedMacrosStyle: TodayCollapsedMacrosStyle {
+        get {
+            if let style = TodayCollapsedMacrosStyle(rawValue: collapsedMacrosRaw) {
+                return style
+            } else if collapsedMacrosRaw == "minimalistLines" {
+                return .verticalLines
+            } else if collapsedMacrosRaw == "coloredBadgeRounded" {
+                // Migrate Badge Rounded to Badge Fill
+                return .badgeFill
+            } else if collapsedMacrosRaw == "inline" || collapsedMacrosRaw == "coloredBadges" || collapsedMacrosRaw == "dotProgress" || collapsedMacrosRaw == "filledCapsules" || collapsedMacrosRaw == "coloredBadgeFill" {
+                // Migrate old styles to capsule (simple)
+                return .capsule
+            } else {
+                return .capsule
+            }
+        }
+        set { collapsedMacrosRaw = newValue.rawValue }
+    }
 
     var body: some View {
         NavigationStack {
@@ -137,6 +159,17 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                }
+                
+                Section("COLLAPSED MACROS STYLE") {
+                    Picker("Style", selection: Binding(
+                        get: { collapsedMacrosStyle },
+                        set: { collapsedMacrosRaw = $0.rawValue }
+                    )) {
+                        ForEach(TodayCollapsedMacrosStyle.allCases, id: \.self) { style in
+                            Text(style.displayName).tag(style)
+                        }
+                    }
                 }
 
                 Section("ACCOUNT") {

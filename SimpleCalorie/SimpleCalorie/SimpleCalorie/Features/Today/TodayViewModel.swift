@@ -12,7 +12,8 @@ final class TodayViewModel: ObservableObject {
     @Published var isDatePickerPresented: Bool = false
     @Published var isCopyFromDateSheetPresented: Bool = false
     @Published var copyFromDateSelectedDate: Date = Date()
-    @Published var copyFromDateTargetMealKind: MealSuggestionTargetMealKind? = nil
+    @Published var copyFromDateDestinationMealKind: MealSuggestionTargetMealKind? = nil
+    @Published var copyFromDateSourceMealKind: MealSuggestionTargetMealKind? = nil
     @AppStorage("showAds") var showAds: Bool = true
     
     // Basic demo values
@@ -222,33 +223,34 @@ extension TodayViewModel {
     }
     
     func presentCopyFromDatePicker(for mealKind: SmartSuggestionsRow.MealKind) {
-        // Map SmartSuggestionsRow.MealKind -> internal target meal kind
-        let targetKind: MealSuggestionTargetMealKind
+        // Map SmartSuggestionsRow.MealKind -> internal meal kind
+        let destinationKind: MealSuggestionTargetMealKind
         switch mealKind {
-        case .breakfast: targetKind = .breakfast
-        case .lunch:     targetKind = .lunch
-        case .dinner:    targetKind = .dinner
-        case .snacks:    targetKind = .snacks
+        case .breakfast: destinationKind = .breakfast
+        case .lunch:     destinationKind = .lunch
+        case .dinner:    destinationKind = .dinner
+        case .snacks:    destinationKind = .snacks
         }
         
-        // Choose a default source date.
-        // Prefer "yesterday" if that meal has items; otherwise fall back to today.
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        var chosenDate = today
+        // Destination is the meal the user initiated from (where items will be copied to)
+        copyFromDateDestinationMealKind = destinationKind
         
-        if let yesterday = calendar.date(byAdding: .day, value: -1, to: today),
-           hasItems(on: yesterday, mealKind: targetKind) {
-            // Prefer yesterday when there are items for this meal.
-            chosenDate = yesterday
-        } else {
-            // If yesterday has no items, just default to today.
-            chosenDate = today
+        // Use the same date as the Today screen's selectedDate (not Date() or yesterday)
+        let calendar = Calendar.current
+        let chosenDate = calendar.startOfDay(for: selectedDate)
+        
+        // For initial source meal kind, prefer the same meal kind as destination
+        // but check if it has items on the selected date; otherwise use first available
+        var initialSourceKind = destinationKind
+        if hasItems(on: chosenDate, mealKind: destinationKind) {
+            initialSourceKind = destinationKind
+        } else if let firstAvailable = firstMealKindWithItems(on: chosenDate) {
+            initialSourceKind = firstAvailable
         }
         
         // Update copy-from-date state
         self.copyFromDateSelectedDate = chosenDate
-        self.copyFromDateTargetMealKind = targetKind
+        self.copyFromDateSourceMealKind = initialSourceKind
         
         // Always present the sheet; let the sheet decide whether Copy is enabled.
         self.isCopyFromDateSheetPresented = true
@@ -264,8 +266,8 @@ extension TodayViewModel {
     }
     
     var previewItemsForCopyFromDate: [FoodItem] {
-        guard let targetMealKind = copyFromDateTargetMealKind else { return [] }
-        return sourceItems(for: targetMealKind, on: copyFromDateSelectedDate)
+        guard let sourceMealKind = copyFromDateSourceMealKind else { return [] }
+        return sourceItems(for: sourceMealKind, on: copyFromDateSelectedDate)
     }
     
     var previewTotalCaloriesForCopyFromDate: Int {
@@ -281,25 +283,29 @@ extension TodayViewModel {
     }
     
     func confirmCopyFromDate() {
-        guard let targetMealKind = copyFromDateTargetMealKind else { return }
-        let items = previewItemsForCopyFromDate
-        let targetMeal: MealType
+        guard let dest = copyFromDateDestinationMealKind,
+              let src = copyFromDateSourceMealKind else { return }
         
-        switch targetMealKind {
-        case .breakfast: targetMeal = .breakfast
-        case .lunch: targetMeal = .lunch
-        case .dinner: targetMeal = .dinner
-        case .snacks: targetMeal = .snacks
+        let sourceDate = copyFromDateSelectedDate
+        let items = sourceItems(for: src, on: sourceDate)
+        
+        let destinationMeal: MealType
+        switch dest {
+        case .breakfast: destinationMeal = .breakfast
+        case .lunch: destinationMeal = .lunch
+        case .dinner: destinationMeal = .dinner
+        case .snacks: destinationMeal = .snacks
         }
         
         if !items.isEmpty {
             withAnimation(.easeInOut(duration: 0.25)) {
-                addItems(items, to: targetMeal, on: date)
+                addItems(items, to: destinationMeal, on: date)
             }
         }
         
         isCopyFromDateSheetPresented = false
-        copyFromDateTargetMealKind = nil
+        copyFromDateDestinationMealKind = nil
+        copyFromDateSourceMealKind = nil
     }
     
     private func sourceItems(for mealKind: MealSuggestionTargetMealKind, on date: Date) -> [FoodItem] {
@@ -386,5 +392,19 @@ extension TodayViewModel {
     
     // Legacy property name for backward compatibility
     var hasLastNightDinner: Bool { hasLastNightDinnerForLunch }
+    
+    var hasTodayLunchForDinner: Bool {
+        hasItems(on: date, mealKind: MealSuggestionTargetMealKind.lunch)
+    }
+    
+    func handleTodayLunchToDinner() {
+        let targetDate = date
+        let lunchItems = sourceItems(for: MealSuggestionTargetMealKind.lunch, on: targetDate)
+        guard !lunchItems.isEmpty else { return }
+        
+        withAnimation(.easeInOut(duration: 0.25)) {
+            addItems(lunchItems, to: .dinner, on: targetDate)
+        }
+    }
 }
 

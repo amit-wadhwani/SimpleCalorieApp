@@ -136,7 +136,7 @@ final class TodayQuickAddTests: XCTestCase {
 
         let viewModel = TodayViewModel(repo: repo, date: today, seedDemoData: false)
         viewModel.copyFromDateSelectedDate = sourceDate
-        viewModel.copyFromDateTargetMealKind = .breakfast
+        viewModel.copyFromDateSourceMealKind = .breakfast
 
         XCTAssertEqual(viewModel.previewItemsForCopyFromDate, [itemA, itemB])
         XCTAssertEqual(viewModel.previewTotalCaloriesForCopyFromDate, itemA.calories + itemB.calories)

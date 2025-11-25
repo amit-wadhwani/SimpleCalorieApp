@@ -81,11 +81,17 @@ struct MealSectionList: View {
                         layoutMode: suggestionsLayoutMode,
                         hasYesterday: hasYesterdayAvailability(for: kind),
                         hasLastWeekOrNight: hasLastWeekOrNightAvailability(for: kind),
+                        hasTodayLunch: (kind == .dinner) ? viewModel.hasTodayLunchForDinner : false,
                         onYesterdayTapped: {
                             handleYesterdaySuggestion(for: kind)
                         },
                         onLastWeekOrLastNightTapped: {
                             handleLastWeekOrNightSuggestion(for: kind)
+                        },
+                        onTodayLunchTapped: {
+                            if kind == .dinner {
+                                viewModel.handleTodayLunchToDinner()
+                            }
                         },
                         onCopyFromDateTapped: {
                             viewModel.presentCopyFromDatePicker(for: kind)
