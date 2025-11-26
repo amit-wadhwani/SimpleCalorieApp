@@ -125,6 +125,33 @@ final class TodayQuickAddTests: XCTestCase {
         }
     }
 
+    func testHandleMealSuggestionUpdatesMacros() {
+        let today = makeDate(year: 2024, month: 2, day: 6)
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        let breakfastItem = FoodItem(
+            name: "Protein Oats",
+            calories: 310,
+            description: "1 bowl",
+            protein: 24,
+            carbs: 40,
+            fat: 8
+        )
+
+        let repo = InMemoryFoodRepository()
+        _ = repo.add(breakfastItem, to: .breakfast, on: yesterday)
+
+        UserDefaults.standard.removeObject(forKey: "today.selectedDate")
+        let viewModel = TodayViewModel(repo: repo, date: today, seedDemoData: false)
+
+        viewModel.handleMealSuggestion(.yesterdayBreakfast)
+
+        XCTAssertEqual(viewModel.meals.breakfast, [breakfastItem])
+        XCTAssertEqual(viewModel.protein, breakfastItem.protein)
+        XCTAssertEqual(viewModel.carbs, breakfastItem.carbs)
+        XCTAssertEqual(viewModel.fat, breakfastItem.fat)
+        XCTAssertEqual(viewModel.consumedCalories, Double(breakfastItem.calories))
+    }
+
     func testCopyFromDatePreviewAndConfirmation() {
         let today = makeDate(year: 2024, month: 1, day: 8)
         let sourceDate = calendar.date(byAdding: .day, value: -2, to: today)!
@@ -134,8 +161,10 @@ final class TodayQuickAddTests: XCTestCase {
         _ = repo.add(itemA, to: .breakfast, on: sourceDate)
         _ = repo.add(itemB, to: .breakfast, on: sourceDate)
 
+        UserDefaults.standard.removeObject(forKey: "today.selectedDate")
         let viewModel = TodayViewModel(repo: repo, date: today, seedDemoData: false)
         viewModel.copyFromDateSelectedDate = sourceDate
+        viewModel.copyFromDateDestinationMealKind = .breakfast
         viewModel.copyFromDateSourceMealKind = .breakfast
 
         XCTAssertEqual(viewModel.previewItemsForCopyFromDate, [itemA, itemB])
@@ -150,6 +179,7 @@ final class TodayQuickAddTests: XCTestCase {
     func testHasItemsAndFirstMealKindHelpers() {
         let today = makeDate(year: 2024, month: 1, day: 9)
 
+        UserDefaults.standard.removeObject(forKey: "today.selectedDate")
         let breakfastOnlyRepo = InMemoryFoodRepository()
         _ = breakfastOnlyRepo.add(FoodItem(name: "Only Breakfast", calories: 300, description: "1 bowl"), to: .breakfast, on: today)
         let breakfastViewModel = TodayViewModel(repo: breakfastOnlyRepo, date: today, seedDemoData: false)
@@ -168,5 +198,34 @@ final class TodayQuickAddTests: XCTestCase {
 
         let emptyViewModel = TodayViewModel(repo: InMemoryFoodRepository(), date: today, seedDemoData: false)
         XCTAssertNil(emptyViewModel.firstMealKindWithItems(on: today))
+    }
+
+    func testConfirmCopyFromDateUpdatesMacrosAndCalories() {
+        let today = makeDate(year: 2024, month: 3, day: 12)
+        let sourceDate = calendar.date(byAdding: .day, value: -3, to: today)!
+        let dinnerItem = FoodItem(
+            name: "Copy Burrito",
+            calories: 540,
+            description: "1 wrap",
+            protein: 32,
+            carbs: 65,
+            fat: 18
+        )
+
+        let repo = InMemoryFoodRepository()
+        _ = repo.add(dinnerItem, to: .dinner, on: sourceDate)
+
+        let viewModel = TodayViewModel(repo: repo, date: today, seedDemoData: false)
+        viewModel.copyFromDateDestinationMealKind = .lunch
+        viewModel.copyFromDateSourceMealKind = .dinner
+        viewModel.copyFromDateSelectedDate = sourceDate
+
+        viewModel.confirmCopyFromDate()
+
+        XCTAssertEqual(viewModel.meals.lunch, [dinnerItem])
+        XCTAssertEqual(viewModel.protein, dinnerItem.protein)
+        XCTAssertEqual(viewModel.carbs, dinnerItem.carbs)
+        XCTAssertEqual(viewModel.fat, dinnerItem.fat)
+        XCTAssertEqual(viewModel.consumedCalories, Double(dinnerItem.calories))
     }
 }

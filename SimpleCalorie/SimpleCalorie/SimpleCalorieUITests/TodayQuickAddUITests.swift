@@ -5,35 +5,12 @@ final class TodayQuickAddUITests: XCTestCase {
         continueAfterFailure = false
     }
     
-    private func setQuickAddMode(_ modeTitle: String, app: XCUIApplication) {
-        // Navigate to Settings
-        let settingsButton = app.buttons["Settings"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 10),
-                      "Settings button should exist")
-        settingsButton.tap()
-        
-        // Change Quick Add mode
-        let quickAddPicker = app.segmentedControls["quickAddModePicker"]
-        XCTAssertTrue(quickAddPicker.waitForExistence(timeout: 10),
-                      "Quick Add mode picker should exist")
-        XCTAssertTrue(quickAddPicker.buttons[modeTitle].exists,
-                      "Quick Add mode '\(modeTitle)' segment should exist")
-        quickAddPicker.buttons[modeTitle].tap()
-        
-        // Return to Today
-        let todayButton = app.buttons["Today"]
-        XCTAssertTrue(todayButton.waitForExistence(timeout: 10),
-                      "Today tab button should exist")
-        todayButton.tap()
-    }
+    // Quick Add mode picker has been removed - suggestions are always on with vertical layout
 
     func testSmartSuggestionsVisibilityAndHideAfterAddingFood() {
         let app = XCUIApplication()
         app.launchArguments += ["UITEST_DISABLE_SEED_DATA"]
         app.launch()
-
-        // Ensure Quick Add is in Suggestions mode
-        setQuickAddMode("Suggestions", app: app)
 
         // Wait for the Today screen to be ready - check for breakfast header
         let breakfastHeader = app.staticTexts["BreakfastHeader"]
@@ -97,9 +74,6 @@ final class TodayQuickAddUITests: XCTestCase {
         ]
         app.launch()
 
-        // Ensure Quick Add is in Suggestions mode
-        setQuickAddMode("Suggestions", app: app)
-
         // 1. Ensure Breakfast is empty
         let breakfastEmpty = app.staticTexts["BreakfastEmptyState"]
         XCTAssertTrue(breakfastEmpty.waitForExistence(timeout: 5),
@@ -121,40 +95,5 @@ final class TodayQuickAddUITests: XCTestCase {
         // We do NOT assert that tapping the chip opens the sheet or that copy behavior works.
         // Those behaviors are covered by TodayQuickAddTests (unit tests) for
         // previewItemsForCopyFromDate, previewTotalCaloriesForCopyFromDate, and canConfirmCopyFromDate.
-    }
-
-    func testSwipeQuickAddVisibleOnlyWhenEmpty() {
-        let app = XCUIApplication()
-        app.launchArguments += ["UITEST_DISABLE_SEED_DATA"]
-        app.launch()
-
-        // Set Quick Add mode to Swipe
-        setQuickAddMode("Swipe", app: app)
-
-        // Wait for breakfast empty state to be visible (verifies meal is empty)
-        let breakfastEmptyState = app.staticTexts["BreakfastEmptyState"]
-        XCTAssertTrue(breakfastEmptyState.waitForExistence(timeout: 10), "Breakfast empty state should be visible when meal is empty")
-        
-        // Main test: Add food to breakfast
-        let addBreakfast = app.buttons["addFoodButton-Breakfast"]
-        XCTAssertTrue(addBreakfast.waitForExistence(timeout: 10))
-        addBreakfast.tap()
-        
-        let addChicken = app.buttons["Add Chicken Breast"]
-        XCTAssertTrue(addChicken.waitForExistence(timeout: 10))
-        addChicken.tap()
-
-        // Wait for navigation and UI updates
-        sleep(3)
-        
-        // Verify food was added by checking if the food item appears OR empty state disappears
-        // Use a more lenient check - either condition indicates success
-        let chickenItem = app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Chicken Breast'")).firstMatch
-        let itemExists = chickenItem.waitForExistence(timeout: 3)
-        let emptyStillExists = breakfastEmptyState.waitForExistence(timeout: 1)
-        
-        // Success if food item appears OR empty state disappears
-        XCTAssertTrue(itemExists || !emptyStillExists, 
-                      "After adding food: food item appeared=\(itemExists), empty state gone=\(!emptyStillExists). At least one should be true.")
     }
 }
