@@ -4,6 +4,7 @@ import UIKit
 struct AddFoodView: View {
     @EnvironmentObject var todayViewModel: TodayViewModel
     @StateObject private var searchViewModel: AddFoodViewModel
+    @StateObject private var favoritesStore = FavoritesStore()
     @Environment(\.dismiss) private var dismiss
     var onFoodAdded: ((FoodItem, MealType) -> Void)? = nil
     
@@ -13,7 +14,11 @@ struct AddFoodView: View {
     init(initialSelectedMeal: MealType, onFoodAdded: ((FoodItem, MealType) -> Void)? = nil) {
         self.onFoodAdded = onFoodAdded
         self._activeMeal = State(initialValue: initialSelectedMeal) // source of truth on open
-        self._searchViewModel = StateObject(wrappedValue: AddFoodViewModel(service: MockFoodSearchService()))
+        let foodSearchService = LocalDemoFoodSearchService()
+        let viewModel = AddFoodViewModel(searchService: foodSearchService)
+        viewModel.onFoodAdded = onFoodAdded
+        // onFoodAddedToDates will be set in onAppear when we have access to todayViewModel
+        self._searchViewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
@@ -42,20 +47,18 @@ struct AddFoodView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: AppSpace.s12) {
-                        ForEach(searchViewModel.rows) { row in
+                        ForEach(Array(zip(searchViewModel.results, searchViewModel.rows)), id: \.0.id) { food, row in
                             FoodRowView(props: row) {
-                                // Convert FoodRowProps to FoodItem with macros
-                                let foodItem = FoodItem(
-                                    name: row.name,
-                                    calories: Int(row.kcal) ?? 0,
-                                    description: row.serving,
-                                    protein: parseMacro(row.protein),
-                                    carbs: parseMacro(row.carbs),
-                                    fat: parseMacro(row.fat)
-                                )
-                                
-                                // Add food to the correct meal
-                                add(foodItem)
+                                // Quick add: + button tapped
+                                searchViewModel.quickAddFood(food, to: activeMeal)
+                                Haptics.success()
+                                dismiss()
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                // Row tapped: open detail sheet
+                                // Note: Button taps will not trigger this gesture
+                                searchViewModel.didSelectFood(food)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -66,19 +69,78 @@ struct AddFoodView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
         }
-    }
-    
-    private func parseMacro(_ str: String) -> Double {
-        let cleaned = str.replacingOccurrences(of: "g", with: "").trimmingCharacters(in: .whitespaces)
-        return Double(cleaned) ?? 0
-    }
-    
-    private func add(_ item: FoodItem) {
-        // Fire callback to Today (which will update preferences)
-        onFoodAdded?(item, activeMeal)
-        Haptics.success()
-        // Dismiss sheet
-        dismiss()
+        .onAppear {
+            // Sync selected date from TodayViewModel
+            searchViewModel.selectedDate = todayViewModel.selectedDate
+            // Set up multi-date callback
+            searchViewModel.onFoodAddedToDates = { dates, item, meal in
+                todayViewModel.add(item, to: meal, on: dates)
+            }
+        }
+        .onChange(of: todayViewModel.selectedDate) { _, newDate in
+            searchViewModel.selectedDate = newDate
+        }
+        .sheet(isPresented: $searchViewModel.isShowingDetail) {
+            if let selectedFood = searchViewModel.selectedFood {
+                FoodDetailSheet(
+                    food: selectedFood,
+                    state: Binding(
+                        get: { 
+                            let calendar = Calendar.current
+                            let today = calendar.startOfDay(for: Date())
+                            return searchViewModel.foodDetailState ?? AddFoodViewModel.FoodDetailState(
+                                selectedServing: nil,
+                                customAmountInGrams: nil,
+                                quantity: 1.0,
+                                selectedWeekdays: [],
+                                selectedDates: [],
+                                isRecurring: false,
+                                recurringEndDate: nil,
+                                baseDate: today
+                            )
+                        },
+                        set: { searchViewModel.foodDetailState = $0 }
+                    ),
+                    meal: activeMeal,
+                    isFavorite: favoritesStore.isFavorite(selectedFood.id),
+                    onServingSizeTap: { option in
+                        searchViewModel.selectServingOption(option)
+                    },
+                    onDefaultServingTap: {
+                        searchViewModel.selectDefaultServing()
+                    },
+                    onCustomServingCommit: { grams in
+                        searchViewModel.setCustomAmount(grams > 0 ? grams : nil)
+                    },
+                    onQuantityChange: { quantity in
+                        searchViewModel.setQuantity(quantity)
+                    },
+                    onWeekdayToggle: { weekday in
+                        searchViewModel.toggleWeekday(weekday)
+                    },
+                    onDateToggle: { date in
+                        searchViewModel.toggleDate(date)
+                    },
+                    onRecurringToggle: {
+                        searchViewModel.toggleRecurring()
+                    },
+                    onAdd: { meal in
+                        searchViewModel.confirmAddFromDetail(to: meal)
+                        Haptics.success()
+                        dismiss()
+                    },
+                    onCancel: {
+                        searchViewModel.isShowingDetail = false
+                    },
+                    onFavoriteToggle: {
+                        favoritesStore.toggleFavorite(selectedFood.id)
+                    },
+                    onRecurringEndDateChange: { date in
+                        searchViewModel.updateRecurringEndDate(date)
+                    }
+                )
+            }
+        }
     }
 }
 

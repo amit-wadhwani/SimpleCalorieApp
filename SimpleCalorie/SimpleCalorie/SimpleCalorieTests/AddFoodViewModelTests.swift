@@ -5,10 +5,26 @@ import XCTest
 final class AddFoodViewModelTests: XCTestCase {
     func testRefreshBuildsFoodRowsWithFormatting() async {
         let foods = [
-            Food(id: UUID(), name: "Chicken Breast", servingGrams: 100, macros: .init(protein: 31, carbs: 0, fat: 3.6), kcal: 165),
-            Food(id: UUID(), name: "Oatmeal", servingGrams: 100, macros: .init(protein: 17, carbs: 68, fat: 7.2), kcal: 389)
+            FoodDefinition(
+                id: UUID(),
+                name: "Chicken Breast",
+                brand: nil,
+                serving: FoodDefinition.Serving(unit: "g", amount: 100, description: "100g"),
+                servingOptions: nil,
+                macros: FoodDefinition.Macros(calories: 165, protein: 31, carbs: 0, fat: 3.6),
+                source: FoodDefinition.SourceMetadata(kind: .localDemo, providerId: nil, lastUpdatedAt: nil)
+            ),
+            FoodDefinition(
+                id: UUID(),
+                name: "Oatmeal",
+                brand: nil,
+                serving: FoodDefinition.Serving(unit: "g", amount: 100, description: "100g"),
+                servingOptions: nil,
+                macros: FoodDefinition.Macros(calories: 389, protein: 17, carbs: 68, fat: 7.2),
+                source: FoodDefinition.SourceMetadata(kind: .localDemo, providerId: nil, lastUpdatedAt: nil)
+            )
         ]
-        let viewModel = AddFoodViewModel(service: StubFoodSearchService(foods: foods))
+        let viewModel = AddFoodViewModel(searchService: StubFoodSearchService(foods: foods))
 
         await viewModel.refresh()
 
@@ -20,10 +36,26 @@ final class AddFoodViewModelTests: XCTestCase {
 
     func testQueryFiltersResultsCaseInsensitively() async {
         let foods = [
-            Food(id: UUID(), name: "Salmon", servingGrams: 100, macros: .init(protein: 20, carbs: 0, fat: 13), kcal: 208),
-            Food(id: UUID(), name: "Avocado", servingGrams: 100, macros: .init(protein: 2, carbs: 9, fat: 15), kcal: 160)
+            FoodDefinition(
+                id: UUID(),
+                name: "Salmon",
+                brand: nil,
+                serving: FoodDefinition.Serving(unit: "g", amount: 100, description: "100g"),
+                servingOptions: nil,
+                macros: FoodDefinition.Macros(calories: 208, protein: 20, carbs: 0, fat: 13),
+                source: FoodDefinition.SourceMetadata(kind: .localDemo, providerId: nil, lastUpdatedAt: nil)
+            ),
+            FoodDefinition(
+                id: UUID(),
+                name: "Avocado",
+                brand: nil,
+                serving: FoodDefinition.Serving(unit: "g", amount: 100, description: "100g"),
+                servingOptions: nil,
+                macros: FoodDefinition.Macros(calories: 160, protein: 2, carbs: 9, fat: 15),
+                source: FoodDefinition.SourceMetadata(kind: .localDemo, providerId: nil, lastUpdatedAt: nil)
+            )
         ]
-        let viewModel = AddFoodViewModel(service: StubFoodSearchService(foods: foods))
+        let viewModel = AddFoodViewModel(searchService: StubFoodSearchService(foods: foods))
 
         viewModel.query = "salM"
         await viewModel.refresh()
@@ -34,11 +66,15 @@ final class AddFoodViewModelTests: XCTestCase {
 }
 
 private struct StubFoodSearchService: FoodSearchService {
-    let foods: [Food]
+    let foods: [FoodDefinition]
 
-    func search(query: String) async -> [Food] {
+    func searchFoods(matching query: String) async throws -> [FoodDefinition] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return foods }
         return foods.filter { $0.name.lowercased().contains(trimmed.lowercased()) }
+    }
+
+    func lookupFood(byBarcode barcode: String) async throws -> FoodDefinition? {
+        return nil
     }
 }

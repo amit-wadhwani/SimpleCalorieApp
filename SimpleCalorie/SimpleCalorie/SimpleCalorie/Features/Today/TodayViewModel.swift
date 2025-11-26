@@ -77,6 +77,17 @@ final class TodayViewModel: ObservableObject {
         recalcTotals()
     }
     
+    func add(_ item: FoodItem, to meal: MealType, on dates: [Date]) {
+        for date in dates {
+            _ = repo.add(item, to: meal, on: date)
+        }
+        // Reload meals for current date if we're adding to current date
+        if dates.contains(where: { Calendar.current.isDate($0, inSameDayAs: self.date) }) {
+            meals = repo.loadMeals(on: date)
+            recalcTotals()
+        }
+    }
+    
     func remove(_ item: FoodItem, from meal: MealType) {
         _ = repo.remove(item, from: meal, on: date)
         meals = repo.loadMeals(on: date)
