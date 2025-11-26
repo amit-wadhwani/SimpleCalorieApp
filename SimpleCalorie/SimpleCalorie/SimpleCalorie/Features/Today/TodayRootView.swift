@@ -70,12 +70,37 @@ struct WeeklyPlaceholderView: View {
 
 struct SettingsView: View {
     @AppStorage("showAds") var showAds: Bool = true
+    @AppStorage(DetailSheetLayoutVariant.storageKey) private var layoutVariantRaw: String = DetailSheetLayoutVariant.controlsAbove.rawValue
+    @AppStorage(HeartStyleVariant.storageKey) private var heartVariantRaw: String = HeartStyleVariant.flat.rawValue
+    @AppStorage("nutrition.macroLabelsUppercase") var macroLabelsUppercase: Bool = true
+    
+    private var layoutVariant: DetailSheetLayoutVariant {
+        DetailSheetLayoutVariant(rawValue: layoutVariantRaw) ?? .controlsAbove
+    }
+    
+    private var heartVariant: HeartStyleVariant {
+        HeartStyleVariant(rawValue: heartVariantRaw) ?? .flat
+    }
 
     var body: some View {
         NavigationStack {
             List {
                 Section("APP") {
                     Toggle("Show Ads", isOn: $showAds)
+                }
+                
+                Section("Detail Sheet Experiments") {
+                    Picker("Layout", selection: $layoutVariantRaw) {
+                        Text("Controls above").tag(DetailSheetLayoutVariant.controlsAbove.rawValue)
+                        Text("Calories above").tag(DetailSheetLayoutVariant.caloriesAbove.rawValue)
+                    }
+                    
+                    Picker("Heart Style", selection: $heartVariantRaw) {
+                        Text("Flat").tag(HeartStyleVariant.flat.rawValue)
+                        Text("Pill").tag(HeartStyleVariant.pill.rawValue)
+                    }
+                    
+                    Toggle("Macro labels in ALL CAPS", isOn: $macroLabelsUppercase)
                 }
 
                 Section("ACCOUNT") {

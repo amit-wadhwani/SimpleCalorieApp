@@ -62,6 +62,7 @@ struct FoodRowView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text("Add \(props.name)"))
+                .accessibilityIdentifier("Add \(props.name)")
             }
         }
         .padding(.horizontal, AppSpace.s16)

@@ -42,8 +42,17 @@ final class TodayQuickAddUITests: XCTestCase {
         XCTAssertTrue(addBreakfast.waitForExistence(timeout: 10), "Add Food button for Breakfast should exist")
         addBreakfast.tap()
 
-        let addChicken = app.buttons["Add Chicken Breast"]
-        XCTAssertTrue(addChicken.waitForExistence(timeout: 10), "Add Chicken Breast button should exist")
+        // Search for chicken to show results
+        let searchField = app.textFields["Search database..."]
+        if searchField.waitForExistence(timeout: 5) {
+            searchField.tap()
+            searchField.typeText("chicken")
+            // Wait for search results to load
+            sleep(1)
+        }
+
+        let addChicken = app.buttons["Add Chicken breast, cooked"]
+        XCTAssertTrue(addChicken.waitForExistence(timeout: 10), "Add Chicken breast, cooked button should exist")
         addChicken.tap()
 
         // Wait for the view to update - breakfast empty state should disappear
