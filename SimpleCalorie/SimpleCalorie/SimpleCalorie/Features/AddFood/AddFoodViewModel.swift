@@ -37,7 +37,7 @@ final class AddFoodViewModel: ObservableObject {
     @Published var isShowingDetail: Bool = false
     @Published var foodDetailState: FoodDetailState?
     
-    private let searchService: FoodSearchService
+    private let foodRepository: FoodDefinitionRepository
     var onFoodAdded: ((FoodItem, MealType) -> Void)?
     var onFoodAddedToDates: (([Date], FoodItem, MealType) -> Void)?
     var selectedDate: Date = Date() // Can be injected from TodayViewModel
@@ -53,23 +53,23 @@ final class AddFoodViewModel: ObservableObject {
         var baseDate: Date                                  // anchor date for schedule UI (doesn't change when toggling recurring)
     }
 
-    init(searchService: FoodSearchService) {
-        self.searchService = searchService
+    init(foodRepository: FoodDefinitionRepository) {
+        self.foodRepository = foodRepository
         Task { await refresh() }
     }
 
     func refresh() async {
         do {
-            results = try await searchService.searchFoods(matching: query)
+            results = try await foodRepository.searchFoods(query: query, limit: 100)
             rows = results.map { food in
                 let servingDescription = food.serving.description ?? "\(Int(food.serving.amount))\(food.serving.unit)"
                 return FoodRowProps(
                     id: food.id,
                     name: food.name,
                     serving: servingDescription,
-                    protein: "\(trim(food.macros.protein))g",
-                    carbs: "\(trim(food.macros.carbs))g",
-                    fat: "\(trim(food.macros.fat))g",
+                    protein: "\(trim(food.macros.protein)) g",
+                    carbs: "\(trim(food.macros.carbs)) g",
+                    fat: "\(trim(food.macros.fat)) g",
                     kcal: "\(food.macros.calories)"
                 )
             }
@@ -192,6 +192,33 @@ final class AddFoodViewModel: ObservableObject {
     }
 
     func didSelectFood(_ food: FoodDefinition) {
+        // For remote sources (e.g., FDC), load full details to get macros and serving options
+        if food.source.kind == .usda, let providerId = food.source.providerId, let fdcId = Int(providerId) {
+            // For FDC foods, we need to load full details to get macros
+            // Try to load via repository first (works if UUID is in mapping from search)
+            Task {
+                do {
+                    let fullFood = try await foodRepository.loadFood(by: food.id)
+                    await MainActor.run {
+                        self.setSelectedFoodAndInitializeState(fullFood)
+                    }
+                } catch {
+                    // If load fails (UUID not in mapping), try direct FDC lookup
+                    // This requires accessing FDCClient directly, which we can't do cleanly
+                    // For now, fall back to search result (may have 0 macros)
+                    // TODO: Consider adding loadFood(byFdcId:) to repository protocol
+                    await MainActor.run {
+                        self.setSelectedFoodAndInitializeState(food)
+                    }
+                }
+            }
+        } else {
+            // For local sources, use the food directly
+            setSelectedFoodAndInitializeState(food)
+        }
+    }
+    
+    private func setSelectedFoodAndInitializeState(_ food: FoodDefinition) {
         selectedFood = food
         isShowingDetail = true
 
@@ -202,7 +229,7 @@ final class AddFoodViewModel: ObservableObject {
 
         // Initialize recurring end date (default: today + 3 months)
         let defaultEndDate = calendar.date(byAdding: .month, value: 3, to: today) ?? today
-        
+
         // Initialize FoodDetailState
         // selectedServing = nil means "use base serving by default"
         // baseDate anchors the schedule UI and doesn't change when toggling recurring

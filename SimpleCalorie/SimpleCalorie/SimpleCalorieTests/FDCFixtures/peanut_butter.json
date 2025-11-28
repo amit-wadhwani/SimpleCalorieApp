@@ -1,0 +1,70 @@
+{
+  "fdcId": 172430,
+  "description": "Peanut butter, smooth style, with salt",
+  "brandOwner": null,
+  "dataType": "Foundation",
+  "foodPortions": [
+    {
+      "gramWeight": 16.0,
+      "amount": 1.0,
+      "modifier": "tbsp",
+      "measureUnit": {
+        "name": "tablespoon",
+        "abbreviation": "tbsp"
+      }
+    },
+    {
+      "gramWeight": 32.0,
+      "amount": 2.0,
+      "modifier": "tbsp",
+      "measureUnit": {
+        "name": "tablespoon",
+        "abbreviation": "tbsp"
+      }
+    },
+    {
+      "gramWeight": 100.0,
+      "amount": 1.0,
+      "modifier": null,
+      "measureUnit": {
+        "name": "gram",
+        "abbreviation": "g"
+      }
+    }
+  ],
+  "foodNutrients": [
+    {
+      "nutrient": {
+        "name": "Energy",
+        "unitName": "kcal",
+        "id": 1008
+      },
+      "amount": 588.0
+    },
+    {
+      "nutrient": {
+        "name": "Protein",
+        "unitName": "g",
+        "id": 1003
+      },
+      "amount": 25.09
+    },
+    {
+      "nutrient": {
+        "name": "Carbohydrate, by difference",
+        "unitName": "g",
+        "id": 1005
+      },
+      "amount": 19.56
+    },
+    {
+      "nutrient": {
+        "name": "Total lipid (fat)",
+        "unitName": "g",
+        "id": 1004
+      },
+      "amount": 50.39
+    }
+  ]
+}
+

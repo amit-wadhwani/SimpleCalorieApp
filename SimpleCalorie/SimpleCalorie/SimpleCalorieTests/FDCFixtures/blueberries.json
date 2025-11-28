@@ -1,0 +1,70 @@
+{
+  "fdcId": 173944,
+  "description": "Blueberries, raw",
+  "brandOwner": null,
+  "dataType": "Foundation",
+  "foodPortions": [
+    {
+      "gramWeight": 148.0,
+      "amount": 1.0,
+      "modifier": "cup",
+      "measureUnit": {
+        "name": "cup",
+        "abbreviation": "cup"
+      }
+    },
+    {
+      "gramWeight": 74.0,
+      "amount": 0.5,
+      "modifier": "cup",
+      "measureUnit": {
+        "name": "cup",
+        "abbreviation": "cup"
+      }
+    },
+    {
+      "gramWeight": 100.0,
+      "amount": 1.0,
+      "modifier": null,
+      "measureUnit": {
+        "name": "gram",
+        "abbreviation": "g"
+      }
+    }
+  ],
+  "foodNutrients": [
+    {
+      "nutrient": {
+        "name": "Energy",
+        "unitName": "kcal",
+        "id": 1008
+      },
+      "amount": 57.0
+    },
+    {
+      "nutrient": {
+        "name": "Protein",
+        "unitName": "g",
+        "id": 1003
+      },
+      "amount": 0.74
+    },
+    {
+      "nutrient": {
+        "name": "Carbohydrate, by difference",
+        "unitName": "g",
+        "id": 1005
+      },
+      "amount": 14.49
+    },
+    {
+      "nutrient": {
+        "name": "Total lipid (fat)",
+        "unitName": "g",
+        "id": 1004
+      },
+      "amount": 0.33
+    }
+  ]
+}
+

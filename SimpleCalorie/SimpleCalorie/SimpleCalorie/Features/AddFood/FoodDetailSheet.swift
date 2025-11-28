@@ -21,6 +21,8 @@ struct FoodDetailSheet: View {
     
     @State private var isFavorite: Bool
     @State private var showFullNutrition: Bool = false
+    @State private var showNutritionInfo: Bool = false
+    @State private var selectedMicronutrient: MicronutrientType?
     @State private var customAmountText: String = ""
     @State private var quantityText: String = "1.0"
     @State private var isCustomAmountActive: Bool = false
@@ -36,6 +38,8 @@ struct FoodDetailSheet: View {
     @AppStorage(DetailSheetLayoutVariant.storageKey) private var layoutVariantRaw: String = DetailSheetLayoutVariant.controlsAbove.rawValue
     @AppStorage(HeartStyleVariant.storageKey) private var heartVariantRaw: String = HeartStyleVariant.flat.rawValue
     @AppStorage("nutrition.macroLabelsUppercase") private var macroLabelsUppercase: Bool = true
+    @AppStorage("nutrition.micronutrientIconMode") private var micronutrientIconModeRaw: String = "neutralDot"
+    @AppStorage("nutrition.showInlineHints") private var showInlineHints: Bool = true
     
     private var layoutVariant: DetailSheetLayoutVariant {
         DetailSheetLayoutVariant(rawValue: layoutVariantRaw) ?? .controlsAbove
@@ -742,6 +746,15 @@ struct FoodDetailSheet: View {
             .sheet(isPresented: $showEndDatePicker) {
                 endDatePickerSheet
             }
+            .sheet(isPresented: $showNutritionInfo) {
+                NutritionInfoSheetView()
+            }
+            .sheet(item: $selectedMicronutrient) { nutrient in
+                NutrientDetailSheet(
+                    type: nutrient,
+                    amount: micronutrientAmount(for: nutrient)
+                )
+            }
             .onAppear {
                 quantityText = formatQuantity(state.quantity)
                 previousCalories = Double(scaledCalories)
@@ -799,9 +812,9 @@ struct FoodDetailSheet: View {
             
             // Row 2: Macro grid (3 columns)
             HStack(spacing: AppSpace.sm) {
-                macroColumn(label: "Protein", value: formatMacro(scaledProtein), color: AppColor.macroProtein)
-                macroColumn(label: "Carbs", value: formatMacro(scaledCarbs), color: AppColor.macroCarbs)
-                macroColumn(label: "Fat", value: formatMacro(scaledFat), color: AppColor.macroFat)
+                macroColumn(label: "Protein", value: scaledProtein, color: AppColor.macroProtein)
+                macroColumn(label: "Carbs", value: scaledCarbs, color: AppColor.macroCarbs)
+                macroColumn(label: "Fat", value: scaledFat, color: AppColor.macroFat)
             }
             
             // Row 3: View Full Nutrition (inside hero card)
@@ -817,9 +830,10 @@ struct FoodDetailSheet: View {
         )
     }
     
-    private func macroColumn(label: String, value: String, color: Color) -> some View {
+    private func macroColumn(label: String, value: Double, color: Color) -> some View {
         let displayLabel = macroLabelsUppercase ? label.uppercased() : label
         let percentage = totalMacros > 0 ? Int((getMacroValue(label: label) / totalMacros) * 100) : 0
+        let (number, unit) = formatMacroComponents(value)
         
         return VStack(spacing: 4) {
             // Macro name
@@ -827,10 +841,15 @@ struct FoodDetailSheet: View {
                 .font(.footnote)
                 .foregroundStyle(AppColor.textMuted)
             
-            // Macro value
-            Text(value)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(color)
+            // Macro value with separated number and unit (same font, size, weight, color)
+            HStack(spacing: 2) {
+                Text(number)
+                    .font(.subheadline.weight(.semibold))
+                
+                Text(unit)
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(color)
             
             // Percentage (optional, lighter font)
             Text("\(percentage)%")
@@ -849,6 +868,43 @@ struct FoodDetailSheet: View {
         }
     }
     
+    private func formatMacroComponents(_ value: Double) -> (String, String) {
+        if value.rounded() == value {
+            return ("\(Int(value))", "g")
+        } else {
+            return (String(format: "%.1f", value), "g")
+        }
+    }
+    
+    private func legendItem(for signal: MicronutrientSignal, label: String) -> some View {
+        let iconMode = MicronutrientIconMode.from(micronutrientIconModeRaw)
+        let color: Color = {
+            switch iconMode {
+            case .signal:
+                // Use the same signal palette as the inline rows
+                switch signal {
+                case .good:
+                    return Color(red: 0.26, green: 0.76, blue: 0.42)
+                case .moderate:
+                    return Color(red: 0.40, green: 0.55, blue: 0.86)
+                case .lowHigh:
+                    return Color(red: 0.96, green: 0.68, blue: 0.23)
+                }
+            case .neutralDot, .none:
+                return Color.gray.opacity(0.8)
+            }
+        }()
+        
+        return HStack(alignment: .center, spacing: 4) {
+            signal.icon(color: color)
+                .frame(width: 14, height: 14, alignment: .center)
+            
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(AppColor.textMuted)
+        }
+    }
+    
     private var fullNutritionRow: some View {
         VStack(spacing: AppSpace.sm) {
             // Centered, muted gray underlined link row
@@ -859,6 +915,8 @@ struct FoodDetailSheet: View {
                 Haptics.light()
             } label: {
                 HStack(spacing: 4) {
+                    Spacer()
+                    
                     Text("View Full Nutrition")
                         .font(.subheadline)
                         .foregroundStyle(AppColor.textMuted.opacity(0.7))
@@ -867,22 +925,66 @@ struct FoodDetailSheet: View {
                     Image(systemName: showFullNutrition ? "chevron.up" : "chevron.down")
                         .font(.caption)
                         .foregroundStyle(AppColor.textMuted)
+                    
+                    Spacer()
                 }
                 .padding(.vertical, 8)
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
             
+            // Divider below "View Full Nutrition"
+            if showFullNutrition {
+                Rectangle()
+                    .fill(AppColor.borderSubtle)
+                    .frame(height: 1)
+                    .padding(.top, 8)
+            }
+            
             // Micronutrient list when expanded
             if showFullNutrition {
-                VStack(alignment: .leading, spacing: AppSpace.sm) {
-                    nutritionRow(label: "Fiber", value: "0g")
-                    nutritionRow(label: "Sugar", value: "0g")
-                    nutritionRow(label: "Sodium", value: "0mg")
-                    nutritionRow(label: "Cholesterol", value: "0mg")
-                    nutritionRow(label: "Potassium", value: "0mg")
+                VStack(alignment: .leading, spacing: 10) {
+                    inlineMicronutrientRow(kind: .fiber, value: food.micronutrients?.fiber ?? 0)
+                    inlineMicronutrientRow(kind: .sugar, value: food.micronutrients?.sugar ?? 0)
+                    inlineMicronutrientRow(kind: .sodium, value: food.micronutrients?.sodium ?? 0)
+                    inlineMicronutrientRow(kind: .cholesterol, value: food.micronutrients?.cholesterol ?? 0)
+                    inlineMicronutrientRow(kind: .potassium, value: food.micronutrients?.potassium ?? 0)
+
+                    // Separator above legend (custom 1px line)
+                    Rectangle()
+                        .fill(AppColor.borderSubtle)
+                        .frame(height: 1)
+                        .padding(.top, 8)
+
+                    // Legend: centered (always shows signal icons for reference)
+                    HStack(alignment: .firstTextBaseline, spacing: 16) {
+                        legendItem(for: .good, label: "Good")
+                        legendItem(for: .moderate, label: "Moderate")
+                        legendItem(for: .lowHigh, label: "Low/High")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 6)
+
+                    // Centered hint with lightbulb (CTA with amber background)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "lightbulb")
+                            .font(.footnote)
+                            .foregroundStyle(Color.yellow.opacity(0.9))
+
+                        Text("Tap any nutrient to learn more")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 2)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.yellow.opacity(0.12))
+                    )
                 }
-                .padding(.top, AppSpace.sm)
+                .padding(.top, 8)
             }
         }
     }
@@ -1481,16 +1583,138 @@ struct FoodDetailSheet: View {
             .buttonStyle(.plain)
             
             if showFullNutrition {
-                VStack(alignment: .leading, spacing: AppSpace.sm) {
-                    nutritionRow(label: "Fiber", value: "0g")
-                    nutritionRow(label: "Sugar", value: "0g")
-                    nutritionRow(label: "Sodium", value: "0mg")
-                    nutritionRow(label: "Cholesterol", value: "0mg")
-                    nutritionRow(label: "Potassium", value: "0mg")
+                VStack(alignment: .leading, spacing: 10) {
+                    inlineMicronutrientRow(kind: .fiber, value: food.micronutrients?.fiber ?? 0)
+                    inlineMicronutrientRow(kind: .sugar, value: food.micronutrients?.sugar ?? 0)
+                    inlineMicronutrientRow(kind: .sodium, value: food.micronutrients?.sodium ?? 0)
+                    inlineMicronutrientRow(kind: .cholesterol, value: food.micronutrients?.cholesterol ?? 0)
+                    inlineMicronutrientRow(kind: .potassium, value: food.micronutrients?.potassium ?? 0)
+
+                    // Separator above legend (custom 1px line)
+                    Rectangle()
+                        .fill(AppColor.borderSubtle)
+                        .frame(height: 1)
+                        .padding(.top, 8)
+
+                    // Legend: centered (always shows signal icons for reference)
+                    HStack(alignment: .firstTextBaseline, spacing: 16) {
+                        legendItem(for: .good, label: "Good")
+                        legendItem(for: .moderate, label: "Moderate")
+                        legendItem(for: .lowHigh, label: "Low/High")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 6)
+
+                    // Centered hint with lightbulb (CTA with amber background)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "lightbulb")
+                            .font(.footnote)
+                            .foregroundStyle(Color.yellow.opacity(0.9))
+
+                        Text("Tap any nutrient to learn more")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 2)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.yellow.opacity(0.12))
+                    )
                 }
-                .padding(.top, AppSpace.sm)
+                .padding(.top, 8)
             }
         }
+    }
+    
+    // MARK: - Micronutrient Signal Colors
+    
+    private func inlineMicronutrientRow(kind: MicronutrientType, value: Double) -> some View {
+        let labelText = kind.displayTitle
+        let iconMode = MicronutrientIconMode.from(micronutrientIconModeRaw)
+        let signal = kind.signal(for: value)
+        
+        // Inline hint behavior
+        let hint = kind.inlineHint(for: value, alwaysShow: showInlineHints)
+        
+        let unit = kind.isMilligramBased ? "mg" : "g"
+        let formattedValue = formatMicronutrient(value, unit: unit)
+        
+        // Icon color based on icon mode
+        let iconColor: Color = {
+            switch iconMode {
+            case .signal:
+                return signal.defaultColor
+            case .neutralDot, .none:
+                return Color.gray.opacity(0.8)
+            }
+        }()
+        
+        return Button {
+            selectedMicronutrient = kind
+            Haptics.light()
+        } label: {
+            HStack(alignment: .center, spacing: 8) {
+                // Column 1: Fixed icon column (16pt)
+                Group {
+                    switch iconMode {
+                    case .signal:
+                        // Use signal-colored icons
+                        signal.icon(color: iconColor)
+                            .frame(width: 16, alignment: .center)
+                    case .neutralDot:
+                        // Small gray filled circle
+                        Circle()
+                            .fill(AppColor.textMuted)
+                            .frame(width: 6, height: 6)
+                            .frame(width: 16, alignment: .center)
+                    case .none:
+                        // Remove icon column but keep spacing
+                        Spacer()
+                            .frame(width: 16)
+                    }
+                }
+
+                // Column 2: Flexible label+hint column
+                Group {
+                    if let hint = hint {
+                        HStack(spacing: 6) {
+                            Text(labelText)
+                                .font(.system(size: 15, weight: .regular))
+                                .foregroundStyle(AppColor.textTitle)
+                            Text("—")
+                                .font(.system(size: 15, weight: .regular))
+                                .foregroundStyle(AppColor.textMuted)
+                            Text(hint)
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundStyle(AppColor.textMuted)
+                        }
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    } else {
+                        Text(labelText)
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundStyle(AppColor.textTitle)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                }
+
+                Spacer(minLength: 8)
+
+                // Column 3: Fixed value column (~56pt) aligned right
+                Text(formattedValue)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(AppColor.textTitle)
+                    .frame(width: 56, alignment: .trailing)
+                    .minimumScaleFactor(0.9)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
     }
     
     private func nutritionRow(label: String, value: String) -> some View {
@@ -1740,11 +1964,39 @@ struct FoodDetailSheet: View {
     
     // MARK: - Helpers
     
-    private func formatMacro(_ value: Double) -> String {
-        if value.rounded() == value {
-            return "\(Int(value))g"
+    private func micronutrientAmount(for type: MicronutrientType) -> Double? {
+        guard let micros = food.micronutrients else { return nil }
+        switch type {
+        case .fiber:       return micros.fiber         // grams
+        case .sugar:       return micros.sugar         // grams
+        case .sodium:      return micros.sodium        // mg
+        case .cholesterol: return micros.cholesterol   // mg
+        case .potassium:   return micros.potassium     // mg
         }
-        return String(format: "%.1fg", value)
+    }
+    
+    private func formatMicronutrient(_ value: Double, unit: String) -> String {
+        let thinSpace = "\u{2009}"
+
+        if value == 0 {
+            return "0" + thinSpace + unit
+        }
+
+        if unit == "g" {
+            if value.rounded() == value {
+                return "\(Int(value))" + thinSpace + unit
+            } else {
+                return String(format: "%.1f", value) + thinSpace + unit
+            }
+        } else {
+            // mg: integer with thin space
+            return "\(Int(value.rounded()))" + thinSpace + unit
+        }
+    }
+    
+    private func formatMacro(_ value: Double) -> String {
+        let (number, unit) = formatMacroComponents(value)
+        return "\(number) \(unit)"
     }
     
     private func formatQuantity(_ value: Double) -> String {
@@ -1824,3 +2076,80 @@ struct DonutSegment: View {
     
     return PreviewWrapper()
 }
+
+// MARK: - Nutrition Info Sheet
+
+struct NutritionInfoSheetView: View {
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Why these nutrients matter")
+                        .font(.headline)
+                        .padding(.bottom, 4)
+                    
+                    Group {
+                        Text("Fiber")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Supports digestion, helps you feel full, and can help stabilize blood sugar. Many adults aim for around 25–35 g per day, depending on their needs.")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    
+                    Group {
+                        Text("Sugar")
+                            .font(.subheadline.weight(.semibold))
+                        Text("High added sugar over time can impact energy levels and metabolic health. Many guidelines suggest limiting added sugars, even if natural sugars (like in fruit) are part of a healthy diet.")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    
+                    Group {
+                        Text("Sodium")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Sodium is essential, but too much over time can stress blood pressure. Many health organizations suggest staying below about 2,300 mg per day, and some people benefit from even less.")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    
+                    Group {
+                        Text("Cholesterol")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Cholesterol in food is just one part of heart health, but consistently very high intakes, alongside other factors, can be a risk. Trends over time matter more than a single meal.")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    
+                    Group {
+                        Text("Potassium")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Potassium helps muscles and nerves work properly and can help balance sodium's effects on blood pressure. Many people get less than they could benefit from.")
+                            .font(.footnote)
+                            .foregroundStyle(AppColor.textMuted)
+                    }
+                    
+                    Text("These notes are general information, not medical advice. Your own ideal ranges can vary based on your health and goals.")
+                        .font(.footnote)
+                        .foregroundStyle(AppColor.textMuted)
+                        .padding(.top, 8)
+                }
+                .padding()
+            }
+            .navigationTitle("About These Nutrients")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+// MARK: - Micronutrient Icon Mode (local to FoodDetailSheet)
+
+fileprivate enum MicronutrientIconMode: String {
+    case signal
+    case neutralDot
+    case none
+    
+    static func from(_ raw: String) -> MicronutrientIconMode {
+        MicronutrientIconMode(rawValue: raw) ?? .neutralDot
+    }
+}
+

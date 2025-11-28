@@ -1,0 +1,61 @@
+{
+  "fdcId": 173424,
+  "description": "Egg, whole, cooked, hard-boiled",
+  "brandOwner": null,
+  "dataType": "Foundation",
+  "foodPortions": [
+    {
+      "gramWeight": 50.0,
+      "amount": 1.0,
+      "modifier": "large egg",
+      "measureUnit": {
+        "name": "item",
+        "abbreviation": "item"
+      }
+    },
+    {
+      "gramWeight": 100.0,
+      "amount": 1.0,
+      "modifier": null,
+      "measureUnit": {
+        "name": "gram",
+        "abbreviation": "g"
+      }
+    }
+  ],
+  "foodNutrients": [
+    {
+      "nutrient": {
+        "name": "Energy",
+        "unitName": "kcal",
+        "id": 1008
+      },
+      "amount": 155.0
+    },
+    {
+      "nutrient": {
+        "name": "Protein",
+        "unitName": "g",
+        "id": 1003
+      },
+      "amount": 12.6
+    },
+    {
+      "nutrient": {
+        "name": "Carbohydrate, by difference",
+        "unitName": "g",
+        "id": 1005
+      },
+      "amount": 1.12
+    },
+    {
+      "nutrient": {
+        "name": "Total lipid (fat)",
+        "unitName": "g",
+        "id": 1004
+      },
+      "amount": 10.6
+    }
+  ]
+}
+

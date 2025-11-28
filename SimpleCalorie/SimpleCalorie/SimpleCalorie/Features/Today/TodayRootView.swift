@@ -73,6 +73,8 @@ struct SettingsView: View {
     @AppStorage(DetailSheetLayoutVariant.storageKey) private var layoutVariantRaw: String = DetailSheetLayoutVariant.controlsAbove.rawValue
     @AppStorage(HeartStyleVariant.storageKey) private var heartVariantRaw: String = HeartStyleVariant.flat.rawValue
     @AppStorage("nutrition.macroLabelsUppercase") var macroLabelsUppercase: Bool = true
+    @AppStorage("nutrition.micronutrientIconMode") private var micronutrientIconModeRaw: String = "neutralDot"
+    @AppStorage("nutrition.showInlineHints") private var showInlineHints: Bool = true
     
     private var layoutVariant: DetailSheetLayoutVariant {
         DetailSheetLayoutVariant(rawValue: layoutVariantRaw) ?? .controlsAbove
@@ -101,11 +103,37 @@ struct SettingsView: View {
                     }
                     
                     Toggle("Macro labels in ALL CAPS", isOn: $macroLabelsUppercase)
+                    
+                    Picker("Nutrient icons", selection: $micronutrientIconModeRaw) {
+                        Text("Signal colors").tag("signal")
+                        Text("Neutral dot").tag("neutralDot")
+                        Text("No icon").tag("none")
+                    }
+                    
+                    Toggle("Always show nutrient context", isOn: $showInlineHints)
                 }
 
                 Section("ACCOUNT") {
                     Text("Profile (coming soon)")
                 }
+                
+                #if DEBUG
+                Section("DEBUG") {
+                    NavigationLink("Food Repo Mode") {
+                        FoodRepositoryModeDebugView()
+                    }
+                    
+                    NavigationLink("Food Repo Diagnostics") {
+                        let repo = FoodRepositoryFactory.makeRepository(mode: FoodRepositoryModeSetting.current())
+                        FoodRepositoryDiagnosticsView(repository: repo)
+                    }
+                    
+                    NavigationLink("Run Provider Nutrient Sweep (FDC)") {
+                        let repo = FoodRepositoryFactory.makeRepository(mode: FoodRepositoryModeSetting.current())
+                        NutrientSweepDebugView(repository: repo)
+                    }
+                }
+                #endif
             }
             .navigationTitle("Settings")
         }

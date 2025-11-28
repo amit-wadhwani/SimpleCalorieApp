@@ -1,0 +1,70 @@
+{
+  "fdcId": 173944,
+  "description": "Oats, dry",
+  "brandOwner": null,
+  "dataType": "Foundation",
+  "foodPortions": [
+    {
+      "gramWeight": 40.0,
+      "amount": 0.5,
+      "modifier": "cup dry",
+      "measureUnit": {
+        "name": "cup",
+        "abbreviation": "cup"
+      }
+    },
+    {
+      "gramWeight": 80.0,
+      "amount": 1.0,
+      "modifier": "cup dry",
+      "measureUnit": {
+        "name": "cup",
+        "abbreviation": "cup"
+      }
+    },
+    {
+      "gramWeight": 100.0,
+      "amount": 1.0,
+      "modifier": null,
+      "measureUnit": {
+        "name": "gram",
+        "abbreviation": "g"
+      }
+    }
+  ],
+  "foodNutrients": [
+    {
+      "nutrient": {
+        "name": "Energy",
+        "unitName": "kcal",
+        "id": 1008
+      },
+      "amount": 389.0
+    },
+    {
+      "nutrient": {
+        "name": "Protein",
+        "unitName": "g",
+        "id": 1003
+      },
+      "amount": 16.9
+    },
+    {
+      "nutrient": {
+        "name": "Carbohydrate, by difference",
+        "unitName": "g",
+        "id": 1005
+      },
+      "amount": 66.3
+    },
+    {
+      "nutrient": {
+        "name": "Total lipid (fat)",
+        "unitName": "g",
+        "id": 1004
+      },
+      "amount": 6.9
+    }
+  ]
+}
+

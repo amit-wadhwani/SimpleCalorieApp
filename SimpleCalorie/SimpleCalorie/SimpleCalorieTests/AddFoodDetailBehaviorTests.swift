@@ -7,8 +7,8 @@ final class AddFoodDetailBehaviorTests: XCTestCase {
     // MARK: - Helpers
     
     private func makeViewModelWith(food: FoodDefinition) -> AddFoodViewModel {
-        let searchService = StubFoodSearchService(foods: [food])
-        let viewModel = AddFoodViewModel(searchService: searchService)
+        let repo = TestFoodRepository(foods: [food])
+        let viewModel = AddFoodViewModel(foodRepository: repo)
         return viewModel
     }
     
@@ -281,19 +281,4 @@ final class AddFoodDetailBehaviorTests: XCTestCase {
     }
 }
 
-// MARK: - Helper
-
-private struct StubFoodSearchService: FoodSearchService {
-    let foods: [FoodDefinition]
-    
-    func searchFoods(matching query: String) async throws -> [FoodDefinition] {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return foods }
-        return foods.filter { $0.name.lowercased().contains(trimmed.lowercased()) }
-    }
-    
-    func lookupFood(byBarcode barcode: String) async throws -> FoodDefinition? {
-        return nil
-    }
-}
 

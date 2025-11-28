@@ -1,0 +1,61 @@
+{
+  "fdcId": 171688,
+  "description": "Apple, raw, with skin",
+  "brandOwner": null,
+  "dataType": "Foundation",
+  "foodPortions": [
+    {
+      "gramWeight": 182.0,
+      "amount": 1.0,
+      "modifier": "medium apple",
+      "measureUnit": {
+        "name": "item",
+        "abbreviation": "item"
+      }
+    },
+    {
+      "gramWeight": 100.0,
+      "amount": 1.0,
+      "modifier": null,
+      "measureUnit": {
+        "name": "gram",
+        "abbreviation": "g"
+      }
+    }
+  ],
+  "foodNutrients": [
+    {
+      "nutrient": {
+        "name": "Energy",
+        "unitName": "kcal",
+        "id": 1008
+      },
+      "amount": 52.0
+    },
+    {
+      "nutrient": {
+        "name": "Protein",
+        "unitName": "g",
+        "id": 1003
+      },
+      "amount": 0.26
+    },
+    {
+      "nutrient": {
+        "name": "Carbohydrate, by difference",
+        "unitName": "g",
+        "id": 1005
+      },
+      "amount": 13.81
+    },
+    {
+      "nutrient": {
+        "name": "Total lipid (fat)",
+        "unitName": "g",
+        "id": 1004
+      },
+      "amount": 0.17
+    }
+  ]
+}
+

@@ -2,6 +2,11 @@
 
 This document is for automated coding agents (like OpenAI Codex) that work on this repo.
 
+## Project Progress Tracking
+
+**Project progress and plan are maintained in `docs/ProjectSpine.md`.**  
+Update this file whenever you complete a significant phase, sub-phase, or add/remove active threads and parking-lot items. The spine serves as the canonical source of truth for project status and should be kept current with each major milestone.
+
 ## Tech Stack
 
 - **Platform:** iOS, SwiftUI, iOS 17+
@@ -138,3 +143,29 @@ If in doubt about choices, prefer:
   - Expectation: UI tests are slower and **not** required on every change. Run them before important releases or when a task explicitly targets UI flows. If a change breaks UI tests, open/follow a dedicated task to repair and re-run them.
 
 > Note: This Linux sandbox cannot run `xcodebuild`; execute the above commands on macOS or in CI.
+
+## Debug Tools
+
+### Provider Nutrient Name Sweeper
+
+A debug-only tool (`Features/Debug/ProviderSweep/NutrientNameSweeper.swift`) that sweeps provider API responses to collect unique nutrient names for validation and test data generation.
+
+**Usage:**
+1. In DEBUG builds, navigate to Settings → DEBUG → "Run Provider Nutrient Sweep (FDC)"
+2. Tap the button to run the sweep
+3. Results are saved to `DebugOutput/Seed_NutrientNames_fdc.json` (gitignored)
+4. The file contains:
+   - Provider name (e.g., "FDC")
+   - Search and detail response counts
+   - Sorted array of unique nutrient names
+   - Generation timestamp
+
+**Generating Seed JSON for Provider Vocabularies:**
+- Run the sweeper from the debug menu
+- Check Xcode console for file path: `📁 Saved to: [path]`
+- The generated JSON can be used as test fixtures or to validate nutrient name mappings
+- File location: `Documents/DebugOutput/Seed_NutrientNames_fdc.json` (in simulator) or device Documents folder
+
+**Testing:**
+- `ProviderSweepTests` validates the sweeper result structure and encoding
+- Tests verify unique nutrient names are properly deduplicated and sorted

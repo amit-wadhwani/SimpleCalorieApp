@@ -14,8 +14,15 @@ struct AddFoodView: View {
     init(initialSelectedMeal: MealType, onFoodAdded: ((FoodItem, MealType) -> Void)? = nil) {
         self.onFoodAdded = onFoodAdded
         self._activeMeal = State(initialValue: initialSelectedMeal) // source of truth on open
-        let foodSearchService = LocalDemoFoodSearchService()
-        let viewModel = AddFoodViewModel(searchService: foodSearchService)
+        
+        #if DEBUG
+        let repoMode = FoodRepositoryModeSetting.current()
+        #else
+        let repoMode: FoodRepositoryMode = .localOnly
+        #endif
+        
+        let foodRepository = FoodRepositoryFactory.makeRepository(mode: repoMode)
+        let viewModel = AddFoodViewModel(foodRepository: foodRepository)
         viewModel.onFoodAdded = onFoodAdded
         // onFoodAddedToDates will be set in onAppear when we have access to todayViewModel
         self._searchViewModel = StateObject(wrappedValue: viewModel)

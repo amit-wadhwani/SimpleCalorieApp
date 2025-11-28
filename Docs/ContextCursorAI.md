@@ -1,8 +1,10 @@
-Awesome—let’s hand this off to Cursor cleanly. Below is everything it needs (context, structure, file-by-file tasks, token mapping, and step order), plus the exact prompt line it expects.
+Awesome—let's hand this off to Cursor cleanly. Below is everything it needs (context, structure, file-by-file tasks, token mapping, and step order), plus the exact prompt line it expects.
 
 ⸻
 
 Place this file at: Docs/ContextCursorAI.md
+
+**Note:** Project progress and plan are maintained in `docs/ProjectSpine.md`. Update this file whenever you complete a significant phase or add a new active thread.
 
 Project one-pager
 
